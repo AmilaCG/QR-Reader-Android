@@ -5,8 +5,8 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <TextureView
-        android:id="@+id/texture_view"
+    <SurfaceView
+        android:id="@+id/camera_viewfinder"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 

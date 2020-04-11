@@ -9,7 +9,7 @@ import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.os.Bundle;
 import android.util.Size;
-import android.view.TextureView;
+import android.view.SurfaceView;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -20,42 +20,20 @@ public class MainActivity extends Activity {
 
     private static final String TAG = "QRScanner";
 
-    private TextureView mTextureView;
+    private SurfaceView mCameraViewfinder;
     private Size mPreviewSize;
     private String mCameraId;
-
-    private TextureView.SurfaceTextureListener mSurfaceTextureListner = new TextureView.SurfaceTextureListener() {
-        @Override
-        public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
-            setupCamera(width, height);
-        }
-
-        @Override
-        public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
-
-        }
-
-        @Override
-        public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-            return false;
-        }
-
-        @Override
-        public void onSurfaceTextureUpdated(SurfaceTexture surface) {
-
-        }
-    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        createTextureView();
+        initViewfinder();
     }
 
-    private void createTextureView() {
-        mTextureView = findViewById(R.id.texture_view);
+    private void initViewfinder() {
+        mCameraViewfinder = findViewById(R.id.camera_viewfinder);
 
     }
 
@@ -63,11 +41,6 @@ public class MainActivity extends Activity {
     protected void onResume() {
         super.onResume();
 
-        if(mTextureView.isAvailable()) {
-            mSurfaceTextureListner.onSurfaceTextureAvailable(mTextureView.getSurfaceTexture(), mTextureView.getWidth(), mTextureView.getHeight());
-        }else {
-            mTextureView.setSurfaceTextureListener(mSurfaceTextureListner);
-        }
     }
 
     @Override
