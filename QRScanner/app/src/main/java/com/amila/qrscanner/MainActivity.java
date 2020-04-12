@@ -1,20 +1,19 @@
 package com.amila.qrscanner;
 
 import android.app.Activity;
-import android.content.Context;
-import android.graphics.SurfaceTexture;
-import android.hardware.camera2.CameraAccessException;
-import android.hardware.camera2.CameraCharacteristics;
-import android.hardware.camera2.CameraManager;
-import android.hardware.camera2.params.StreamConfigurationMap;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.Size;
+import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.WindowManager;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import com.google.android.gms.vision.CameraSource;
+import com.google.android.gms.vision.Detector;
+import com.google.android.gms.vision.barcode.Barcode;
+import com.google.android.gms.vision.barcode.BarcodeDetector;
+
+import java.io.IOException;
 
 public class MainActivity extends Activity {
 
@@ -22,12 +21,13 @@ public class MainActivity extends Activity {
 
     private SurfaceView mCameraViewfinder;
     private Size mPreviewSize;
-    private String mCameraId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         initViewfinder();
     }
@@ -35,6 +35,48 @@ public class MainActivity extends Activity {
     private void initViewfinder() {
         mCameraViewfinder = findViewById(R.id.camera_viewfinder);
 
+        BarcodeDetector barcodeDetector = new BarcodeDetector.Builder(this).build();
+        final CameraSource cameraSource = new CameraSource.Builder(this, barcodeDetector)
+                .setAutoFocusEnabled(true)
+                .setFacing(CameraSource.CAMERA_FACING_BACK)
+                //.setRequestedPreviewSize(mPreviewSize.getWidth(), mPreviewSize.getHeight())
+                .build();
+
+        mCameraViewfinder.getHolder().addCallback(new SurfaceHolder.Callback() {
+            @Override
+            public void surfaceCreated(SurfaceHolder holder) {
+                Log.d(TAG,"surfaceCreated");
+                try {
+                    cameraSource.start(mCameraViewfinder.getHolder());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+
+            }
+
+            @Override
+            public void surfaceDestroyed(SurfaceHolder holder) {
+                Log.d(TAG,"surfaceDestroyed");
+                cameraSource.stop();
+            }
+        });
+
+        barcodeDetector.setProcessor(new Detector.Processor<Barcode>() {
+            @Override
+            public void release() {
+
+            }
+
+            @Override
+            public void receiveDetections(Detector.Detections<Barcode> detections) {
+                String result = detections.getDetectedItems().valueAt(0).rawValue;
+                Log.d(TAG,"Barcode decoded: " + result);
+            }
+        });
     }
 
     @Override
@@ -47,49 +89,5 @@ public class MainActivity extends Activity {
     protected void onPause() {
         super.onPause();
 
-    }
-
-    private void setupCamera(int width, int height) {
-        CameraManager cameraManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
-        try {
-            // Iterating through camera id's to get back camera's stream configuration map
-            for(String cameraId : cameraManager.getCameraIdList()) {
-                CameraCharacteristics cameraCharacteristics = cameraManager.getCameraCharacteristics(cameraId);
-                if(cameraCharacteristics.get(CameraCharacteristics.LENS_FACING) == CameraCharacteristics.LENS_FACING_FRONT) {
-                    continue;
-                }
-                StreamConfigurationMap streamConfigMap = cameraCharacteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
-                Size[] sizes = streamConfigMap.getOutputSizes(SurfaceTexture.class);
-                mPreviewSize = getPreferredPreviewSize(sizes, width, height);
-                mCameraId = cameraId;
-                return;
-            }
-        } catch (CameraAccessException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private Size getPreferredPreviewSize(Size[] mapSizes, int width, int height) {
-        List<Size> sizesCollector = new ArrayList();
-        for(Size option : mapSizes) {
-            if(height > width) {
-                if(option.getWidth() > height && option.getHeight() > width) {
-                    sizesCollector.add(option);
-                }
-            } else {
-                if(option.getWidth() > width && option.getHeight() > height) {
-                    sizesCollector.add(option);
-                }
-            }
-        }
-        if(sizesCollector.size() > 0) {
-            return Collections.min(sizesCollector, new Comparator<Size>() {
-                @Override
-                public int compare(Size o1, Size o2) {
-                    return Long.signum(o1.getWidth() * o1.getHeight() - o2.getWidth() * o2.getHeight());
-                }
-            });
-        }
-        return mapSizes[0];
     }
 }
