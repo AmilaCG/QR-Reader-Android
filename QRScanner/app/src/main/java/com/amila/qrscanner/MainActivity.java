@@ -14,6 +14,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
@@ -24,6 +25,7 @@ import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
 import com.google.android.material.snackbar.Snackbar;
 
+import java.io.File;
 import java.io.IOException;
 
 public class MainActivity extends Activity {
@@ -32,10 +34,11 @@ public class MainActivity extends Activity {
 
     private static final int RC_HANDLE_CAMERA_PERM = 2;
 
-    private SurfaceView mCameraViewfinder;
+    private SurfaceView mSurfaceView;
     private Size mPreviewSize;
     private Context mContext;
-    private BarcodeDetector mBarcodeDetector;
+    private CameraSource mCameraSource;
+    private boolean mUseFlash = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,10 +47,12 @@ public class MainActivity extends Activity {
         mContext = this;
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        mSurfaceView = findViewById(R.id.camera_viewfinder);
 
         int rc = ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
         if (rc == PackageManager.PERMISSION_GRANTED) {
-            initViewfinder();
+            initCamera(mUseFlash);
+            setupViewfinder();
         } else {
             requestCameraPermission();
         }
@@ -67,40 +72,9 @@ public class MainActivity extends Activity {
 
     }
 
-    private void initViewfinder() {
-        mCameraViewfinder = findViewById(R.id.camera_viewfinder);
-
-        mBarcodeDetector = new BarcodeDetector.Builder(this).build();
-        final CameraSource cameraSource = new CameraSource.Builder(this, mBarcodeDetector)
-                .setAutoFocusEnabled(true)
-                .setFacing(CameraSource.CAMERA_FACING_BACK)
-                //.setRequestedPreviewSize(mPreviewSize.getWidth(), mPreviewSize.getHeight())
-                .build();
-
-        mCameraViewfinder.getHolder().addCallback(new SurfaceHolder.Callback() {
-            @Override
-            public void surfaceCreated(SurfaceHolder holder) {
-                Log.d(TAG,"surfaceCreated");
-                try {
-                    cameraSource.start(mCameraViewfinder.getHolder());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-
-            }
-
-            @Override
-            public void surfaceDestroyed(SurfaceHolder holder) {
-                Log.d(TAG,"surfaceDestroyed");
-                cameraSource.stop();
-            }
-        });
-
-        mBarcodeDetector.setProcessor(new Detector.Processor<Barcode>() {
+    private void initCamera(boolean useFlash) {
+        BarcodeDetector barcodeDetector = new BarcodeDetector.Builder(this).build();
+        barcodeDetector.setProcessor(new Detector.Processor<Barcode>() {
             @Override
             public void release() {
                 Log.d(TAG,"barcodeDetector Processor release");
@@ -118,6 +92,51 @@ public class MainActivity extends Activity {
                 }
             }
         });
+
+        if (!barcodeDetector.isOperational()) {
+            Log.w(TAG, "Detector dependencies are not available");
+
+            File cacheDir = getCacheDir();
+            // Check for low storage
+            if (cacheDir.getFreeSpace() * 100 / cacheDir.getTotalSpace() <= 10) {
+                Toast.makeText(this, R.string.low_storage_error, Toast.LENGTH_LONG).show();
+                Log.w(TAG, getString(R.string.low_storage_error));
+            } else {
+                Log.e(TAG, getString(R.string.unknown_download_error));
+            }
+        }
+
+        mCameraSource = new CameraSource.Builder(this, barcodeDetector)
+                .setFacing(CameraSource.CAMERA_FACING_BACK)
+                .setAutoFocusEnabled(true)
+                //.setRequestedPreviewSize(mPreviewSize.getWidth(), mPreviewSize.getHeight())
+                .build();
+        //TODO: Need to implement a method to use flasher
+    }
+
+    private void setupViewfinder() {
+        mSurfaceView.getHolder().addCallback(new SurfaceHolder.Callback() {
+            @Override
+            public void surfaceCreated(SurfaceHolder holder) {
+                Log.d(TAG,"surfaceCreated");
+                try {
+                    mCameraSource.start(mSurfaceView.getHolder());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+
+            }
+
+            @Override
+            public void surfaceDestroyed(SurfaceHolder holder) {
+                Log.d(TAG,"surfaceDestroyed");
+                mCameraSource.stop();
+            }
+        });
     }
 
     @Override
@@ -130,7 +149,8 @@ public class MainActivity extends Activity {
 
         if (grantResults.length != 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             Log.d(TAG, "Camera permission granted");
-            initViewfinder();
+            initCamera(mUseFlash);
+            setupViewfinder();
             return;
         }
 
@@ -173,5 +193,9 @@ public class MainActivity extends Activity {
                 Snackbar.LENGTH_INDEFINITE)
                 .setAction("OK", listener)
                 .show();
+    }
+
+    public void toggleFlash(View view) {
+        mUseFlash = !mUseFlash;
     }
 }
