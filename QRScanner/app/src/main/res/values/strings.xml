@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">QR Code Reader</string>
+    <string name="request_camera_permission">Need to access the camera for scanning</string>
+    <string name="no_camera_permission">This application cannot run because it does not have the camera permission. The application will now exit.</string>
 </resources>
