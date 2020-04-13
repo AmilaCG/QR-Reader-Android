@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.hardware.Camera;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.Size;
@@ -19,7 +20,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 
-import com.google.android.gms.vision.CameraSource;
+import com.amila.qrscanner.camera.CameraSource;
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
@@ -108,10 +109,11 @@ public class MainActivity extends Activity {
 
         mCameraSource = new CameraSource.Builder(this, barcodeDetector)
                 .setFacing(CameraSource.CAMERA_FACING_BACK)
-                .setAutoFocusEnabled(true)
-                //.setRequestedPreviewSize(mPreviewSize.getWidth(), mPreviewSize.getHeight())
+                .setRequestedPreviewSize(1280, 720)
+                .setRequestedFps(20.0f)
+                .setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE)
+                .setFlashMode(useFlash ? Camera.Parameters.FLASH_MODE_TORCH : null)
                 .build();
-        //TODO: Need to implement a method to use flasher
     }
 
     private void setupViewfinder() {
@@ -195,6 +197,7 @@ public class MainActivity extends Activity {
                 .show();
     }
 
+    //TODO: Need to find a method to toggle flash on runtime
     public void toggleFlash(View view) {
         mUseFlash = !mUseFlash;
     }
