@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.util.Log;
@@ -73,6 +74,7 @@ public class MainActivity extends Activity {
             initCamera(mUseFlash);
             mSurfaceView.setVisibility(View.VISIBLE);
         } else {
+            getWindow().getDecorView().setBackgroundColor(Color.BLACK);
             requestCameraPermission();
         }
     }
@@ -81,7 +83,7 @@ public class MainActivity extends Activity {
     protected void onResume() {
         super.onResume();
         Log.d(TAG,"onResume");
-
+        initCamera(mUseFlash);
     }
 
     @Override
@@ -92,7 +94,10 @@ public class MainActivity extends Activity {
     }
 
     private void initCamera(boolean useFlash) {
-        BarcodeDetector barcodeDetector = new BarcodeDetector.Builder(this).build();
+        final BarcodeDetector barcodeDetector = new BarcodeDetector.Builder(this)
+                .setBarcodeFormats(Barcode.QR_CODE | Barcode.DATA_MATRIX | Barcode.AZTEC)
+                .build();
+
         barcodeDetector.setProcessor(new Detector.Processor<Barcode>() {
             @Override
             public void release() {
@@ -101,13 +106,15 @@ public class MainActivity extends Activity {
 
             @Override
             public void receiveDetections(Detector.Detections<Barcode> detections) {
-                if(detections.getDetectedItems().size() > 0) {
-                    String result = detections.getDetectedItems().valueAt(0).rawValue;
+                if(detections.getDetectedItems().size() != 0) {
+                    String result = detections.getDetectedItems().valueAt(0).displayValue;
                     Log.d(TAG,"Barcode decoded: " + result);
 
                     Intent intent = new Intent(mContext, BarcodeResultActivity.class);
                     intent.putExtra("barcode", result);
                     startActivity(intent);
+
+                    barcodeDetector.release();
                 }
             }
         });
@@ -138,6 +145,7 @@ public class MainActivity extends Activity {
         mSurfaceView.getHolder().addCallback(new SurfaceHolder.Callback() {
             @Override
             public void surfaceCreated(SurfaceHolder holder) {
+                Log.d(TAG, "surfaceCreated");
                 mIsSurfaceAvailable = true;
                 startCamera();
             }
@@ -149,6 +157,7 @@ public class MainActivity extends Activity {
 
             @Override
             public void surfaceDestroyed(SurfaceHolder holder) {
+                Log.d(TAG, "surfaceDestroyed");
                 mIsSurfaceAvailable = false;
                 mCameraSource.stop();
             }
@@ -156,7 +165,9 @@ public class MainActivity extends Activity {
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
         if (requestCode != RC_HANDLE_CAMERA_PERM) {
             Log.d(TAG, "Got unexpected permission result: " + requestCode);
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
