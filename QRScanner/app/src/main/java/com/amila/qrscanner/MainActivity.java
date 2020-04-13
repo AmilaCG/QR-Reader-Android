@@ -1,8 +1,10 @@
 package com.amila.qrscanner;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -21,6 +23,8 @@ import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 
 import com.amila.qrscanner.camera.CameraSource;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
@@ -33,13 +37,19 @@ public class MainActivity extends Activity {
 
     private static final String TAG = "QRScanner";
 
+    // Intent request code to handle updating play services if needed.
+    private static final int RC_HANDLE_GMS = 9001;
+
     private static final int RC_HANDLE_CAMERA_PERM = 2;
 
     private SurfaceView mSurfaceView;
+    private boolean mIsSurfaceAvailable;
+    private SurfaceHolder mSurfaceHolder;
+
     private Size mPreviewSize;
     private Context mContext;
     private CameraSource mCameraSource;
-    private boolean mUseFlash = false;
+    private boolean mUseFlash;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,13 +57,21 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         mContext = this;
 
+        mUseFlash = false;
+        mIsSurfaceAvailable = false;
+        mCameraSource = null;
+
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
         mSurfaceView = findViewById(R.id.camera_viewfinder);
+        mSurfaceView.setVisibility(View.GONE);
+        mSurfaceHolder = mSurfaceView.getHolder();
+        setupViewfinder();
 
         int rc = ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
         if (rc == PackageManager.PERMISSION_GRANTED) {
             initCamera(mUseFlash);
-            setupViewfinder();
+            mSurfaceView.setVisibility(View.VISIBLE);
         } else {
             requestCameraPermission();
         }
@@ -120,12 +138,8 @@ public class MainActivity extends Activity {
         mSurfaceView.getHolder().addCallback(new SurfaceHolder.Callback() {
             @Override
             public void surfaceCreated(SurfaceHolder holder) {
-                Log.d(TAG,"surfaceCreated");
-                try {
-                    mCameraSource.start(mSurfaceView.getHolder());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                mIsSurfaceAvailable = true;
+                startCamera();
             }
 
             @Override
@@ -135,7 +149,7 @@ public class MainActivity extends Activity {
 
             @Override
             public void surfaceDestroyed(SurfaceHolder holder) {
-                Log.d(TAG,"surfaceDestroyed");
+                mIsSurfaceAvailable = false;
                 mCameraSource.stop();
             }
         });
@@ -152,7 +166,7 @@ public class MainActivity extends Activity {
         if (grantResults.length != 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             Log.d(TAG, "Camera permission granted");
             initCamera(mUseFlash);
-            setupViewfinder();
+            mSurfaceView.setVisibility(View.VISIBLE);
             return;
         }
 
@@ -195,6 +209,27 @@ public class MainActivity extends Activity {
                 Snackbar.LENGTH_INDEFINITE)
                 .setAction("OK", listener)
                 .show();
+    }
+
+    @SuppressLint("MissingPermission")
+    private void startCamera() {
+        // Check that the device has play services available
+        int code = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(
+                getApplicationContext());
+        if (code != ConnectionResult.SUCCESS) {
+            Dialog dlg = GoogleApiAvailability.getInstance().getErrorDialog(this, code, RC_HANDLE_GMS);
+            dlg.show();
+        }
+
+        if (mCameraSource != null) {
+            if (mIsSurfaceAvailable) {
+                try {
+                    mCameraSource.start(mSurfaceHolder);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
     //TODO: Need to find a method to toggle flash on runtime
