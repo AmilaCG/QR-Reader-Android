@@ -10,7 +10,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.graphics.Rect;
 import android.hardware.Camera;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -45,6 +47,8 @@ public class MainActivity extends Activity {
     private static final int RC_HANDLE_GMS = 9001;
 
     private static final int RC_HANDLE_CAMERA_PERM = 2;
+
+    private static final int FULL_SCALE = 100;
 
     private SurfaceView mSurfaceView;
     private boolean mIsSurfaceAvailable;
@@ -85,6 +89,8 @@ public class MainActivity extends Activity {
         mSurfaceView.setVisibility(View.GONE);
         mSurfaceHolder = mSurfaceView.getHolder();
         setupViewfinder();
+
+        setPreviewSize();
 
         int rc = ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
         if (rc == PackageManager.PERMISSION_GRANTED) {
@@ -168,6 +174,9 @@ public class MainActivity extends Activity {
                     Intent intent = new Intent(mContext, BarcodeResultActivity.class);
                     intent.putExtra("barcode", result);
                     startActivity(intent);
+//                    Intent intent = new Intent(Intent.ACTION_VIEW);
+//                    intent.setData(Uri.parse(result));
+//                    startActivity(intent);
 
                     mBarcodeDetector.release();
                 }
@@ -197,7 +206,7 @@ public class MainActivity extends Activity {
 
         mCameraSource = new CameraSource.Builder(mContext, mBarcodeDetector)
                 .setFacing(CameraSource.CAMERA_FACING_BACK)
-                .setRequestedPreviewSize(1280, 720)
+                .setRequestedPreviewSize(mPreviewSize.getWidth(), mPreviewSize.getHeight())
                 .setRequestedFps(20.0f)
                 .setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE)
                 .setFlashMode(useFlash ? Camera.Parameters.FLASH_MODE_TORCH : null)
@@ -304,6 +313,21 @@ public class MainActivity extends Activity {
                 }
             }
         }
+    }
+
+    private void setPreviewSize() {
+        int scaleFactor = 65;
+
+        Rect displaySize = new Rect();
+        getWindowManager().getDefaultDisplay().getRectSize(displaySize);
+
+        mPreviewSize = new Size(displaySize.width() * scaleFactor / FULL_SCALE, displaySize.height() * scaleFactor / FULL_SCALE);
+        displaySize = null;
+
+        if (mPreviewSize.getHeight() > mPreviewSize.getWidth()) {
+            mPreviewSize = new Size(mPreviewSize.getHeight(), mPreviewSize.getWidth());
+        }
+        Log.d(TAG, "mPreviewSize width: " + mPreviewSize.getWidth() + ", height: " + mPreviewSize.getHeight());
     }
 
     //TODO: Need to find a method to toggle flash on runtime
