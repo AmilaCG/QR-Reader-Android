@@ -12,6 +12,8 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.hardware.Camera;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.util.Size;
 import android.view.SurfaceHolder;
@@ -24,6 +26,7 @@ import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 
 import com.amila.qrscanner.camera.CameraSource;
+
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.vision.Detector;
@@ -49,8 +52,19 @@ public class MainActivity extends Activity {
 
     private Size mPreviewSize;
     private Context mContext;
+
     private CameraSource mCameraSource;
+    private BarcodeDetector mBarcodeDetector;
+
     private boolean mUseFlash;
+
+    private Handler mTaskHandler;
+
+    public static class CameraState {
+        static final int INIT_CAMERA = 0;
+        static final int START_CAMERA = 1;
+        static final int RELEASE_CAMERA = 2;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,9 +72,12 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         mContext = this;
 
+        setupTaskHandler();
+
         mUseFlash = false;
         mIsSurfaceAvailable = false;
         mCameraSource = null;
+        mBarcodeDetector = null;
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
@@ -71,7 +88,8 @@ public class MainActivity extends Activity {
 
         int rc = ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
         if (rc == PackageManager.PERMISSION_GRANTED) {
-            initCamera(mUseFlash);
+            initBarcodeDetector();
+            mTaskHandler.sendEmptyMessage(CameraState.INIT_CAMERA);
             mSurfaceView.setVisibility(View.VISIBLE);
         } else {
             getWindow().getDecorView().setBackgroundColor(Color.BLACK);
@@ -79,34 +97,71 @@ public class MainActivity extends Activity {
         }
     }
 
+    private void setupTaskHandler() {
+        mTaskHandler = new Handler(this.getMainLooper()) {
+            @Override
+            public void handleMessage(@NonNull Message msg) {
+                super.handleMessage(msg);
+                switch (msg.what) {
+                    case CameraState.INIT_CAMERA:
+                        if (mCameraSource == null) initCamera(mUseFlash);
+                        break;
+
+                    case CameraState.START_CAMERA:
+                        startCamera();
+                        break;
+
+                    case CameraState.RELEASE_CAMERA:
+                        Log.d(TAG, "RELEASE_CAMERA called");
+                        if (mCameraSource != null) mCameraSource.release();
+                        mCameraSource = null;
+                        break;
+                }
+            }
+        };
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
         Log.d(TAG,"onResume");
-        initCamera(mUseFlash);
+        if (mBarcodeDetector == null) initBarcodeDetector();
+        mTaskHandler.sendEmptyMessage(CameraState.INIT_CAMERA);
+        mTaskHandler.sendEmptyMessage(CameraState.START_CAMERA);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         Log.d(TAG,"onPause");
-
+        if (mCameraSource != null) mCameraSource.stop();
     }
 
-    private void initCamera(boolean useFlash) {
-        final BarcodeDetector barcodeDetector = new BarcodeDetector.Builder(this)
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mCameraSource != null) {
+            mTaskHandler.sendEmptyMessage(CameraState.RELEASE_CAMERA);
+            mCameraSource = null;
+        }
+    }
+
+    private void initBarcodeDetector() {
+        mBarcodeDetector = new BarcodeDetector.Builder(this)
                 .setBarcodeFormats(Barcode.QR_CODE | Barcode.DATA_MATRIX | Barcode.AZTEC)
                 .build();
 
-        barcodeDetector.setProcessor(new Detector.Processor<Barcode>() {
+        mBarcodeDetector.setProcessor(new Detector.Processor<Barcode>() {
             @Override
             public void release() {
                 Log.d(TAG,"barcodeDetector Processor release");
+                mBarcodeDetector = null;
+                mTaskHandler.sendEmptyMessage(CameraState.RELEASE_CAMERA);
             }
 
             @Override
             public void receiveDetections(Detector.Detections<Barcode> detections) {
-                if(detections.getDetectedItems().size() != 0) {
+                if (detections.getDetectedItems().size() != 0) {
                     String result = detections.getDetectedItems().valueAt(0).displayValue;
                     Log.d(TAG,"Barcode decoded: " + result);
 
@@ -114,25 +169,33 @@ public class MainActivity extends Activity {
                     intent.putExtra("barcode", result);
                     startActivity(intent);
 
-                    barcodeDetector.release();
+                    mBarcodeDetector.release();
                 }
             }
         });
+    }
 
-        if (!barcodeDetector.isOperational()) {
-            Log.w(TAG, "Detector dependencies are not available");
+    @SuppressWarnings("deprecation")
+    private void initCamera(boolean useFlash) {
+        if (mBarcodeDetector == null) {
+            Log.e(TAG, "Barcode detector is null");
+            return;
+        }
+
+        if (!mBarcodeDetector.isOperational()) {
+            Log.e(TAG, "Detector dependencies are not available");
 
             File cacheDir = getCacheDir();
             // Check for low storage
             if (cacheDir.getFreeSpace() * 100 / cacheDir.getTotalSpace() <= 10) {
-                Toast.makeText(this, R.string.low_storage_error, Toast.LENGTH_LONG).show();
+                Toast.makeText(mContext, R.string.low_storage_error, Toast.LENGTH_LONG).show();
                 Log.w(TAG, getString(R.string.low_storage_error));
             } else {
                 Log.e(TAG, getString(R.string.unknown_download_error));
             }
         }
 
-        mCameraSource = new CameraSource.Builder(this, barcodeDetector)
+        mCameraSource = new CameraSource.Builder(mContext, mBarcodeDetector)
                 .setFacing(CameraSource.CAMERA_FACING_BACK)
                 .setRequestedPreviewSize(1280, 720)
                 .setRequestedFps(20.0f)
@@ -147,7 +210,7 @@ public class MainActivity extends Activity {
             public void surfaceCreated(SurfaceHolder holder) {
                 Log.d(TAG, "surfaceCreated");
                 mIsSurfaceAvailable = true;
-                startCamera();
+                mTaskHandler.sendEmptyMessage(CameraState.START_CAMERA);
             }
 
             @Override
@@ -159,7 +222,7 @@ public class MainActivity extends Activity {
             public void surfaceDestroyed(SurfaceHolder holder) {
                 Log.d(TAG, "surfaceDestroyed");
                 mIsSurfaceAvailable = false;
-                mCameraSource.stop();
+                if (mCameraSource != null) mCameraSource.stop();
             }
         });
     }
@@ -176,7 +239,7 @@ public class MainActivity extends Activity {
 
         if (grantResults.length != 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             Log.d(TAG, "Camera permission granted");
-            initCamera(mUseFlash);
+            mTaskHandler.sendEmptyMessage(CameraState.INIT_CAMERA);
             mSurfaceView.setVisibility(View.VISIBLE);
             return;
         }

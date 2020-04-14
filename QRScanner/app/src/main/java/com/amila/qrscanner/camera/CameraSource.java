@@ -71,7 +71,7 @@ import java.util.Map;
  * <li>android.permissions.CAMERA</li>
  * </ul>
  */
-//@SuppressWarnings("deprecation")
+@SuppressWarnings("deprecation")
 public class CameraSource {
     @SuppressLint("InlinedApi")
     public static final int CAMERA_FACING_BACK = com.google.android.gms.vision.CameraSource.CAMERA_FACING_BACK;
