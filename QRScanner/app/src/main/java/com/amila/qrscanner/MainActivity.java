@@ -22,7 +22,9 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.CompoundButton;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
@@ -211,6 +213,20 @@ public class MainActivity extends Activity {
                 .setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE)
                 .setFlashMode(useFlash ? Camera.Parameters.FLASH_MODE_TORCH : null)
                 .build();
+
+        ToggleButton tbFlasher = findViewById(R.id.flasher);
+        tbFlasher.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    mCameraSource.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
+                    mUseFlash = true;
+                } else {
+                    mCameraSource.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
+                    mUseFlash = false;
+                }
+            }
+        });
     }
 
     private void setupViewfinder() {
@@ -328,10 +344,5 @@ public class MainActivity extends Activity {
             mPreviewSize = new Size(mPreviewSize.getHeight(), mPreviewSize.getWidth());
         }
         Log.d(TAG, "mPreviewSize width: " + mPreviewSize.getWidth() + ", height: " + mPreviewSize.getHeight());
-    }
-
-    //TODO: Need to find a method to toggle flash on runtime
-    public void toggleFlash(View view) {
-        mUseFlash = !mUseFlash;
     }
 }
