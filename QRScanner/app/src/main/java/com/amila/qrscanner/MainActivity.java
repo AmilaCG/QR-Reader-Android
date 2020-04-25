@@ -61,6 +61,7 @@ public class MainActivity extends Activity {
 
     private CameraSource mCameraSource;
     private BarcodeDetector mBarcodeDetector;
+    private BarcodeTrackerView mTrackerView;
 
     private boolean mUseFlash;
 
@@ -91,6 +92,8 @@ public class MainActivity extends Activity {
         mSurfaceView.setVisibility(View.GONE);
         mSurfaceHolder = mSurfaceView.getHolder();
         setupViewfinder();
+
+        mTrackerView = findViewById(R.id.barcode_tracker_view);
 
         setPreviewSize();
 
@@ -170,17 +173,23 @@ public class MainActivity extends Activity {
             @Override
             public void receiveDetections(Detector.Detections<Barcode> detections) {
                 if (detections.getDetectedItems().size() != 0) {
-                    String result = detections.getDetectedItems().valueAt(0).displayValue;
+                    Barcode detectedBarcode = detections.getDetectedItems().valueAt(0);
+
+                    mTrackerView.updateView(detectedBarcode.cornerPoints);
+
+                    String result = detectedBarcode.displayValue;
                     Log.d(TAG,"Barcode decoded: " + result);
 
-                    Intent intent = new Intent(mContext, BarcodeResultActivity.class);
-                    intent.putExtra("barcode", result);
-                    startActivity(intent);
+//                    Intent intent = new Intent(mContext, BarcodeResultActivity.class);
+//                    intent.putExtra("barcode", result);
+//                    startActivity(intent);
 //                    Intent intent = new Intent(Intent.ACTION_VIEW);
 //                    intent.setData(Uri.parse(result));
 //                    startActivity(intent);
 
-                    mBarcodeDetector.release();
+//                    mBarcodeDetector.release();
+                } else {
+                    mTrackerView.clearView();
                 }
             }
         });

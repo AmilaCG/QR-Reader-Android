@@ -35,6 +35,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresPermission;
 import androidx.annotation.StringDef;
 
+import com.amila.qrscanner.BarcodeTrackerView;
 import com.google.android.gms.common.images.Size;
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.Frame;
@@ -753,6 +754,8 @@ public class CameraSource {
         }
         Size pictureSize = sizePair.pictureSize();
         mPreviewSize = sizePair.previewSize();
+
+        BarcodeTrackerView.setPreviewSize(mPreviewSize.getWidth(), mPreviewSize.getHeight());
 
         int[] previewFpsRange = selectPreviewFpsRange(camera, mRequestedFps);
         if (previewFpsRange == null) {
