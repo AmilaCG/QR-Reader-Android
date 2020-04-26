@@ -33,7 +33,7 @@ public class BarcodeTrackerView extends View {
 
     private void init() {
         mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mPaint.setStrokeWidth(8);
+        mPaint.setStrokeWidth(14);
         mPaint.setColor(Color.GREEN);
 
         mCornerPts = null;

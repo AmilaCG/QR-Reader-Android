@@ -12,7 +12,6 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.hardware.Camera;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -145,6 +144,7 @@ public class MainActivity extends Activity {
     protected void onPause() {
         super.onPause();
         Log.d(TAG,"onPause");
+        mTrackerView.clearView();
         if (mCameraSource != null) mCameraSource.stop();
     }
 
@@ -180,14 +180,11 @@ public class MainActivity extends Activity {
                     String result = detectedBarcode.displayValue;
                     Log.d(TAG,"Barcode decoded: " + result);
 
-//                    Intent intent = new Intent(mContext, BarcodeResultActivity.class);
-//                    intent.putExtra("barcode", result);
-//                    startActivity(intent);
-//                    Intent intent = new Intent(Intent.ACTION_VIEW);
-//                    intent.setData(Uri.parse(result));
-//                    startActivity(intent);
+                    Intent intent = new Intent(mContext, BarcodeResultActivity.class);
+                    intent.putExtra("barcode", result);
+                    startActivity(intent);
 
-//                    mBarcodeDetector.release();
+                    mBarcodeDetector.release();
                 } else {
                     mTrackerView.clearView();
                 }
