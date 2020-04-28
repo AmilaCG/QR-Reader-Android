@@ -107,30 +107,6 @@ public class MainActivity extends Activity {
         }
     }
 
-    private void setupTaskHandler() {
-        mTaskHandler = new Handler(this.getMainLooper()) {
-            @Override
-            public void handleMessage(@NonNull Message msg) {
-                super.handleMessage(msg);
-                switch (msg.what) {
-                    case CameraState.INIT_CAMERA:
-                        if (mCameraSource == null) initCamera(mUseFlash);
-                        break;
-
-                    case CameraState.START_CAMERA:
-                        startCamera();
-                        break;
-
-                    case CameraState.RELEASE_CAMERA:
-                        Log.d(TAG, "RELEASE_CAMERA called");
-                        if (mCameraSource != null) mCameraSource.release();
-                        mCameraSource = null;
-                        break;
-                }
-            }
-        };
-    }
-
     @Override
     protected void onResume() {
         super.onResume();
@@ -155,6 +131,53 @@ public class MainActivity extends Activity {
             mTaskHandler.sendEmptyMessage(CameraState.RELEASE_CAMERA);
             mCameraSource = null;
         }
+    }
+
+    private void setupTaskHandler() {
+        mTaskHandler = new Handler(this.getMainLooper()) {
+            @Override
+            public void handleMessage(@NonNull Message msg) {
+                super.handleMessage(msg);
+                switch (msg.what) {
+                    case CameraState.INIT_CAMERA:
+                        if (mCameraSource == null) initCamera(mUseFlash);
+                        break;
+
+                    case CameraState.START_CAMERA:
+                        startCamera();
+                        break;
+
+                    case CameraState.RELEASE_CAMERA:
+                        Log.d(TAG, "RELEASE_CAMERA called");
+                        if (mCameraSource != null) mCameraSource.release();
+                        mCameraSource = null;
+                        break;
+                }
+            }
+        };
+    }
+
+    private void setupViewfinder() {
+        mSurfaceView.getHolder().addCallback(new SurfaceHolder.Callback() {
+            @Override
+            public void surfaceCreated(SurfaceHolder holder) {
+                Log.d(TAG, "surfaceCreated");
+                mIsSurfaceAvailable = true;
+                mTaskHandler.sendEmptyMessage(CameraState.START_CAMERA);
+            }
+
+            @Override
+            public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+
+            }
+
+            @Override
+            public void surfaceDestroyed(SurfaceHolder holder) {
+                Log.d(TAG, "surfaceDestroyed");
+                mIsSurfaceAvailable = false;
+                if (mCameraSource != null) mCameraSource.stop();
+            }
+        });
     }
 
     private void initBarcodeDetector() {
@@ -235,27 +258,25 @@ public class MainActivity extends Activity {
         });
     }
 
-    private void setupViewfinder() {
-        mSurfaceView.getHolder().addCallback(new SurfaceHolder.Callback() {
-            @Override
-            public void surfaceCreated(SurfaceHolder holder) {
-                Log.d(TAG, "surfaceCreated");
-                mIsSurfaceAvailable = true;
-                mTaskHandler.sendEmptyMessage(CameraState.START_CAMERA);
-            }
+    @SuppressLint("MissingPermission")
+    private void startCamera() {
+        // Check that the device has play services available
+        int code = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(
+                getApplicationContext());
+        if (code != ConnectionResult.SUCCESS) {
+            Dialog dlg = GoogleApiAvailability.getInstance().getErrorDialog(this, code, RC_HANDLE_GMS);
+            dlg.show();
+        }
 
-            @Override
-            public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-
+        if (mCameraSource != null) {
+            if (mIsSurfaceAvailable) {
+                try {
+                    mCameraSource.start(mSurfaceHolder);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
-
-            @Override
-            public void surfaceDestroyed(SurfaceHolder holder) {
-                Log.d(TAG, "surfaceDestroyed");
-                mIsSurfaceAvailable = false;
-                if (mCameraSource != null) mCameraSource.stop();
-            }
-        });
+        }
     }
 
     @Override
@@ -314,27 +335,6 @@ public class MainActivity extends Activity {
                 Snackbar.LENGTH_INDEFINITE)
                 .setAction("OK", listener)
                 .show();
-    }
-
-    @SuppressLint("MissingPermission")
-    private void startCamera() {
-        // Check that the device has play services available
-        int code = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(
-                getApplicationContext());
-        if (code != ConnectionResult.SUCCESS) {
-            Dialog dlg = GoogleApiAvailability.getInstance().getErrorDialog(this, code, RC_HANDLE_GMS);
-            dlg.show();
-        }
-
-        if (mCameraSource != null) {
-            if (mIsSurfaceAvailable) {
-                try {
-                    mCameraSource.start(mSurfaceHolder);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
     }
 
     private void setPreviewSize() {
