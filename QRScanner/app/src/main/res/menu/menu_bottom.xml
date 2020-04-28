@@ -7,6 +7,6 @@
         android:title="About" />
     <item android:id="@+id/action_torch"
         android:title="Flash"
-        android:icon="@drawable/ic_flash_on_white_24dp"
+        android:icon="@drawable/ic_flash_off_white_24dp"
         app:showAsAction="always"/>
 </menu>

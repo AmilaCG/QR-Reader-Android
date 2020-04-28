@@ -17,16 +17,17 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.util.Size;
+import android.view.MenuItem;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.CompoundButton;
 import android.widget.Toast;
-import android.widget.ToggleButton;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.amila.qrscanner.camera.CameraSource;
 
@@ -35,6 +36,7 @@ import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
+import com.google.android.material.bottomappbar.BottomAppBar;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.io.File;
@@ -79,6 +81,7 @@ public class MainActivity extends Activity {
         mContext = this;
 
         setupTaskHandler();
+        setupBottomAppBar();
 
         mUseFlash = false;
         mIsSurfaceAvailable = false;
@@ -242,20 +245,6 @@ public class MainActivity extends Activity {
                 .setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE)
                 .setFlashMode(useFlash ? Camera.Parameters.FLASH_MODE_TORCH : null)
                 .build();
-
-        ToggleButton tbFlasher = findViewById(R.id.flasher);
-        tbFlasher.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    mCameraSource.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
-                    mUseFlash = true;
-                } else {
-                    mCameraSource.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
-                    mUseFlash = false;
-                }
-            }
-        });
     }
 
     @SuppressLint("MissingPermission")
@@ -335,6 +324,31 @@ public class MainActivity extends Activity {
                 Snackbar.LENGTH_INDEFINITE)
                 .setAction("OK", listener)
                 .show();
+    }
+
+    private void setupBottomAppBar() {
+        BottomAppBar bottomAppBar = findViewById(R.id.bottom_app_bar);
+        bottomAppBar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                int id = item.getItemId();
+                switch(id) {
+                    case R.id.action_torch:
+                        if(mUseFlash) {
+                            mCameraSource.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
+                            item.setIcon(ContextCompat.getDrawable(mContext, R.drawable.ic_flash_off_white_24dp));
+                            mUseFlash = !mUseFlash;
+                        } else {
+                            mCameraSource.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
+                            item.setIcon(ContextCompat.getDrawable(mContext, R.drawable.ic_flash_on_white_24dp));
+                            mUseFlash = !mUseFlash;
+                        }
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+        });
     }
 
     private void setPreviewSize() {

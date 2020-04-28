@@ -17,17 +17,6 @@
             android:layout_height="match_parent"
             app:layout_constraintBottom_toBottomOf="parent" />
 
-        <ToggleButton
-            android:id="@+id/flasher"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            android:checked="false"
-            android:textOff="Flasher"
-            android:textOn="Flasher"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
         <com.amila.qrscanner.BarcodeTrackerView
             android:id="@+id/barcode_tracker_view"
             android:layout_width="match_parent"
@@ -36,7 +25,7 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <com.google.android.material.bottomappbar.BottomAppBar
-        android:id="@+id/navigation_view"
+        android:id="@+id/bottom_app_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
