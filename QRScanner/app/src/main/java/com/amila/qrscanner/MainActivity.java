@@ -220,8 +220,8 @@ public class MainActivity extends Activity {
                 if (detections.getDetectedItems().size() != 0) {
                     Barcode detectedBarcode = detections.getDetectedItems().valueAt(0);
 
-                    mTrackerView.updateView(detectedBarcode.cornerPoints);
                     mBeepPlayer.run();
+                    mTrackerView.updateView(detectedBarcode.cornerPoints);
 
                     String result = detectedBarcode.displayValue;
                     Log.d(TAG,"Barcode decoded: " + result);
