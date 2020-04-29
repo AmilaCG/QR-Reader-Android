@@ -73,13 +73,6 @@ public class MainActivity extends Activity {
     private SoundPool mSoundPool;
     private int mBeep;
 
-    private Runnable mBeepPlayer = new Runnable() {
-        @Override
-        public void run() {
-            mSoundPool.play(mBeep, 1, 1, 0, 0, 1);
-        }
-    };
-
     public static class CameraState {
         static final int INIT_CAMERA = 0;
         static final int START_CAMERA = 1;
@@ -220,7 +213,7 @@ public class MainActivity extends Activity {
                 if (detections.getDetectedItems().size() != 0) {
                     Barcode detectedBarcode = detections.getDetectedItems().valueAt(0);
 
-                    mBeepPlayer.run();
+                    mSoundPool.play(mBeep, 1, 1, 0, 0, 1);
                     mTrackerView.updateView(detectedBarcode.cornerPoints);
 
                     String result = detectedBarcode.displayValue;
