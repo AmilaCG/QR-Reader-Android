@@ -12,6 +12,8 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.hardware.Camera;
+import android.media.AudioAttributes;
+import android.media.SoundPool;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -68,6 +70,16 @@ public class MainActivity extends Activity {
 
     private Handler mTaskHandler;
 
+    private SoundPool mSoundPool;
+    private int mBeep;
+
+    private Runnable mBeepPlayer = new Runnable() {
+        @Override
+        public void run() {
+            mSoundPool.play(mBeep, 1, 1, 0, 0, 1);
+        }
+    };
+
     public static class CameraState {
         static final int INIT_CAMERA = 0;
         static final int START_CAMERA = 1;
@@ -80,13 +92,15 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         mContext = this;
 
-        setupTaskHandler();
-        setupBottomAppBar();
-
         mUseFlash = false;
         mIsSurfaceAvailable = false;
         mCameraSource = null;
         mBarcodeDetector = null;
+        mSoundPool = null;
+
+        setupTaskHandler();
+        setupBottomAppBar();
+        setupAudioBeep();
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
@@ -133,6 +147,11 @@ public class MainActivity extends Activity {
         if (mCameraSource != null) {
             mTaskHandler.sendEmptyMessage(CameraState.RELEASE_CAMERA);
             mCameraSource = null;
+        }
+
+        if (mSoundPool != null) {
+            mSoundPool.release();
+            mSoundPool = null;
         }
     }
 
@@ -202,6 +221,7 @@ public class MainActivity extends Activity {
                     Barcode detectedBarcode = detections.getDetectedItems().valueAt(0);
 
                     mTrackerView.updateView(detectedBarcode.cornerPoints);
+                    mBeepPlayer.run();
 
                     String result = detectedBarcode.displayValue;
                     Log.d(TAG,"Barcode decoded: " + result);
@@ -349,6 +369,20 @@ public class MainActivity extends Activity {
                 }
             }
         });
+    }
+
+    private void setupAudioBeep() {
+        AudioAttributes audioAttributes = new AudioAttributes.Builder()
+                .setUsage(AudioAttributes.USAGE_NOTIFICATION_COMMUNICATION_INSTANT)
+                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                .build();
+
+        mSoundPool = new SoundPool.Builder()
+                .setMaxStreams(1)
+                .setAudioAttributes(audioAttributes)
+                .build();
+
+        mBeep = mSoundPool.load(this, R.raw.beep, 1);
     }
 
     private void setPreviewSize() {
