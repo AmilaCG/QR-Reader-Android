@@ -14,6 +14,7 @@ import android.graphics.Rect;
 import android.hardware.Camera;
 import android.media.AudioAttributes;
 import android.media.SoundPool;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -65,6 +66,7 @@ public class MainActivity extends Activity {
     private CameraSource mCameraSource;
     private BarcodeDetector mBarcodeDetector;
     private BarcodeTrackerView mTrackerView;
+    private Barcode mDetectedBarcode;
 
     private boolean mUseFlash;
 
@@ -211,17 +213,19 @@ public class MainActivity extends Activity {
             @Override
             public void receiveDetections(Detector.Detections<Barcode> detections) {
                 if (detections.getDetectedItems().size() != 0) {
-                    Barcode detectedBarcode = detections.getDetectedItems().valueAt(0);
+                    mDetectedBarcode = detections.getDetectedItems().valueAt(0);
 
                     mSoundPool.play(mBeep, 1, 1, 0, 0, 1);
-                    mTrackerView.updateView(detectedBarcode.cornerPoints);
+                    mTrackerView.updateView(mDetectedBarcode.cornerPoints);
 
-                    String result = detectedBarcode.displayValue;
-                    Log.d(TAG,"Barcode decoded: " + result);
-
-                    Intent intent = new Intent(mContext, BarcodeResultActivity.class);
-                    intent.putExtra("barcode", result);
-                    startActivity(intent);
+                    AsyncTask.execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            Intent intent = new Intent(mContext, BarcodeResultActivity.class);
+                            intent.putExtra("barcode", mDetectedBarcode.displayValue);
+                            startActivity(intent);
+                        }
+                    });
 
                     mBarcodeDetector.release();
                 } else {
