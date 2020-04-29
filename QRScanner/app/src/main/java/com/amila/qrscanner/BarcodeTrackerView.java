@@ -48,13 +48,9 @@ public class BarcodeTrackerView extends View {
         float scaleY = (float) mCanvasHeight / mPrevSizeHeight;
 
         if(mCornerPts != null) {
-            float[] pts = {
-                    mCornerPts[0].x * scaleX, mCornerPts[0].y * scaleY,
-                    mCornerPts[1].x * scaleX, mCornerPts[1].y * scaleY,
-                    mCornerPts[2].x * scaleX, mCornerPts[2].y * scaleY,
-                    mCornerPts[3].x * scaleX, mCornerPts[3].y * scaleY };
-
-            canvas.drawPoints(pts, mPaint);
+            for (int i = 0; i < 4; i++) {
+                canvas.drawCircle(mCornerPts[i].x * scaleX, mCornerPts[i].y * scaleY, 8f, mPaint);
+            }
         }
     }
 
