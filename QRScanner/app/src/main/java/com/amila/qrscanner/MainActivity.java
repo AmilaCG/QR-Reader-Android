@@ -210,24 +210,36 @@ public class MainActivity extends Activity {
                 mTaskHandler.sendEmptyMessage(CameraState.RELEASE_CAMERA);
             }
 
+            String currentBarcode = null;
+            int confirmCounter = 0;
+            final static int CONFIRM_VALUE = 3;
             @Override
             public void receiveDetections(Detector.Detections<Barcode> detections) {
                 if (detections.getDetectedItems().size() != 0) {
                     mDetectedBarcode = detections.getDetectedItems().valueAt(0);
+                    if (currentBarcode != null && currentBarcode.equals(mDetectedBarcode.displayValue)) {
+                        confirmCounter++;
+                        if (confirmCounter >= CONFIRM_VALUE){
+                            confirmCounter = 0;
 
-                    mSoundPool.play(mBeep, 1, 1, 0, 0, 1);
-                    mTrackerView.updateView(mDetectedBarcode.cornerPoints);
+                            mSoundPool.play(mBeep, 1, 1, 0, 0, 1);
+                            mTrackerView.updateView(mDetectedBarcode.cornerPoints);
 
-                    AsyncTask.execute(new Runnable() {
-                        @Override
-                        public void run() {
-                            Intent intent = new Intent(mContext, BarcodeResultActivity.class);
-                            intent.putExtra("barcode", mDetectedBarcode.displayValue);
-                            startActivity(intent);
+                            AsyncTask.execute(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Intent intent = new Intent(mContext, BarcodeResultActivity.class);
+                                    intent.putExtra("barcode", mDetectedBarcode.displayValue);
+                                    startActivity(intent);
+                                }
+                            });
+
+                            mBarcodeDetector.release();
                         }
-                    });
-
-                    mBarcodeDetector.release();
+                    } else {
+                        currentBarcode = mDetectedBarcode.displayValue;
+                        confirmCounter = 0;
+                    }
                 } else {
                     mTrackerView.clearView();
                 }
