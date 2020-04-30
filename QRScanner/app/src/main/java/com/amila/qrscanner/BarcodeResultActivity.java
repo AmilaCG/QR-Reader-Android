@@ -1,6 +1,8 @@
 package com.amila.qrscanner;
 
 import android.app.Activity;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -40,5 +42,11 @@ public class BarcodeResultActivity extends Activity {
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.setData(Uri.parse(mResult));
         startActivity(intent);
+    }
+
+    public void copyToClipboard(View view) {
+        ClipboardManager clipboardManager = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+        ClipData clip = ClipData.newPlainText("QRCode", mResult);
+        if (clipboardManager != null) clipboardManager.setPrimaryClip(clip);
     }
 }
