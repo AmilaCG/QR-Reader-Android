@@ -20,7 +20,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.util.Size;
-import android.view.MenuItem;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
@@ -28,7 +27,6 @@ import android.view.WindowManager;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
@@ -157,11 +155,8 @@ public class MainActivity extends Activity {
                 super.handleMessage(msg);
                 switch (msg.what) {
                     case CameraState.INIT_CAMERA:
-                        AsyncTask.execute(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (mCameraSource == null) initCamera(mUseFlash);
-                            }
+                        AsyncTask.execute(() -> {
+                            if (mCameraSource == null) initCamera(mUseFlash);
                         });
                         break;
 
@@ -245,13 +240,10 @@ public class MainActivity extends Activity {
                             if (mCameraSource != null) mCameraSource.stopPreview();
                             mTaskHandler.sendEmptyMessage(CameraState.STOP_CAMERA);
 
-                            AsyncTask.execute(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Intent intent = new Intent(mContext, BarcodeResultActivity.class);
-                                    intent.putExtra("barcode", mDetectedBarcode.displayValue);
-                                    startActivity(intent);
-                                }
+                            AsyncTask.execute(() -> {
+                                Intent intent = new Intent(mContext, BarcodeResultActivity.class);
+                                intent.putExtra("barcode", mDetectedBarcode.displayValue);
+                                startActivity(intent);
                             });
 
                             mTaskHandler.sendEmptyMessage(RELEASE_BARCODE_DETECTOR);
@@ -341,11 +333,7 @@ public class MainActivity extends Activity {
         Log.e(TAG, "Permission not granted: results len = " + grantResults.length +
                 " Result code = " + (grantResults.length > 0 ? grantResults[0] : "(empty)"));
 
-        DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                finish();
-            }
-        };
+        DialogInterface.OnClickListener listener = (dialog, id) -> finish();
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("QR Code Reader")
@@ -365,11 +353,8 @@ public class MainActivity extends Activity {
 
         final Activity thisActivity = this;
 
-        View.OnClickListener listener = new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        View.OnClickListener listener = view -> {
                 ActivityCompat.requestPermissions(thisActivity, permissions, RC_HANDLE_CAMERA_PERM);
-            }
         };
 
         findViewById(R.id.main_layout).setOnClickListener(listener);
@@ -381,25 +366,22 @@ public class MainActivity extends Activity {
 
     private void setupBottomAppBar() {
         BottomAppBar bottomAppBar = findViewById(R.id.bottom_app_bar);
-        bottomAppBar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                int id = item.getItemId();
-                switch(id) {
-                    case R.id.action_torch:
-                        if(mUseFlash) {
-                            mCameraSource.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
-                            item.setIcon(ContextCompat.getDrawable(mContext, R.drawable.ic_flash_off_white_24dp));
-                            mUseFlash = !mUseFlash;
-                        } else {
-                            mCameraSource.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
-                            item.setIcon(ContextCompat.getDrawable(mContext, R.drawable.ic_flash_on_white_24dp));
-                            mUseFlash = !mUseFlash;
-                        }
-                        return true;
-                    default:
-                        return false;
-                }
+        bottomAppBar.setOnMenuItemClickListener((item) -> {
+            int id = item.getItemId();
+            switch(id) {
+                case R.id.action_torch:
+                    if(mUseFlash) {
+                        mCameraSource.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
+                        item.setIcon(ContextCompat.getDrawable(mContext, R.drawable.ic_flash_off_white_24dp));
+                        mUseFlash = !mUseFlash;
+                    } else {
+                        mCameraSource.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
+                        item.setIcon(ContextCompat.getDrawable(mContext, R.drawable.ic_flash_on_white_24dp));
+                        mUseFlash = !mUseFlash;
+                    }
+                    return true;
+                default:
+                    return false;
             }
         });
     }
