@@ -78,8 +78,11 @@ public class MainActivity extends Activity {
     public static class CameraState {
         static final int INIT_CAMERA = 0;
         static final int START_CAMERA = 1;
-        static final int RELEASE_CAMERA = 2;
+        static final int STOP_CAMERA = 2;
+        static final int RELEASE_CAMERA = 3;
     }
+
+    private static final int RELEASE_BARCODE_DETECTOR = 10;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -125,7 +128,6 @@ public class MainActivity extends Activity {
         Log.d(TAG,"onResume");
         if (mBarcodeDetector == null) initBarcodeDetector();
         mTaskHandler.sendEmptyMessage(CameraState.INIT_CAMERA);
-        mTaskHandler.sendEmptyMessage(CameraState.START_CAMERA);
     }
 
     @Override
@@ -133,16 +135,14 @@ public class MainActivity extends Activity {
         super.onPause();
         Log.d(TAG,"onPause");
         mTrackerView.clearView();
-        if (mCameraSource != null) mCameraSource.stop();
+        mTaskHandler.sendEmptyMessage(CameraState.STOP_CAMERA);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (mCameraSource != null) {
-            mTaskHandler.sendEmptyMessage(CameraState.RELEASE_CAMERA);
-            mCameraSource = null;
-        }
+        mTaskHandler.sendEmptyMessage(RELEASE_BARCODE_DETECTOR);
+        mTaskHandler.sendEmptyMessage(CameraState.RELEASE_CAMERA);
 
         if (mSoundPool != null) {
             mSoundPool.release();
@@ -157,18 +157,35 @@ public class MainActivity extends Activity {
                 super.handleMessage(msg);
                 switch (msg.what) {
                     case CameraState.INIT_CAMERA:
-                        if (mCameraSource == null) initCamera(mUseFlash);
+                        AsyncTask.execute(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (mCameraSource == null) initCamera(mUseFlash);
+                            }
+                        });
                         break;
 
                     case CameraState.START_CAMERA:
                         startCamera();
                         break;
 
+                    case CameraState.STOP_CAMERA:
+                        if (mCameraSource != null) mCameraSource.stop();
+                        break;
+
                     case CameraState.RELEASE_CAMERA:
                         Log.d(TAG, "RELEASE_CAMERA called");
-                        if (mCameraSource != null) mCameraSource.release();
-                        mCameraSource = null;
+                        if (mCameraSource != null) {
+                            mCameraSource.release();
+                            mCameraSource = null;
+                        }
                         break;
+
+                    case RELEASE_BARCODE_DETECTOR:
+                        if (mBarcodeDetector != null) {
+                            mBarcodeDetector.release();
+                            mBarcodeDetector = null;
+                        }
                 }
             }
         };
@@ -192,7 +209,9 @@ public class MainActivity extends Activity {
             public void surfaceDestroyed(SurfaceHolder holder) {
                 Log.d(TAG, "surfaceDestroyed");
                 mIsSurfaceAvailable = false;
-                if (mCameraSource != null) mCameraSource.stop();
+
+                mTaskHandler.sendEmptyMessage(RELEASE_BARCODE_DETECTOR);
+                mTaskHandler.sendEmptyMessage(CameraState.RELEASE_CAMERA);
             }
         });
     }
@@ -206,8 +225,6 @@ public class MainActivity extends Activity {
             @Override
             public void release() {
                 Log.d(TAG,"barcodeDetector Processor release");
-                mBarcodeDetector = null;
-                mTaskHandler.sendEmptyMessage(CameraState.RELEASE_CAMERA);
             }
 
             String currentBarcode = null;
@@ -225,6 +242,9 @@ public class MainActivity extends Activity {
                             mSoundPool.play(mBeep, 1, 1, 0, 0, 1);
                             mTrackerView.updateView(mDetectedBarcode.cornerPoints);
 
+                            if (mCameraSource != null) mCameraSource.stopPreview();
+                            mTaskHandler.sendEmptyMessage(CameraState.STOP_CAMERA);
+
                             AsyncTask.execute(new Runnable() {
                                 @Override
                                 public void run() {
@@ -234,7 +254,7 @@ public class MainActivity extends Activity {
                                 }
                             });
 
-                            mBarcodeDetector.release();
+                            mTaskHandler.sendEmptyMessage(RELEASE_BARCODE_DETECTOR);
                         }
                     } else {
                         currentBarcode = mDetectedBarcode.displayValue;
@@ -267,13 +287,17 @@ public class MainActivity extends Activity {
             }
         }
 
-        mCameraSource = new CameraSource.Builder(mContext, mBarcodeDetector)
-                .setFacing(CameraSource.CAMERA_FACING_BACK)
-                .setRequestedPreviewSize(mPreviewSize.getWidth(), mPreviewSize.getHeight())
-                .setRequestedFps(20.0f)
-                .setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE)
-                .setFlashMode(useFlash ? Camera.Parameters.FLASH_MODE_TORCH : null)
-                .build();
+        if (mCameraSource == null) {
+            mCameraSource = new CameraSource.Builder(mContext, mBarcodeDetector)
+                    .setFacing(CameraSource.CAMERA_FACING_BACK)
+                    .setRequestedPreviewSize(mPreviewSize.getWidth(), mPreviewSize.getHeight())
+                    .setRequestedFps(20.0f)
+                    .setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE)
+                    .setFlashMode(useFlash ? Camera.Parameters.FLASH_MODE_TORCH : null)
+                    .build();
+        } else {
+            Log.e(TAG, "initCamera: Init camera failed. mCameraSource is not null");
+        }
     }
 
     @SuppressLint("MissingPermission")

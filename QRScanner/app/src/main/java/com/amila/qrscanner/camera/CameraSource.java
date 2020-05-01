@@ -436,6 +436,10 @@ public class CameraSource {
         }
     }
 
+    public void stopPreview() {
+        mCamera.stopPreview();
+    }
+
     /**
      * Returns the preview size that is currently in use by the underlying camera.
      */
