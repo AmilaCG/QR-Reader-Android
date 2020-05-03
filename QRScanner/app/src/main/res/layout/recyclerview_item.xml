@@ -6,8 +6,10 @@
 
     <TextView
         android:id="@+id/textView"
-        style="@style/word_title"
+        style="@style/result_style"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:autoLink="web"
+        android:textIsSelectable="true"
         android:background="@android:color/holo_blue_dark" />
 </LinearLayout>
