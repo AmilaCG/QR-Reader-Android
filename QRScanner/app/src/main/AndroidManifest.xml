@@ -13,7 +13,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".BarcodeResultActivity"></activity>
-        <activity android:name=".ScanHistory"></activity>
+        <activity android:name=".ScanHistoryActivity"></activity>
         <activity
             android:name=".MainActivity"
             android:screenOrientation="nosensor">

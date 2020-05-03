@@ -382,7 +382,7 @@ public class MainActivity extends Activity {
                     return true;
 
                 case R.id.action_history:
-                    Intent intent = new Intent(this, ScanHistory.class);
+                    Intent intent = new Intent(this, ScanHistoryActivity.class);
                     startActivity(intent);
                     return true;
 

@@ -52,7 +52,7 @@ public class BarcodeResultActivity extends AppCompatActivity {
     }
 
     public void showHistory(View view) {
-        Intent intent = new Intent(this, ScanHistory.class);
+        Intent intent = new Intent(this, ScanHistoryActivity.class);
         startActivity(intent);
         finish();
     }

@@ -16,7 +16,7 @@ import com.amila.qrscanner.resultdb.ResultViewModel;
 import java.util.Collections;
 import java.util.List;
 
-public class ScanHistory extends AppCompatActivity {
+public class ScanHistoryActivity extends AppCompatActivity {
 
     private ResultViewModel mResultViewModel;
 
