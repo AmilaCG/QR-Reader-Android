@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".BarcodeResultActivity"
-    android:background="@color/cardview_dark_background">
+    android:fitsSystemWindows="true">
 
     <TextView
         android:id="@+id/barcode_result"
@@ -55,6 +55,18 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/copy"
         app:layout_constraintStart_toStartOf="@+id/copy"
+        app:layout_constraintTop_toBottomOf="@+id/open_browser"
+        app:layout_constraintVertical_bias="0.4" />
+
+    <Button
+        android:id="@+id/history"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="showHistory"
+        android:text="History"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/open_browser"
+        app:layout_constraintStart_toStartOf="@+id/open_browser"
         app:layout_constraintTop_toBottomOf="@+id/open_browser"
         app:layout_constraintVertical_bias="0.4" />
 

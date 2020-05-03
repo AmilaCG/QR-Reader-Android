@@ -1,16 +1,20 @@
 package com.amila.qrscanner;
 
-import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
 import android.view.View;
 import android.widget.TextView;
 
-public class BarcodeResultActivity extends Activity {
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
+
+import com.amila.qrscanner.resultdb.Result;
+import com.amila.qrscanner.resultdb.ResultViewModel;
+
+public class BarcodeResultActivity extends AppCompatActivity {
 
     private TextView mBarcodeResult;
     private String mResult;
@@ -20,18 +24,15 @@ public class BarcodeResultActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_barcode_result);
 
-//        DisplayMetrics displayMetrics = new DisplayMetrics();
-//        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-//        int width = displayMetrics.widthPixels;
-//        int height = displayMetrics.heightPixels;
-//
-//        getWindow().setLayout((int)(width * 0.8), (int)(height * 0.6));
-
         Intent intent = getIntent();
         mResult = intent.getStringExtra("barcode");
 
         mBarcodeResult = findViewById(R.id.barcode_result);
         mBarcodeResult.setText(mResult);
+
+        ResultViewModel resultViewModel = new ViewModelProvider(this).get(ResultViewModel.class);
+        Result result = new Result(mResult);
+        resultViewModel.insert(result);
     }
 
     public void back (View v) {
@@ -48,5 +49,11 @@ public class BarcodeResultActivity extends Activity {
         ClipboardManager clipboardManager = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
         ClipData clip = ClipData.newPlainText("QRCode", mResult);
         if (clipboardManager != null) clipboardManager.setPrimaryClip(clip);
+    }
+
+    public void showHistory(View view) {
+        Intent intent = new Intent(this, ScanHistory.class);
+        startActivity(intent);
+        finish();
     }
 }

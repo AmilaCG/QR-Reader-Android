@@ -380,6 +380,12 @@ public class MainActivity extends Activity {
                         mUseFlash = !mUseFlash;
                     }
                     return true;
+
+                case R.id.action_history:
+                    Intent intent = new Intent(this, ScanHistory.class);
+                    startActivity(intent);
+                    return true;
+
                 default:
                     return false;
             }

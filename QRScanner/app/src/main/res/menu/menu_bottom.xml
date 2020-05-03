@@ -3,6 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item android:id="@+id/action_settings"
         android:title="Settings" />
+    <item android:id="@+id/action_history"
+        android:title="Scan History" />
     <item android:id="@+id/action_about"
         android:title="About" />
     <item android:id="@+id/action_torch"
