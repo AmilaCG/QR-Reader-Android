@@ -1,7 +1,7 @@
 # QR-Reader-Android
 Minimalistic QR Code Reader for Android (Using Google Vision Barcode API)  
 
-This project is still in development phase. Goal is to build a robust, useful QR code reader using the power of Google Vision Barcode API.
+This project is still in development. Goal is to build a robust, useful QR code reader using the power of Google Vision Barcode API.
 
 ## Demo
 
