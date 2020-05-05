@@ -12,9 +12,14 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".BarcodeResultActivity"
+        <activity
+            android:name=".SettingsActivity"
             android:screenOrientation="nosensor" />
-        <activity android:name=".ScanHistoryActivity"
+        <activity
+            android:name=".BarcodeResultActivity"
+            android:screenOrientation="nosensor" />
+        <activity
+            android:name=".ScanHistoryActivity"
             android:screenOrientation="nosensor" />
         <activity
             android:name=".MainActivity"

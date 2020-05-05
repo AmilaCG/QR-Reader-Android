@@ -8,17 +8,21 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.hardware.Camera;
 import android.media.AudioAttributes;
 import android.media.SoundPool;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.Message;
 import android.util.Log;
+import android.util.Patterns;
 import android.util.Size;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -29,6 +33,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.preference.PreferenceManager;
 
 import com.amila.qrscanner.camera.CameraSource;
 
@@ -54,6 +59,8 @@ public class MainActivity extends Activity {
 
     private static final int FULL_SCALE = 100;
 
+    private static final int RELEASE_BARCODE_DETECTOR = 10;
+
     private SurfaceView mSurfaceView;
     private boolean mIsSurfaceAvailable;
     private SurfaceHolder mSurfaceHolder;
@@ -69,9 +76,12 @@ public class MainActivity extends Activity {
     private boolean mUseFlash;
 
     private Handler mTaskHandler;
+    private HandlerThread mHandlerThread;
 
     private SoundPool mSoundPool;
     private int mBeep;
+
+    private SharedPreferences mSharedPrefs;
 
     public static class CameraState {
         static final int INIT_CAMERA = 0;
@@ -79,8 +89,6 @@ public class MainActivity extends Activity {
         static final int STOP_CAMERA = 2;
         static final int RELEASE_CAMERA = 3;
     }
-
-    private static final int RELEASE_BARCODE_DETECTOR = 10;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,7 +102,6 @@ public class MainActivity extends Activity {
         mBarcodeDetector = null;
         mSoundPool = null;
 
-        setupTaskHandler();
         setupBottomAppBar();
         setupAudioBeep();
 
@@ -108,6 +115,10 @@ public class MainActivity extends Activity {
         mTrackerView = findViewById(R.id.barcode_tracker_view);
 
         setPreviewSize();
+
+        mHandlerThread = new HandlerThread("QRRead");
+        mHandlerThread.start();
+        setupTaskHandler();
 
         int rc = ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
         if (rc == PackageManager.PERMISSION_GRANTED) {
@@ -126,6 +137,8 @@ public class MainActivity extends Activity {
         Log.d(TAG,"onResume");
         if (mBarcodeDetector == null) initBarcodeDetector();
         mTaskHandler.sendEmptyMessage(CameraState.INIT_CAMERA);
+
+        mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
     }
 
     @Override
@@ -149,15 +162,13 @@ public class MainActivity extends Activity {
     }
 
     private void setupTaskHandler() {
-        mTaskHandler = new Handler(this.getMainLooper()) {
+        mTaskHandler = new Handler(mHandlerThread.getLooper()) {
             @Override
             public void handleMessage(@NonNull Message msg) {
                 super.handleMessage(msg);
                 switch (msg.what) {
                     case CameraState.INIT_CAMERA:
-                        AsyncTask.execute(() -> {
-                            if (mCameraSource == null) initCamera(mUseFlash);
-                        });
+                        if (mCameraSource == null) initCamera(mUseFlash);
                         break;
 
                     case CameraState.START_CAMERA:
@@ -181,6 +192,7 @@ public class MainActivity extends Activity {
                             mBarcodeDetector.release();
                             mBarcodeDetector = null;
                         }
+                        break;
                 }
             }
         };
@@ -234,16 +246,29 @@ public class MainActivity extends Activity {
                         if (confirmCounter >= CONFIRM_VALUE){
                             confirmCounter = 0;
 
-                            mSoundPool.play(mBeep, 1, 1, 0, 0, 1);
+                            if (mSharedPrefs.getBoolean("audio_beep", true)) {
+                                mSoundPool.play(mBeep, 1, 1, 0, 0, 1);
+                            }
                             mTrackerView.updateView(mDetectedBarcode.cornerPoints);
 
                             if (mCameraSource != null) mCameraSource.stopPreview();
                             mTaskHandler.sendEmptyMessage(CameraState.STOP_CAMERA);
 
                             AsyncTask.execute(() -> {
-                                Intent intent = new Intent(mContext, BarcodeResultActivity.class);
-                                intent.putExtra("barcode", mDetectedBarcode.displayValue);
-                                startActivity(intent);
+                                boolean openInBrowser =
+                                        mSharedPrefs.getBoolean("open_browser", false);
+                                boolean isValidURL =
+                                        Patterns.WEB_URL.matcher(mDetectedBarcode.displayValue).matches();
+
+                                if (openInBrowser && isValidURL) {
+                                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                                    intent.setData(Uri.parse(mDetectedBarcode.displayValue));
+                                    startActivity(intent);
+                                } else {
+                                    Intent intent = new Intent(mContext, BarcodeResultActivity.class);
+                                    intent.putExtra("barcode", mDetectedBarcode.displayValue);
+                                    startActivity(intent);
+                                }
                             });
 
                             mTaskHandler.sendEmptyMessage(RELEASE_BARCODE_DETECTOR);
@@ -382,8 +407,11 @@ public class MainActivity extends Activity {
                     return true;
 
                 case R.id.action_history:
-                    Intent intent = new Intent(this, ScanHistoryActivity.class);
-                    startActivity(intent);
+                    startActivity(new Intent(this, ScanHistoryActivity.class));
+                    return true;
+
+                case R.id.action_settings:
+                    startActivity(new Intent(this, SettingsActivity.class));
                     return true;
 
                 default:
