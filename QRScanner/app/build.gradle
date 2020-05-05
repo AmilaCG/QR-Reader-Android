@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'com.google.android.gms.oss-licenses-plugin'
 
 android {
     compileSdkVersion 29
@@ -32,7 +33,7 @@ dependencies {
 
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
-    implementation 'androidx.preference:preference:1.1.0-rc01'
+    implementation 'androidx.preference:preference:1.1.1'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
@@ -47,4 +48,6 @@ dependencies {
     // Lifecycle components
     implementation "androidx.lifecycle:lifecycle-extensions:$rootProject.archLifecycleVersion"
     annotationProcessor "androidx.lifecycle:lifecycle-compiler:$rootProject.archLifecycleVersion"
+
+    implementation 'com.google.android.gms:play-services-oss-licenses:17.0.0'
 }
