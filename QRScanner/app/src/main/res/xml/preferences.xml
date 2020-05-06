@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
     <PreferenceCategory
         app:key="scanning"
@@ -22,6 +23,14 @@
             app:key="version"
             app:title="Version"
             app:summary="0.01" />
+
+        <Preference
+            app:title="Legal information"
+            app:summary="Open source licenses">
+            <intent
+                android:targetPackage="com.amila.qrscanner"
+                android:targetClass="com.google.android.gms.oss.licenses.OssLicensesMenuActivity" />
+        </Preference>
     </PreferenceCategory>
 
 </PreferenceScreen>

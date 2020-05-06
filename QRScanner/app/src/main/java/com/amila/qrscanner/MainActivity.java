@@ -39,7 +39,6 @@ import com.amila.qrscanner.camera.CameraSource;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.android.gms.oss.licenses.OssLicensesMenuActivity;
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
@@ -413,10 +412,6 @@ public class MainActivity extends Activity {
 
                 case R.id.action_settings:
                     startActivity(new Intent(this, SettingsActivity.class));
-                    return true;
-
-                case R.id.action_about:
-                    startActivity(new Intent(this, OssLicensesMenuActivity.class));
                     return true;
 
                 default:
