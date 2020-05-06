@@ -8,12 +8,14 @@
         <SwitchPreference
             app:defaultValue="false"
             app:key="open_browser"
-            app:title="Open browser directly" />
+            app:title="Open browser directly"
+            app:icon="@drawable/ic_public_white_24dp" />
 
         <SwitchPreference
             app:defaultValue="true"
             app:key="audio_beep"
-            app:title="Beep sound on decode" />
+            app:title="Beep sound on decode"
+            app:icon="@drawable/ic_volume_up_white_24dp" />
     </PreferenceCategory>
 
     <PreferenceCategory

@@ -12,15 +12,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity
-            android:name=".SettingsActivity"
-            android:screenOrientation="nosensor" />
-        <activity
-            android:name=".BarcodeResultActivity"
-            android:screenOrientation="nosensor" />
-        <activity
-            android:name=".ScanHistoryActivity"
-            android:screenOrientation="nosensor" />
+
         <activity
             android:name=".MainActivity"
             android:screenOrientation="nosensor">
@@ -30,6 +22,32 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".SettingsActivity"
+            android:label="Settings"
+            android:screenOrientation="nosensor"
+            android:theme="@style/OtherActivities" />
+
+        <activity
+            android:name=".BarcodeResultActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="nosensor"
+            android:theme="@style/OtherActivities" />
+
+        <activity
+            android:name=".ScanHistoryActivity"
+            android:label="Scan History"
+            android:screenOrientation="nosensor"
+            android:theme="@style/OtherActivities" />
+
+        <activity
+            android:name="com.google.android.gms.oss.licenses.OssLicensesMenuActivity"
+            android:theme="@style/OtherActivities" />
+
+        <activity
+            android:name="com.google.android.gms.oss.licenses.OssLicensesActivity"
+            android:theme="@style/OtherActivities" />
 
         <meta-data
             android:name="com.google.android.gms.version"

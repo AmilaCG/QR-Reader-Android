@@ -7,14 +7,6 @@
     tools:context=".BarcodeResultActivity"
     android:fitsSystemWindows="true">
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/colorToolbar"
-        app:title="QR Code Reader"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <TextView
         android:id="@+id/barcode_result"
         android:layout_width="0dp"
