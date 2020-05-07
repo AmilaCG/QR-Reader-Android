@@ -7,16 +7,12 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.ViewModelProvider;
-
-import com.amila.qrscanner.resultdb.Result;
-import com.amila.qrscanner.resultdb.ResultViewModel;
 
 public class BarcodeResultActivity extends AppCompatActivity {
 
-    private TextView mBarcodeResult;
     private String mResult;
 
     @Override
@@ -27,12 +23,8 @@ public class BarcodeResultActivity extends AppCompatActivity {
         Intent intent = getIntent();
         mResult = intent.getStringExtra("barcode");
 
-        mBarcodeResult = findViewById(R.id.barcode_result);
-        mBarcodeResult.setText(mResult);
-
-        ResultViewModel resultViewModel = new ViewModelProvider(this).get(ResultViewModel.class);
-        Result result = new Result(mResult);
-        resultViewModel.insert(result);
+        TextView barcodeResult = findViewById(R.id.barcode_result);
+        barcodeResult.setText(mResult);
     }
 
     public void back (View v) {
@@ -48,12 +40,16 @@ public class BarcodeResultActivity extends AppCompatActivity {
     public void copyToClipboard(View view) {
         ClipboardManager clipboardManager = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
         ClipData clip = ClipData.newPlainText("QRCode", mResult);
-        if (clipboardManager != null) clipboardManager.setPrimaryClip(clip);
+        if (clipboardManager != null) {
+            clipboardManager.setPrimaryClip(clip);
+
+            Toast.makeText(this, getString(R.string.confirm_copy_to_clipboard),
+                    Toast.LENGTH_SHORT).show();
+        }
     }
 
     public void showHistory(View view) {
         Intent intent = new Intent(this, ScanHistoryActivity.class);
         startActivity(intent);
-        finish();
     }
 }

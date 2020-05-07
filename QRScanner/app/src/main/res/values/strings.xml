@@ -6,4 +6,5 @@
     <string name="unknown_download_error">QR code reading dependencies cannot be downloaded due to unknown reason</string>
     <string name="clear_history_confirmation">Are you sure you want to clear scan history?</string>
     <string name="empty_scan_history">Scan history is already empty</string>
+    <string name="confirm_copy_to_clipboard">Copied to clipboard</string>
 </resources>

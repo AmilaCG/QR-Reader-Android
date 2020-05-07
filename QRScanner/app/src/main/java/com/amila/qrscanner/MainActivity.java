@@ -31,12 +31,17 @@ import android.view.WindowManager;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelStoreOwner;
 import androidx.preference.PreferenceManager;
 
 import com.amila.qrscanner.camera.CameraSource;
 
+import com.amila.qrscanner.resultdb.Result;
+import com.amila.qrscanner.resultdb.ResultViewModel;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.vision.Detector;
@@ -48,7 +53,7 @@ import com.google.android.material.snackbar.Snackbar;
 import java.io.File;
 import java.io.IOException;
 
-public class MainActivity extends Activity {
+public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "QRScanner";
 
@@ -83,6 +88,8 @@ public class MainActivity extends Activity {
 
     private SharedPreferences mSharedPrefs;
 
+    private ViewModelStoreOwner mViewModelStoreOwner;
+
     public static class CameraState {
         static final int INIT_CAMERA = 0;
         static final int START_CAMERA = 1;
@@ -101,6 +108,7 @@ public class MainActivity extends Activity {
         mCameraSource = null;
         mBarcodeDetector = null;
         mSoundPool = null;
+        mViewModelStoreOwner = this;
 
         setupBottomAppBar();
         setupAudioBeep();
@@ -269,6 +277,11 @@ public class MainActivity extends Activity {
                                     intent.putExtra("barcode", mDetectedBarcode.displayValue);
                                     startActivity(intent);
                                 }
+
+                                // Insert result to the database
+                                ResultViewModel resultViewModel = new ViewModelProvider(mViewModelStoreOwner).get(ResultViewModel.class);
+                                Result result = new Result(mDetectedBarcode.displayValue);
+                                resultViewModel.insert(result);
                             });
 
                             mTaskHandler.sendEmptyMessage(RELEASE_BARCODE_DETECTOR);

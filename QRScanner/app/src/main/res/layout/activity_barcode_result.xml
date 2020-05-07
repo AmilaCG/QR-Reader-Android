@@ -15,37 +15,89 @@
         android:layout_marginEnd="24dp"
         android:text="Result"
         android:textAlignment="center"
-        android:textColor="#F4F4F4"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:textColor="#F4F4F4"
         android:textIsSelectable="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.3" />
 
-    <Button
+    <ImageButton
         android:id="@+id/copy"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:background="@drawable/btn_background"
         android:onClick="copyToClipboard"
-        android:text="Copy to Clipboard"
+        android:src="@drawable/ic_content_copy_white_40dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/open_browser"
-        app:layout_constraintTop_toTopOf="@+id/barcode_result"
-        app:layout_constraintVertical_bias="0.6" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.7" />
 
-    <Button
-        android:id="@+id/open_browser"
-        android:layout_width="wrap_content"
+    <TextView
+        android:id="@+id/txt_copy"
+        android:layout_width="70dp"
         android:layout_height="wrap_content"
+        android:text="Copy to clipboard"
+        android:textAlignment="center"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/copy"
+        app:layout_constraintStart_toStartOf="@+id/copy"
+        app:layout_constraintTop_toBottomOf="@+id/copy"
+        app:layout_constraintVertical_bias="0.03" />
+
+    <ImageButton
+        android:id="@+id/open_browser"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:background="@drawable/btn_background"
         android:onClick="openBrowser"
-        android:text="Open in browser"
+        android:src="@drawable/ic_public_white_48dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/copy"
+        app:layout_constraintStart_toEndOf="@id/history"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.7" />
+
+    <TextView
+        android:id="@+id/txt_open_browser"
+        android:layout_width="70dp"
+        android:layout_height="wrap_content"
+        android:text="Open in browser"
+        android:textAlignment="center"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/open_browser"
+        app:layout_constraintStart_toStartOf="@+id/open_browser"
+        app:layout_constraintTop_toBottomOf="@+id/open_browser"
+        app:layout_constraintVertical_bias="0.03" />
+
+    <ImageButton
+        android:id="@+id/history"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:background="@drawable/btn_background"
+        android:onClick="showHistory"
+        android:src="@drawable/ic_history_white_48dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/open_browser"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/barcode_result"
-        app:layout_constraintVertical_bias="0.6" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.7" />
+
+    <TextView
+        android:id="@+id/txt_history"
+        android:layout_width="70dp"
+        android:layout_height="wrap_content"
+        android:text="History"
+        android:textAlignment="center"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/history"
+        app:layout_constraintStart_toStartOf="@+id/history"
+        app:layout_constraintTop_toBottomOf="@+id/history"
+        app:layout_constraintVertical_bias="0.03" />
 
     <Button
         android:id="@+id/back"
@@ -54,21 +106,9 @@
         android:onClick="back"
         android:text="Done"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/copy"
-        app:layout_constraintStart_toStartOf="@+id/copy"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/open_browser"
-        app:layout_constraintVertical_bias="0.4" />
-
-    <Button
-        android:id="@+id/history"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="showHistory"
-        android:text="History"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/open_browser"
-        app:layout_constraintStart_toStartOf="@+id/open_browser"
-        app:layout_constraintTop_toBottomOf="@+id/open_browser"
-        app:layout_constraintVertical_bias="0.4" />
+        app:layout_constraintVertical_bias="0.7" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
