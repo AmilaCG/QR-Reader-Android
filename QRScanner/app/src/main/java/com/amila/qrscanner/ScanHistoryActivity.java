@@ -1,6 +1,7 @@
 package com.amila.qrscanner;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -34,6 +35,11 @@ public class ScanHistoryActivity extends AppCompatActivity {
         mResults = null;
 
         RecyclerView recyclerView = findViewById(R.id.recyclerview);
+
+        RecyclerView.ItemDecoration dividerItemDecoration =
+                new DividerItemDecorator(ContextCompat.getDrawable(this, R.drawable.line_divider));
+        recyclerView.addItemDecoration(dividerItemDecoration);
+
         final ResultListAdapter adapter = new ResultListAdapter(this);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
