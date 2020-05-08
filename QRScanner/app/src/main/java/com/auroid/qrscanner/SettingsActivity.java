@@ -1,4 +1,4 @@
-package com.amila.qrscanner;
+package com.auroid.qrscanner;
 
 import android.os.Bundle;
 

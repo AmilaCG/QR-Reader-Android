@@ -1,4 +1,4 @@
-package com.amila.qrscanner;
+package com.auroid.qrscanner;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -13,9 +13,9 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 
-import com.amila.qrscanner.resultdb.Result;
-import com.amila.qrscanner.resultdb.ResultListAdapter;
-import com.amila.qrscanner.resultdb.ResultViewModel;
+import com.auroid.qrscanner.resultdb.Result;
+import com.auroid.qrscanner.resultdb.ResultListAdapter;
+import com.auroid.qrscanner.resultdb.ResultViewModel;
 
 import java.util.Collections;
 import java.util.List;

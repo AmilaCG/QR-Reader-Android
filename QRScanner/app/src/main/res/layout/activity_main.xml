@@ -17,7 +17,7 @@
             android:layout_height="match_parent"
             app:layout_constraintBottom_toBottomOf="parent" />
 
-        <com.amila.qrscanner.BarcodeTrackerView
+        <com.auroid.qrscanner.BarcodeTrackerView
             android:id="@+id/barcode_tracker_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />

@@ -1,4 +1,4 @@
-package com.amila.qrscanner;
+package com.auroid.qrscanner;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -38,10 +38,10 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelStoreOwner;
 import androidx.preference.PreferenceManager;
 
-import com.amila.qrscanner.camera.CameraSource;
+import com.auroid.qrscanner.camera.CameraSource;
 
-import com.amila.qrscanner.resultdb.Result;
-import com.amila.qrscanner.resultdb.ResultViewModel;
+import com.auroid.qrscanner.resultdb.Result;
+import com.auroid.qrscanner.resultdb.ResultViewModel;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.vision.Detector;

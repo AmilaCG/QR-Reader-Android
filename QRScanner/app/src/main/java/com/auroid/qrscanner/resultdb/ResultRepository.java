@@ -1,4 +1,4 @@
-package com.amila.qrscanner.resultdb;
+package com.auroid.qrscanner.resultdb;
 
 import android.app.Application;
 

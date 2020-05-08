@@ -30,7 +30,7 @@
             app:title="Legal information"
             app:summary="Open source licenses">
             <intent
-                android:targetPackage="com.amila.qrscanner"
+                android:targetPackage="com.auroid.qrscanner"
                 android:targetClass="com.google.android.gms.oss.licenses.OssLicensesMenuActivity" />
         </Preference>
     </PreferenceCategory>

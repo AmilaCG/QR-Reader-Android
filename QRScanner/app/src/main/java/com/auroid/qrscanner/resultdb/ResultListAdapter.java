@@ -1,4 +1,4 @@
-package com.amila.qrscanner.resultdb;
+package com.auroid.qrscanner.resultdb;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -9,7 +9,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.amila.qrscanner.R;
+import com.auroid.qrscanner.R;
 
 import java.util.List;
 
