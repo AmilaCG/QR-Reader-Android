@@ -7,4 +7,5 @@
     <string name="clear_history_confirmation">Are you sure you want to clear scan history?</string>
     <string name="empty_scan_history">Scan history is already empty</string>
     <string name="confirm_copy_to_clipboard">Copied to clipboard</string>
+    <string name="scan_guide">Place a QR code inside this view to scan</string>
 </resources>
