@@ -24,7 +24,7 @@
         <Preference
             app:key="version"
             app:title="Version"
-            app:summary="0.01" />
+            app:summary="@string/versionName" />
 
         <Preference
             app:title="Legal information"

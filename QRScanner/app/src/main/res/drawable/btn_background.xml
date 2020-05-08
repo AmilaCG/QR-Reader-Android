@@ -5,7 +5,7 @@
         android:height="70dp"
         android:width="70dp" />
 
-    <solid android:color="@color/colorButtonBg" />
+    <solid android:color="@color/colorAccent" />
 
     <corners android:radius="35dp" />
 </shape>
