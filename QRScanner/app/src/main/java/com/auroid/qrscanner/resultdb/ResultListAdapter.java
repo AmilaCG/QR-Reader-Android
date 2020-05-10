@@ -17,10 +17,12 @@ public class ResultListAdapter extends RecyclerView.Adapter<ResultListAdapter.Re
 
     static class ResultViewHolder extends RecyclerView.ViewHolder {
         private final TextView resultItemView;
+        private final TextView timeItemView;
 
         private ResultViewHolder(View itemView) {
             super(itemView);
-            resultItemView = itemView.findViewById(R.id.textView);
+            resultItemView = itemView.findViewById(R.id.textViewResult);
+            timeItemView = itemView.findViewById(R.id.textViewTime);
         }
     }
 
@@ -43,14 +45,19 @@ public class ResultListAdapter extends RecyclerView.Adapter<ResultListAdapter.Re
         if (mResults != null) {
             Result current = mResults.get(position);
             holder.resultItemView.setText(current.getResult());
+            holder.timeItemView.setText(current.getTime().toString());
         } else {
             holder.resultItemView.setText("No results");
         }
     }
 
     public void setResults(List<Result> results) {
-        mResults = results;
+        this.mResults = results;
         notifyDataSetChanged();
+    }
+
+    public Result getResultAt(int position) {
+        return mResults.get(position);
     }
 
     @Override

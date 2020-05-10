@@ -52,6 +52,7 @@ import com.google.android.material.snackbar.Snackbar;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -280,7 +281,7 @@ public class MainActivity extends AppCompatActivity {
 
                                 // Insert result to the database
                                 ResultViewModel resultViewModel = new ViewModelProvider(mViewModelStoreOwner).get(ResultViewModel.class);
-                                Result result = new Result(mDetectedBarcode.displayValue);
+                                Result result = new Result(mDetectedBarcode.displayValue, new Date());
                                 resultViewModel.insert(result);
                             });
 

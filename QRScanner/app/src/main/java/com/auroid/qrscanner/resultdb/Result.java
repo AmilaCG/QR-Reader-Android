@@ -1,23 +1,38 @@
 package com.auroid.qrscanner.resultdb;
 
-import androidx.annotation.NonNull;
-import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
+
+import java.util.Date;
 
 @Entity(tableName = "result_table")
 public class Result {
 
-    @PrimaryKey
-    @NonNull
-    @ColumnInfo(name = "result")
+    @PrimaryKey(autoGenerate = true)
+    private int mId;
+
     private String mResult;
 
-    public Result(@NonNull String result) {
-        this.mResult = result;
+    private Date mTime;
+
+    public Result(String mResult, Date mTime) {
+        this.mResult = mResult;
+        this.mTime = mTime;
+    }
+
+    public void setId(int id) {
+        this.mId = id;
+    }
+
+    public int getId() {
+        return mId;
     }
 
     public String getResult() {
-        return this.mResult;
+        return mResult;
+    }
+
+    public Date getTime() {
+        return mTime;
     }
 }

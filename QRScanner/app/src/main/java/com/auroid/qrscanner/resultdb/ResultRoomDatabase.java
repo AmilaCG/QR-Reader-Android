@@ -5,11 +5,13 @@ import android.content.Context;
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
+import androidx.room.TypeConverters;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-@Database(entities = {Result.class}, version = 1, exportSchema = false)
+@Database(entities = {Result.class}, version = 2, exportSchema = false)
+@TypeConverters({DateConverter.class})
 public abstract class ResultRoomDatabase extends RoomDatabase {
 
     public abstract ResultDao resultDao();
@@ -24,6 +26,7 @@ public abstract class ResultRoomDatabase extends RoomDatabase {
                 if (INSTANCE == null) {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
                             ResultRoomDatabase.class, "result_database")
+                            .fallbackToDestructiveMigration()
                             .build();
                 }
             }

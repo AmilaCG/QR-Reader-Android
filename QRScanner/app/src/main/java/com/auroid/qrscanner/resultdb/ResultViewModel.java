@@ -27,6 +27,10 @@ public class ResultViewModel extends AndroidViewModel {
         mRepository.insert(result);
     }
 
+    public void delete(Result result) {
+        mRepository.delete(result);
+    }
+
     public void clearAll() {
         mRepository.clearAll();
     }

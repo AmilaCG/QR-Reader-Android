@@ -27,6 +27,12 @@ public class ResultRepository {
         });
     }
 
+    void delete(Result result) {
+        ResultRoomDatabase.databaseWriteExecutor.execute(() -> {
+            mResultDao.delete(result);
+        });
+    }
+
     void clearAll() {
         ResultRoomDatabase.databaseWriteExecutor.execute(() -> {
             mResultDao.deleteAll();
