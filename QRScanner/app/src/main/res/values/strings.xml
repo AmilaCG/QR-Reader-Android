@@ -10,4 +10,5 @@
     <string name="scan_guide">Place a QR code inside this view to scan</string>
     <string name="confirm_clear_scan_history">Scan history has been cleared</string>
     <string name="confirm_result_delete">Item deleted</string>
+    <string name="invalid_url">Invalid URL, Try web search instead</string>
 </resources>

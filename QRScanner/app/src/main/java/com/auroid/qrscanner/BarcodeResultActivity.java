@@ -1,10 +1,12 @@
 package com.auroid.qrscanner;
 
+import android.app.SearchManager;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Patterns;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -32,9 +34,17 @@ public class BarcodeResultActivity extends AppCompatActivity {
     }
 
     public void openBrowser (View v) {
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setData(Uri.parse(mResult));
-        startActivity(intent);
+        boolean isValidURL =
+                Patterns.WEB_URL.matcher(mResult).matches();
+
+        if (isValidURL) {
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setData(Uri.parse(mResult));
+            startActivity(intent);
+        } else {
+            Toast.makeText(this, getString(R.string.invalid_url),
+                    Toast.LENGTH_SHORT).show();
+        }
     }
 
     public void copyToClipboard(View view) {
@@ -48,8 +58,9 @@ public class BarcodeResultActivity extends AppCompatActivity {
         }
     }
 
-    public void showHistory(View view) {
-        Intent intent = new Intent(this, ScanHistoryActivity.class);
+    public void webSearch(View view) {
+        Intent intent = new Intent(Intent.ACTION_WEB_SEARCH);
+        intent.putExtra(SearchManager.QUERY, mResult);
         startActivity(intent);
     }
 }
