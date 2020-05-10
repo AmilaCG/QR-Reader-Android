@@ -11,7 +11,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.auroid.qrscanner.R;
 
+import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Locale;
 
 public class ResultListAdapter extends RecyclerView.Adapter<ResultListAdapter.ResultViewHolder> {
 
@@ -29,6 +31,9 @@ public class ResultListAdapter extends RecyclerView.Adapter<ResultListAdapter.Re
     private final LayoutInflater mInflater;
     private List<Result> mResults;
 
+    private final SimpleDateFormat mFormatter =
+            new SimpleDateFormat("EEE, d MMM yyyy, h:mm a", Locale.getDefault());
+
     public ResultListAdapter(Context context) {
         mInflater = LayoutInflater.from(context);
     }
@@ -45,7 +50,7 @@ public class ResultListAdapter extends RecyclerView.Adapter<ResultListAdapter.Re
         if (mResults != null) {
             Result current = mResults.get(position);
             holder.resultItemView.setText(current.getResult());
-            holder.timeItemView.setText(current.getTime().toString());
+            holder.timeItemView.setText(mFormatter.format(current.getTime()));
         } else {
             holder.resultItemView.setText("No results");
         }
