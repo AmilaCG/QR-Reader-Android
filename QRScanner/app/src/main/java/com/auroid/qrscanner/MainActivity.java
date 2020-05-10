@@ -308,14 +308,14 @@ public class MainActivity extends AppCompatActivity {
         if (!mBarcodeDetector.isOperational()) {
             Log.e(TAG, "Detector dependencies are not available");
 
-            File cacheDir = getCacheDir();
-            // Check for low storage
-            if (cacheDir.getFreeSpace() * 100 / cacheDir.getTotalSpace() <= 10) {
-                Toast.makeText(mContext, R.string.low_storage_error, Toast.LENGTH_LONG).show();
-                Log.w(TAG, getString(R.string.low_storage_error));
-            } else {
-                Log.e(TAG, getString(R.string.unknown_download_error));
-            }
+            DialogInterface.OnClickListener listener = (dialog, id) -> finish();
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Dependencies not found")
+                    .setMessage(R.string.dependencies_not_found)
+                    .setPositiveButton("OK", listener)
+                    .setCancelable(false)
+                    .show();
         }
 
         if (mCameraSource == null) {
@@ -378,6 +378,7 @@ public class MainActivity extends AppCompatActivity {
         builder.setTitle("QR Code Reader")
                 .setMessage(R.string.no_camera_permission)
                 .setPositiveButton("OK", listener)
+                .setCancelable(false)
                 .show();
     }
 

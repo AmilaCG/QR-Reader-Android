@@ -11,4 +11,6 @@
     <string name="confirm_clear_scan_history">Scan history has been cleared</string>
     <string name="confirm_result_delete">Item deleted</string>
     <string name="invalid_url">Invalid URL, Try web search instead</string>
+    <string name="dependencies_not_found">Google Play Services will download required files in the background. This might take couple of minutes.
+        Please make sure to connect to the internet and try again in a moment.</string>
 </resources>
