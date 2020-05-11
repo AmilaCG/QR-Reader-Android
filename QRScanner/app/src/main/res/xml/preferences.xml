@@ -27,6 +27,11 @@
             app:summary="@string/versionName" />
 
         <Preference
+            app:key="developer"
+            app:title="Developer"
+            app:summary="Auroid Labs"/>
+
+        <Preference
             app:title="Legal information"
             app:summary="Open source licenses">
             <intent
