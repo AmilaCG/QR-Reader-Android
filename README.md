@@ -1,8 +1,8 @@
 # QR-Reader-Android
 A robust, minimalist QR code reader for Android powered by [Google Vision Barcode API](https://developers.google.com/vision/android/barcodes-overview).
 
-<a href="https://play.google.com/store/apps/details?id=com.auroid.qrscanner">
-<img src="google-play-badge.png" style="zoom:25%;float:left" /></a>
+<a href="https://play.google.com/store/apps/details?id=com.auroid.qrscanner" rel="noopener noreferrer" target="_blank">
+<img src="google-play-badge.png" style="float:left" width="180" /></a>
 
 
 
