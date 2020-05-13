@@ -28,7 +28,6 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -40,6 +39,7 @@ import androidx.preference.PreferenceManager;
 
 import com.auroid.qrscanner.camera.CameraSource;
 
+import com.auroid.qrscanner.camera.PreviewFrameSetListener;
 import com.auroid.qrscanner.resultdb.Result;
 import com.auroid.qrscanner.resultdb.ResultViewModel;
 import com.google.android.gms.common.ConnectionResult;
@@ -50,7 +50,6 @@ import com.google.android.gms.vision.barcode.BarcodeDetector;
 import com.google.android.material.bottomappbar.BottomAppBar;
 import com.google.android.material.snackbar.Snackbar;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Date;
 
@@ -71,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean mIsSurfaceAvailable;
     private SurfaceHolder mSurfaceHolder;
 
-    private Size mPreviewSize;
+    private Size mReqPreviewSize;
     private Context mContext;
 
     private CameraSource mCameraSource;
@@ -116,9 +115,6 @@ public class MainActivity extends AppCompatActivity {
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        mSurfaceView = findViewById(R.id.camera_viewfinder);
-        mSurfaceView.setVisibility(View.GONE);
-        mSurfaceHolder = mSurfaceView.getHolder();
         setupViewfinder();
 
         mTrackerView = findViewById(R.id.barcode_tracker_view);
@@ -208,6 +204,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setupViewfinder() {
+        mSurfaceView = findViewById(R.id.camera_viewfinder);
+
+        mSurfaceView.setVisibility(View.GONE);
+        mSurfaceHolder = mSurfaceView.getHolder();
+
         mSurfaceView.getHolder().addCallback(new SurfaceHolder.Callback() {
             @Override
             public void surfaceCreated(SurfaceHolder holder) {
@@ -319,9 +320,12 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (mCameraSource == null) {
-            mCameraSource = new CameraSource.Builder(mContext, mBarcodeDetector)
+            PreviewFrameSetListener surfaceSizeCalc =
+                    new SurfaceSizeCalculator(mContext, mSurfaceView, mTrackerView);
+
+            mCameraSource = new CameraSource.Builder(mContext, mBarcodeDetector, surfaceSizeCalc)
                     .setFacing(CameraSource.CAMERA_FACING_BACK)
-                    .setRequestedPreviewSize(mPreviewSize.getWidth(), mPreviewSize.getHeight())
+                    .setRequestedPreviewSize(mReqPreviewSize.getWidth(), mReqPreviewSize.getHeight())
                     .setRequestedFps(20.0f)
                     .setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE)
                     .setFlashMode(useFlash ? Camera.Parameters.FLASH_MODE_TORCH : null)
@@ -455,12 +459,12 @@ public class MainActivity extends AppCompatActivity {
         Rect displaySize = new Rect();
         getWindowManager().getDefaultDisplay().getRectSize(displaySize);
 
-        mPreviewSize = new Size(displaySize.width() * scaleFactor / FULL_SCALE, displaySize.height() * scaleFactor / FULL_SCALE);
+        mReqPreviewSize = new Size(displaySize.width() * scaleFactor / FULL_SCALE, displaySize.height() * scaleFactor / FULL_SCALE);
         displaySize = null;
 
-        if (mPreviewSize.getHeight() > mPreviewSize.getWidth()) {
-            mPreviewSize = new Size(mPreviewSize.getHeight(), mPreviewSize.getWidth());
+        if (mReqPreviewSize.getHeight() > mReqPreviewSize.getWidth()) {
+            mReqPreviewSize = new Size(mReqPreviewSize.getHeight(), mReqPreviewSize.getWidth());
         }
-        Log.d(TAG, "mPreviewSize width: " + mPreviewSize.getWidth() + ", height: " + mPreviewSize.getHeight());
+        Log.d(TAG, "mReqPreviewSize width: " + mReqPreviewSize.getWidth() + ", height: " + mReqPreviewSize.getHeight());
     }
 }

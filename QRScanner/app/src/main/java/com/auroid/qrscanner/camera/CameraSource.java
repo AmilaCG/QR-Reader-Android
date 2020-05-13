@@ -161,6 +161,10 @@ public class CameraSource {
      */
     private Map<byte[], ByteBuffer> mBytesToByteBuffer = new HashMap<>();
 
+    // PreviewFrameListener used to let others know the resolution of the preview frame created by
+    // Camera API
+    private PreviewFrameSetListener mPreviewFrameListener;
+
     //==============================================================================================
     // Builder
     //==============================================================================================
@@ -170,13 +174,13 @@ public class CameraSource {
      */
     public static class Builder {
         private final Detector<?> mDetector;
-        private CameraSource mCameraSource = new CameraSource();
+        private CameraSource mCameraSource;
 
         /**
          * Creates a camera source builder with the supplied context and detector.  Camera preview
          * images will be streamed to the associated detector upon starting the camera source.
          */
-        public Builder(Context context, Detector<?> detector) {
+        public Builder(Context context, Detector<?> detector, PreviewFrameSetListener previewFrameSetListener) {
             if (context == null) {
                 throw new IllegalArgumentException("No context supplied.");
             }
@@ -185,6 +189,8 @@ public class CameraSource {
             }
 
             mDetector = detector;
+
+            mCameraSource = new CameraSource(previewFrameSetListener);
             mCameraSource.mContext = context;
         }
 
@@ -672,7 +678,8 @@ public class CameraSource {
     /**
      * Only allow creation via the builder class.
      */
-    private CameraSource() {
+    private CameraSource(PreviewFrameSetListener previewFrameSetListener) {
+        this.mPreviewFrameListener = previewFrameSetListener;
     }
 
     /**
@@ -760,6 +767,7 @@ public class CameraSource {
         mPreviewSize = sizePair.previewSize();
 
         BarcodeTrackerView.setPreviewSize(mPreviewSize.getWidth(), mPreviewSize.getHeight());
+        mPreviewFrameListener.onPreviewFrameSet(mPreviewSize.getWidth(), mPreviewSize.getHeight());
 
         int[] previewFpsRange = selectPreviewFpsRange(camera, mRequestedFps);
         if (previewFpsRange == null) {
