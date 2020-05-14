@@ -67,7 +67,6 @@ public class MainActivity extends AppCompatActivity {
     private static final int RELEASE_BARCODE_DETECTOR = 10;
 
     private SurfaceView mSurfaceView;
-    private boolean mIsSurfaceAvailable;
     private SurfaceHolder mSurfaceHolder;
 
     private Size mReqPreviewSize;
@@ -104,7 +103,6 @@ public class MainActivity extends AppCompatActivity {
         mContext = this;
 
         mUseFlash = false;
-        mIsSurfaceAvailable = false;
         mCameraSource = null;
         mBarcodeDetector = null;
         mSoundPool = null;
@@ -173,19 +171,22 @@ public class MainActivity extends AppCompatActivity {
                 super.handleMessage(msg);
                 switch (msg.what) {
                     case CameraState.INIT_CAMERA:
+                        Log.d(TAG,"INIT_CAMERA");
                         if (mCameraSource == null) initCamera(mUseFlash);
                         break;
 
                     case CameraState.START_CAMERA:
+                        Log.d(TAG,"START_CAMERA");
                         startCamera();
                         break;
 
                     case CameraState.STOP_CAMERA:
+                        Log.d(TAG,"STOP_CAMERA");
                         if (mCameraSource != null) mCameraSource.stop();
                         break;
 
                     case CameraState.RELEASE_CAMERA:
-                        Log.d(TAG, "RELEASE_CAMERA called");
+                        Log.d(TAG, "RELEASE_CAMERA");
                         if (mCameraSource != null) {
                             mCameraSource.release();
                             mCameraSource = null;
@@ -193,6 +194,7 @@ public class MainActivity extends AppCompatActivity {
                         break;
 
                     case RELEASE_BARCODE_DETECTOR:
+                        Log.d(TAG,"RELEASE_BARCODE_DETECTOR");
                         if (mBarcodeDetector != null) {
                             mBarcodeDetector.release();
                             mBarcodeDetector = null;
@@ -213,7 +215,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void surfaceCreated(SurfaceHolder holder) {
                 Log.d(TAG, "surfaceCreated");
-                mIsSurfaceAvailable = true;
                 mTaskHandler.sendEmptyMessage(CameraState.START_CAMERA);
             }
 
@@ -225,7 +226,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void surfaceDestroyed(SurfaceHolder holder) {
                 Log.d(TAG, "surfaceDestroyed");
-                mIsSurfaceAvailable = false;
 
                 mTaskHandler.sendEmptyMessage(RELEASE_BARCODE_DETECTOR);
                 mTaskHandler.sendEmptyMessage(CameraState.RELEASE_CAMERA);
@@ -261,7 +261,6 @@ public class MainActivity extends AppCompatActivity {
                             }
                             mTrackerView.updateView(mDetectedBarcode.cornerPoints);
 
-                            if (mCameraSource != null) mCameraSource.stopPreview();
                             mTaskHandler.sendEmptyMessage(CameraState.STOP_CAMERA);
 
                             AsyncTask.execute(() -> {
@@ -346,12 +345,10 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (mCameraSource != null) {
-            if (mIsSurfaceAvailable) {
-                try {
-                    mCameraSource.start(mSurfaceHolder);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+            try {
+                mCameraSource.start(mSurfaceHolder);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
     }
