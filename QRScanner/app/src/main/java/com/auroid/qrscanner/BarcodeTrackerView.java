@@ -3,12 +3,13 @@ package com.auroid.qrscanner;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
+
+import androidx.core.content.ContextCompat;
 
 public class BarcodeTrackerView extends View {
     private static final String TAG = "BarcodeTrackerView";
@@ -23,18 +24,18 @@ public class BarcodeTrackerView extends View {
 
     public BarcodeTrackerView(Context context) {
         super(context);
-        init();
+        init(context);
     }
 
     public BarcodeTrackerView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        init();
+        init(context);
     }
 
-    private void init() {
+    private void init(Context context) {
         mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mPaint.setStrokeWidth(14);
-        mPaint.setColor(Color.GREEN);
+        mPaint.setColor(ContextCompat.getColor(context, R.color.colorAccent));
 
         mCornerPts = null;
     }

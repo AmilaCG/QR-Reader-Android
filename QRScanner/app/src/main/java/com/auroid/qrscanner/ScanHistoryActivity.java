@@ -39,10 +39,6 @@ public class ScanHistoryActivity extends AppCompatActivity {
 
         RecyclerView recyclerView = findViewById(R.id.recyclerview);
 
-        RecyclerView.ItemDecoration dividerItemDecoration =
-                new DividerItemDecorator(ContextCompat.getDrawable(this, R.drawable.line_divider));
-        recyclerView.addItemDecoration(dividerItemDecoration);
-
         final ResultListAdapter adapter = new ResultListAdapter(this);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));

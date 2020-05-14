@@ -5,7 +5,6 @@
     <color name="colorAccent">#03DAC5</color>
     <color name="transparentDark">#3C000000</color>
     <color name="invisible">#00000000</color>
-    <color name="colorDivider">#6E6E6E</color>
     <color name="colorButtonBg">#FFC107</color>
     <color name="colorText">#F4F4F4</color>
 </resources>
