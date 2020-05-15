@@ -2,7 +2,6 @@ package com.auroid.qrscanner;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -39,14 +38,14 @@ public class ScanHistoryActivity extends AppCompatActivity {
 
         RecyclerView recyclerView = findViewById(R.id.recyclerview);
 
-        final ResultListAdapter adapter = new ResultListAdapter(this);
+        final ResultListAdapter adapter = new ResultListAdapter();
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         mResultViewModel = new ViewModelProvider(this).get(ResultViewModel.class);
 
         mResultViewModel.getAllResults().observe(this, results -> {
-            adapter.setResults(results);
+            adapter.submitList(results);
 
             if (results.size() == 0) {
                 mBtnClear.setEnabled(false);
