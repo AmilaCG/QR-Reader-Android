@@ -28,6 +28,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -89,6 +90,8 @@ public class MainActivity extends AppCompatActivity {
 
     private ViewModelStoreOwner mViewModelStoreOwner;
 
+    private TextView mTvScanGuide;
+
     public static class CameraState {
         static final int INIT_CAMERA = 0;
         static final int START_CAMERA = 1;
@@ -108,10 +111,13 @@ public class MainActivity extends AppCompatActivity {
         mSoundPool = null;
         mViewModelStoreOwner = this;
 
+        mTvScanGuide = findViewById(R.id.txt_scan_guide);
+
         setupBottomAppBar();
         setupAudioBeep();
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        getWindow().getDecorView().setBackgroundColor(Color.BLACK);
 
         setupViewfinder();
 
@@ -129,7 +135,6 @@ public class MainActivity extends AppCompatActivity {
             mTaskHandler.sendEmptyMessage(CameraState.INIT_CAMERA);
             mSurfaceView.setVisibility(View.VISIBLE);
         } else {
-            getWindow().getDecorView().setBackgroundColor(Color.BLACK);
             requestCameraPermission();
         }
     }
@@ -140,7 +145,8 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG,"onResume");
         if (mBarcodeDetector == null) initBarcodeDetector();
         mTaskHandler.sendEmptyMessage(CameraState.INIT_CAMERA);
-
+        mSurfaceView.setVisibility(View.VISIBLE);
+        mTvScanGuide.setVisibility(View.VISIBLE);
         mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
     }
 
@@ -150,6 +156,8 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG,"onPause");
         mTrackerView.clearView();
         mTaskHandler.sendEmptyMessage(CameraState.STOP_CAMERA);
+        mTvScanGuide.setVisibility(View.INVISIBLE);
+        mSurfaceView.setVisibility(View.GONE);
     }
 
     @Override
