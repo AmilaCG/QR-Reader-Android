@@ -12,6 +12,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.auroid.qrscanner.resultdb.Result;
@@ -25,8 +26,6 @@ public class ScanHistoryActivity extends AppCompatActivity {
 
     private ResultViewModel mResultViewModel;
 
-    private Button mBtnClear;
-
     private Result mRecentlyDeletedItem;
 
     @Override
@@ -34,7 +33,8 @@ public class ScanHistoryActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scan_history);
 
-        mBtnClear = findViewById(R.id.clear_db);
+        Button btnClear = findViewById(R.id.clear_db);
+        TextView tvGuide = findViewById(R.id.text_guide);
 
         RecyclerView recyclerView = findViewById(R.id.recyclerview);
 
@@ -48,16 +48,20 @@ public class ScanHistoryActivity extends AppCompatActivity {
             adapter.submitList(results);
 
             if (results.size() == 0) {
-                mBtnClear.setEnabled(false);
+                btnClear.setEnabled(false);
+                tvGuide.setText(getString(R.string.empty_scan_history));
             } else {
-                mBtnClear.setEnabled(true);
+                btnClear.setEnabled(true);
+                tvGuide.setText(getString(R.string.delete_guide));
             }
         });
 
         new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0,
                 ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
             @Override
-            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+            public boolean onMove(@NonNull RecyclerView recyclerView,
+                                  @NonNull RecyclerView.ViewHolder viewHolder,
+                                  @NonNull RecyclerView.ViewHolder target) {
                 return false;
             }
 
