@@ -54,4 +54,6 @@ dependencies {
     annotationProcessor "androidx.lifecycle:lifecycle-compiler:$rootProject.archLifecycleVersion"
 
     implementation 'com.google.android.gms:play-services-oss-licenses:17.0.0'
+
+    implementation 'com.google.code.gson:gson:2.8.6'
 }

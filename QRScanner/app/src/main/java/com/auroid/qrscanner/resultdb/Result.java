@@ -15,9 +15,9 @@ public class Result {
 
     private Date mTime;
 
-    public Result(String mResult, Date mTime) {
-        this.mResult = mResult;
-        this.mTime = mTime;
+    public Result(String result, Date time) {
+        this.mResult = result;
+        this.mTime = time;
     }
 
     public void setId(int id) {

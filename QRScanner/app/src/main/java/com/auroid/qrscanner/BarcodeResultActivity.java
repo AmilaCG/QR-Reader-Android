@@ -16,8 +16,16 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 
+import com.auroid.qrscanner.resultdb.Result;
+import com.auroid.qrscanner.resultdb.ResultViewModel;
+import com.auroid.qrscanner.serializable.BarcodeWrapper;
+
+import com.auroid.qrscanner.serializable.EventWrapper;
+import com.auroid.qrscanner.serializable.GeoWrapper;
 import com.google.android.gms.vision.barcode.Barcode;
+import com.google.gson.Gson;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -35,14 +43,16 @@ public class BarcodeResultActivity extends AppCompatActivity {
     private String mEventStart;
     private String mEventEnd;
 
+    private Barcode mDetectedBarcode = MainActivity.mDetectedBarcode;
+
     @SuppressLint("DefaultLocale")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_barcode_result);
 
-        mResult = MainActivity.mDetectedBarcode.displayValue;
-        mResultType = MainActivity.mDetectedBarcode.valueFormat;
+        mResult = mDetectedBarcode.displayValue;
+        mResultType = mDetectedBarcode.valueFormat;
 
         TextView tvBarcodeResult = findViewById(R.id.barcode_result);
         tvBarcodeResult.setText(mResult);
@@ -55,23 +65,39 @@ public class BarcodeResultActivity extends AppCompatActivity {
                 Log.d(TAG, "URL");
                 tvAction.setText(R.string.action_web);
                 ibAction.setImageResource(R.drawable.ic_public_black_44dp);
+
+                BarcodeWrapper barcodeUrl = new BarcodeWrapper(mDetectedBarcode.valueFormat,
+                        mDetectedBarcode.displayValue, mDetectedBarcode.url.url,
+                        null, null, null);
+                insertToDb(barcodeUrl);
                 break;
 
             case Barcode.PHONE:
                 Log.d(TAG, "PHONE");
                 tvAction.setText(R.string.action_phone);
                 ibAction.setImageResource(R.drawable.ic_phone_black_38dp);
+
+                BarcodeWrapper barcodePhone = new BarcodeWrapper(mDetectedBarcode.valueFormat,
+                        mDetectedBarcode.displayValue, null,
+                        mDetectedBarcode.phone.number, null, null);
+                insertToDb(barcodePhone);
                 break;
 
             case Barcode.GEO:
                 Log.d(TAG, "GEO");
                 tvAction.setText(R.string.action_geo);
                 ibAction.setImageResource(R.drawable.ic_location_on_black_38dp);
+
+                GeoWrapper geo = new GeoWrapper(mDetectedBarcode.geoPoint.lat, mDetectedBarcode.geoPoint.lng);
+                BarcodeWrapper barcodeGeo = new BarcodeWrapper(mDetectedBarcode.valueFormat,
+                        mDetectedBarcode.displayValue, null,
+                        null, geo, null);
+                insertToDb(barcodeGeo);
                 break;
 
             case Barcode.CALENDAR_EVENT:
                 Log.d(TAG, "CALENDAR_EVENT");
-                mCalEvent = MainActivity.mDetectedBarcode.calendarEvent;
+                mCalEvent = mDetectedBarcode.calendarEvent;
 
                 mEventStart = mCalEvent.start.year + "/" + mCalEvent.start.month + "/" + mCalEvent.start.day
                         + " " + String.format("%02d", mCalEvent.start.hours)
@@ -95,11 +121,24 @@ public class BarcodeResultActivity extends AppCompatActivity {
 
                 tvAction.setText(R.string.action_calender);
                 ibAction.setImageResource(R.drawable.ic_calender_black_38dp);
+
+                EventWrapper event = new EventWrapper(
+                        mCalEvent.description,
+                        mCalEvent.location,
+                        mCalEvent.organizer,
+                        mCalEvent.status,
+                        mCalEvent.summary,
+                        mEventStart,
+                        mEventEnd);
+                BarcodeWrapper barcodeEvent = new BarcodeWrapper(mDetectedBarcode.valueFormat,
+                        mDetectedBarcode.displayValue, null,
+                        null, null, event);
+                insertToDb(barcodeEvent);
                 break;
 
             case Barcode.WIFI:
                 Log.d(TAG, "WIFI");
-                Barcode.WiFi wifiParams = MainActivity.mDetectedBarcode.wifi;
+                Barcode.WiFi wifiParams = mDetectedBarcode.wifi;
 
                 String encryption;
                 switch (wifiParams.encryptionType) {
@@ -127,12 +166,22 @@ public class BarcodeResultActivity extends AppCompatActivity {
 
                 tvAction.setVisibility(View.GONE);
                 ibAction.setVisibility(View.GONE);
+
+                BarcodeWrapper barcodeWifi = new BarcodeWrapper(mDetectedBarcode.valueFormat,
+                        mDetectedBarcode.displayValue, null,
+                        null, null, null);
+                insertToDb(barcodeWifi);
                 break;
 
             default:
                 Log.d(TAG, "default");
                 tvAction.setVisibility(View.GONE);
                 ibAction.setVisibility(View.GONE);
+
+                BarcodeWrapper barcodeDefault = new BarcodeWrapper(mDetectedBarcode.valueFormat,
+                        mDetectedBarcode.displayValue, null,
+                        null, null, null);
+                insertToDb(barcodeDefault);
                 break;
         }
     }
@@ -158,7 +207,7 @@ public class BarcodeResultActivity extends AppCompatActivity {
     }
 
     private void openBrowser() {
-        String url = MainActivity.mDetectedBarcode.url.url;
+        String url = mDetectedBarcode.url.url;
         boolean isValidURL = Patterns.WEB_URL.matcher(url).matches();
 
         if (isValidURL) {
@@ -172,7 +221,7 @@ public class BarcodeResultActivity extends AppCompatActivity {
     }
 
     private void openDialer() {
-        String number = MainActivity.mDetectedBarcode.phone.number;
+        String number = mDetectedBarcode.phone.number;
 
         Intent intent = new Intent(Intent.ACTION_DIAL);
         intent.setData(Uri.parse("tel:"+number));
@@ -180,8 +229,8 @@ public class BarcodeResultActivity extends AppCompatActivity {
     }
 
     private void openMaps() {
-        double lat = MainActivity.mDetectedBarcode.geoPoint.lat;
-        double lng = MainActivity.mDetectedBarcode.geoPoint.lng;
+        double lat = mDetectedBarcode.geoPoint.lat;
+        double lng = mDetectedBarcode.geoPoint.lng;
         String geo = "geo:0,0?q=" + lat + "," + lng + "(Location)";
         Uri coordinates = Uri.parse(geo);
 
@@ -246,5 +295,14 @@ public class BarcodeResultActivity extends AppCompatActivity {
 
     public void back(View v) {
         finish();
+    }
+
+    private void insertToDb(BarcodeWrapper barcode) {
+        Gson gson = new Gson();
+        String resultJson = gson.toJson(barcode);
+
+        ResultViewModel resultViewModel = new ViewModelProvider(this).get(ResultViewModel.class);
+        Result result = new Result(resultJson, new Date());
+        resultViewModel.insert(result);
     }
 }

@@ -42,6 +42,8 @@ import com.auroid.qrscanner.camera.CameraSource;
 import com.auroid.qrscanner.camera.PreviewFrameSetListener;
 import com.auroid.qrscanner.resultdb.Result;
 import com.auroid.qrscanner.resultdb.ResultViewModel;
+import com.auroid.qrscanner.serializable.BarcodeWrapper;
+
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.vision.Detector;
@@ -49,6 +51,7 @@ import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
 import com.google.android.material.bottomappbar.BottomAppBar;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.util.Date;
@@ -278,15 +281,21 @@ public class MainActivity extends AppCompatActivity {
                                     Intent intent = new Intent(Intent.ACTION_VIEW);
                                     intent.setData(Uri.parse(mDetectedBarcode.url.url));
                                     startActivity(intent);
+
+                                    BarcodeWrapper barcode = new BarcodeWrapper(mDetectedBarcode.valueFormat,
+                                            mDetectedBarcode.displayValue, mDetectedBarcode.url.url,
+                                            null, null, null);
+                                    Gson gson = new Gson();
+                                    String resultJson = gson.toJson(barcode);
+
+                                    // Insert result to the database
+                                    ResultViewModel resultViewModel =
+                                            new ViewModelProvider(mViewModelStoreOwner).get(ResultViewModel.class);
+                                    Result result = new Result(resultJson, new Date());
+                                    resultViewModel.insert(result);
                                 } else {
                                     startActivity(new Intent(mContext, BarcodeResultActivity.class));
                                 }
-
-                                // Insert result to the database
-                                ResultViewModel resultViewModel =
-                                        new ViewModelProvider(mViewModelStoreOwner).get(ResultViewModel.class);
-                                Result result = new Result(mDetectedBarcode.displayValue, new Date());
-                                resultViewModel.insert(result);
                             });
 
                             mTaskHandler.sendEmptyMessage(RELEASE_BARCODE_DETECTOR);

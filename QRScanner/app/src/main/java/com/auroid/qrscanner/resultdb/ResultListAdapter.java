@@ -11,6 +11,9 @@ import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.auroid.qrscanner.R;
+import com.auroid.qrscanner.serializable.BarcodeWrapper;
+
+import com.google.gson.Gson;
 
 import java.text.SimpleDateFormat;
 import java.util.Locale;
@@ -19,6 +22,8 @@ public class ResultListAdapter extends ListAdapter<Result, ResultListAdapter.Res
 
     private final SimpleDateFormat mFormatter =
             new SimpleDateFormat("EEE, d MMM yyyy, h:mm a", Locale.getDefault());
+
+    private Gson mGson;
 
     private static final DiffUtil.ItemCallback<Result> DIFF_CALLBACK = new DiffUtil.ItemCallback<Result>() {
         @Override
@@ -35,6 +40,7 @@ public class ResultListAdapter extends ListAdapter<Result, ResultListAdapter.Res
 
     public ResultListAdapter() {
         super(DIFF_CALLBACK);
+        mGson = new Gson();
     }
 
     @NonNull
@@ -48,8 +54,12 @@ public class ResultListAdapter extends ListAdapter<Result, ResultListAdapter.Res
     @Override
     public void onBindViewHolder(@NonNull ResultViewHolder holder, int position) {
         Result current = getItem(position);
-        holder.resultItemView.setText(current.getResult());
+        holder.resultItemView.setText(fromJson(current.getResult()).displayValue);
         holder.timeItemView.setText(mFormatter.format(current.getTime()));
+    }
+
+    private BarcodeWrapper fromJson(String resultJson) {
+        return mGson.fromJson(resultJson, BarcodeWrapper.class);
     }
 
     public Result getResultAt(int position) {
