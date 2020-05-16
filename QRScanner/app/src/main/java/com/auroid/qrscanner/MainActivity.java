@@ -22,7 +22,6 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
 import android.util.Log;
-import android.util.Patterns;
 import android.util.Size;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -76,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
     private CameraSource mCameraSource;
     private BarcodeDetector mBarcodeDetector;
     private BarcodeTrackerView mTrackerView;
-    private Barcode mDetectedBarcode;
+    public static Barcode mDetectedBarcode;
 
     private boolean mUseFlash;
 
@@ -274,21 +273,18 @@ public class MainActivity extends AppCompatActivity {
                             AsyncTask.execute(() -> {
                                 boolean openInBrowser =
                                         mSharedPrefs.getBoolean("open_browser", false);
-                                boolean isValidURL =
-                                        Patterns.WEB_URL.matcher(mDetectedBarcode.displayValue).matches();
 
-                                if (openInBrowser && isValidURL) {
+                                if (openInBrowser && mDetectedBarcode.valueFormat == Barcode.URL) {
                                     Intent intent = new Intent(Intent.ACTION_VIEW);
-                                    intent.setData(Uri.parse(mDetectedBarcode.displayValue));
+                                    intent.setData(Uri.parse(mDetectedBarcode.url.url));
                                     startActivity(intent);
                                 } else {
-                                    Intent intent = new Intent(mContext, BarcodeResultActivity.class);
-                                    intent.putExtra("barcode", mDetectedBarcode.displayValue);
-                                    startActivity(intent);
+                                    startActivity(new Intent(mContext, BarcodeResultActivity.class));
                                 }
 
                                 // Insert result to the database
-                                ResultViewModel resultViewModel = new ViewModelProvider(mViewModelStoreOwner).get(ResultViewModel.class);
+                                ResultViewModel resultViewModel =
+                                        new ViewModelProvider(mViewModelStoreOwner).get(ResultViewModel.class);
                                 Result result = new Result(mDetectedBarcode.displayValue, new Date());
                                 resultViewModel.insert(result);
                             });
@@ -464,7 +460,8 @@ public class MainActivity extends AppCompatActivity {
         Rect displaySize = new Rect();
         getWindowManager().getDefaultDisplay().getRectSize(displaySize);
 
-        mReqPreviewSize = new Size(displaySize.width() * scaleFactor / FULL_SCALE, displaySize.height() * scaleFactor / FULL_SCALE);
+        mReqPreviewSize =
+                new Size(displaySize.width() * scaleFactor / FULL_SCALE, displaySize.height() * scaleFactor / FULL_SCALE);
         displaySize = null;
 
         if (mReqPreviewSize.getHeight() > mReqPreviewSize.getWidth()) {
