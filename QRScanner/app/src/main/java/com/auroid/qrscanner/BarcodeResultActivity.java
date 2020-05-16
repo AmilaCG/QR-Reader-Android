@@ -57,12 +57,6 @@ public class BarcodeResultActivity extends AppCompatActivity {
                 ibAction.setImageResource(R.drawable.ic_public_black_44dp);
                 break;
 
-            case Barcode.TEXT:
-                Log.d(TAG, "TEXT");
-                tvAction.setVisibility(View.GONE);
-                ibAction.setVisibility(View.GONE);
-                break;
-
             case Barcode.PHONE:
                 Log.d(TAG, "PHONE");
                 tvAction.setText(R.string.action_phone);
@@ -101,6 +95,38 @@ public class BarcodeResultActivity extends AppCompatActivity {
 
                 tvAction.setText(R.string.action_calender);
                 ibAction.setImageResource(R.drawable.ic_calender_black_38dp);
+                break;
+
+            case Barcode.WIFI:
+                Log.d(TAG, "WIFI");
+                Barcode.WiFi wifiParams = MainActivity.mDetectedBarcode.wifi;
+
+                String encryption;
+                switch (wifiParams.encryptionType) {
+                    case Barcode.WiFi.OPEN:
+                        encryption = "None";
+                        break;
+
+                    case Barcode.WiFi.WPA:
+                        encryption = "WPA";
+                        break;
+
+                    case Barcode.WiFi.WEP:
+                        encryption = "WEP";
+                        break;
+
+                    default:
+                        encryption = "Unknown";
+                }
+
+                String wifiInfo = "Wi-Fi Network\n" +
+                        "\nName: " + wifiParams.ssid +
+                        "\nPassword: " + wifiParams.password +
+                        "\nEncryption: " + encryption;
+                tvBarcodeResult.setText(wifiInfo);
+
+                tvAction.setVisibility(View.GONE);
+                ibAction.setVisibility(View.GONE);
                 break;
 
             default:
