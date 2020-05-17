@@ -26,15 +26,13 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
-            android:layout_marginEnd="2dp"
             android:textAppearance="@android:style/TextAppearance.Material.Medium"
             android:text="Result"
-            android:textColor="@color/colorText"
-            android:autoLink="web"
+            android:textColor="@color/colorAccent"
             android:textIsSelectable="true"
             app:layout_constraintStart_toEndOf="@id/imgview_history"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintEnd_toStartOf="@id/textThreeDot" />
 
         <TextView
             android:id="@+id/textViewTime"
@@ -43,7 +41,20 @@
             android:layout_marginStart="4dp"
             android:text="Date/Time"
             app:layout_constraintStart_toEndOf="@id/imgview_history"
-            app:layout_constraintTop_toBottomOf="@id/textViewResult" />
+            app:layout_constraintTop_toBottomOf="@id/textViewResult"
+            app:layout_constraintEnd_toStartOf="@id/textThreeDot" />
+
+        <TextView
+            android:id="@+id/textThreeDot"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingStart="6dp"
+            android:paddingEnd="8dp"
+            android:text="⋮"
+            android:textStyle="bold"
+            android:textSize="22dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

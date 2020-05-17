@@ -1,9 +1,11 @@
 package com.auroid.qrscanner.resultdb;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -11,6 +13,7 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.auroid.qrscanner.ActionHandler;
 import com.auroid.qrscanner.R;
 import com.auroid.qrscanner.serializable.BarcodeWrapper;
 
@@ -26,6 +29,8 @@ public class ResultListAdapter extends ListAdapter<Result, ResultListAdapter.Res
             new SimpleDateFormat("EEE, d MMM yyyy, h:mm a", Locale.getDefault());
 
     private Gson mGson;
+
+    private Context mContext;
 
     private static final DiffUtil.ItemCallback<Result> DIFF_CALLBACK = new DiffUtil.ItemCallback<Result>() {
         @Override
@@ -48,7 +53,8 @@ public class ResultListAdapter extends ListAdapter<Result, ResultListAdapter.Res
     @NonNull
     @Override
     public ResultViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View itemView = LayoutInflater.from(parent.getContext())
+        mContext = parent.getContext();
+        View itemView = LayoutInflater.from(mContext)
                 .inflate(R.layout.recyclerview_item, parent, false);
         return new ResultViewHolder(itemView);
     }
@@ -60,6 +66,80 @@ public class ResultListAdapter extends ListAdapter<Result, ResultListAdapter.Res
         holder.resultItemView.setText(barcodeWrapper.displayValue);
         holder.timeItemView.setText(mFormatter.format(current.getTime()));
         setIcon(barcodeWrapper.valueFormat, holder);
+
+        holder.optionItemView.setOnClickListener(v -> {
+            PopupMenu popupMenu = new PopupMenu(mContext, holder.optionItemView);
+
+            inflateMenu(barcodeWrapper.valueFormat, popupMenu);
+            ActionHandler actionHandler = new ActionHandler(mContext, barcodeWrapper);
+
+            popupMenu.setOnMenuItemClickListener(item -> {
+                switch (item.getItemId()) {
+                    case R.id.menu_item_action:
+                        runAction(barcodeWrapper.valueFormat, actionHandler);
+                        return true;
+
+                    case R.id.menu_item_search:
+                        actionHandler.webSearch();
+                        return true;
+
+                    case R.id.menu_item_copy:
+                        actionHandler.copyToClipboard();
+                        return true;
+
+                    default:
+                        return false;
+                }
+            });
+            popupMenu.show();
+        });
+    }
+
+    private void runAction(int resultType, ActionHandler actionHandler) {
+        switch (resultType) {
+            case Barcode.URL:
+                actionHandler.openBrowser();
+                break;
+
+            case Barcode.PHONE:
+                actionHandler.openDialer();
+                break;
+
+            case Barcode.GEO:
+                actionHandler.openMaps();
+                break;
+
+            case Barcode.CALENDAR_EVENT:
+                actionHandler.addToCalender();
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    private void inflateMenu(int resultType, PopupMenu popupMenu) {
+        switch(resultType) {
+            case Barcode.URL:
+                popupMenu.inflate(R.menu.menu_result_web);
+                break;
+
+            case Barcode.PHONE:
+                popupMenu.inflate(R.menu.menu_result_phone);
+                break;
+
+            case Barcode.GEO:
+                popupMenu.inflate(R.menu.menu_result_geo);
+                break;
+
+            case Barcode.CALENDAR_EVENT:
+                popupMenu.inflate(R.menu.menu_result_event);
+                break;
+
+            default:
+                popupMenu.inflate(R.menu.menu_result_default);
+                break;
+        }
     }
 
     private void setIcon(int resultType, ResultViewHolder holder) {
@@ -98,12 +178,14 @@ public class ResultListAdapter extends ListAdapter<Result, ResultListAdapter.Res
         private final TextView resultItemView;
         private final TextView timeItemView;
         private final ImageView iconItemView;
+        private final TextView optionItemView;
 
         private ResultViewHolder(View itemView) {
             super(itemView);
             resultItemView = itemView.findViewById(R.id.textViewResult);
             timeItemView = itemView.findViewById(R.id.textViewTime);
             iconItemView = itemView.findViewById(R.id.imgview_history);
+            optionItemView = itemView.findViewById(R.id.textThreeDot);
         }
     }
 }
