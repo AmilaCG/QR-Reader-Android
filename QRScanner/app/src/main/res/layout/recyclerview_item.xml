@@ -12,25 +12,38 @@
         android:layout_height="match_parent"
         android:layout_margin="4dp">
 
+        <ImageView
+            android:id="@+id/imgview_history"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:padding="2dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
         <TextView
             android:id="@+id/textViewResult"
-            style="@style/result_style"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="2dp"
+            android:textAppearance="@android:style/TextAppearance.Material.Medium"
             android:text="Result"
+            android:textColor="@color/colorText"
             android:autoLink="web"
             android:textIsSelectable="true"
+            app:layout_constraintStart_toEndOf="@id/imgview_history"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintEnd_toEndOf="parent" />
 
         <TextView
             android:id="@+id/textViewTime"
-            style="@style/time_style"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
             android:text="Date/Time"
-            app:layout_constraintTop_toBottomOf="@id/textViewResult"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toEndOf="@id/imgview_history"
+            app:layout_constraintTop_toBottomOf="@id/textViewResult" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
