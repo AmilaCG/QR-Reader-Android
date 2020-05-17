@@ -9,12 +9,12 @@ public class BarcodeWrapper {
     public GeoWrapper geoWrapper;
     public EventWrapper eventWrapper;
 
-    public BarcodeWrapper(int valueFormat, String displayValue, String url, String phoneNumber, GeoWrapper geoWrapper, EventWrapper eventWrapper) {
+    public BarcodeWrapper(int valueFormat, String displayValue) {
         this.valueFormat = valueFormat;
         this.displayValue = displayValue;
-        this.url = url;
-        this.phoneNumber = phoneNumber;
-        this.geoWrapper = geoWrapper;
-        this.eventWrapper = eventWrapper;
+        this.url = null;
+        this.phoneNumber = null;
+        this.geoWrapper = null;
+        this.eventWrapper = null;
     }
 }

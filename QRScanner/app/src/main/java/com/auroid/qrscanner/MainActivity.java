@@ -38,7 +38,6 @@ import androidx.lifecycle.ViewModelStoreOwner;
 import androidx.preference.PreferenceManager;
 
 import com.auroid.qrscanner.camera.CameraSource;
-
 import com.auroid.qrscanner.camera.PreviewFrameSetListener;
 import com.auroid.qrscanner.resultdb.Result;
 import com.auroid.qrscanner.resultdb.ResultViewModel;
@@ -283,8 +282,8 @@ public class MainActivity extends AppCompatActivity {
                                     startActivity(intent);
 
                                     BarcodeWrapper barcode = new BarcodeWrapper(mDetectedBarcode.valueFormat,
-                                            mDetectedBarcode.displayValue, mDetectedBarcode.url.url,
-                                            null, null, null);
+                                                    mDetectedBarcode.displayValue);
+                                    barcode.url = mDetectedBarcode.url.url;
                                     Gson gson = new Gson();
                                     String resultJson = gson.toJson(barcode);
 

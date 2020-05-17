@@ -21,9 +21,9 @@ import androidx.lifecycle.ViewModelProvider;
 import com.auroid.qrscanner.resultdb.Result;
 import com.auroid.qrscanner.resultdb.ResultViewModel;
 import com.auroid.qrscanner.serializable.BarcodeWrapper;
-
 import com.auroid.qrscanner.serializable.EventWrapper;
 import com.auroid.qrscanner.serializable.GeoWrapper;
+
 import com.google.android.gms.vision.barcode.Barcode;
 import com.google.gson.Gson;
 
@@ -60,16 +60,18 @@ public class BarcodeResultActivity extends AppCompatActivity {
         TextView tvAction = findViewById(R.id.txt_action);
         ImageButton ibAction = findViewById(R.id.ib_action);
 
+        // Create BarcodeWrapper object which will be stored in the database
+        BarcodeWrapper barcodeWrapper =
+                new BarcodeWrapper(mResultType, mResult);
+
         switch (mResultType) {
             case Barcode.URL:
                 Log.d(TAG, "URL");
                 tvAction.setText(R.string.action_web);
                 ibAction.setImageResource(R.drawable.ic_public_black_44dp);
 
-                BarcodeWrapper barcodeUrl = new BarcodeWrapper(mDetectedBarcode.valueFormat,
-                        mDetectedBarcode.displayValue, mDetectedBarcode.url.url,
-                        null, null, null);
-                insertToDb(barcodeUrl);
+                barcodeWrapper.url = mDetectedBarcode.url.url;
+                insertToDb(barcodeWrapper);
                 break;
 
             case Barcode.PHONE:
@@ -77,10 +79,8 @@ public class BarcodeResultActivity extends AppCompatActivity {
                 tvAction.setText(R.string.action_phone);
                 ibAction.setImageResource(R.drawable.ic_phone_black_38dp);
 
-                BarcodeWrapper barcodePhone = new BarcodeWrapper(mDetectedBarcode.valueFormat,
-                        mDetectedBarcode.displayValue, null,
-                        mDetectedBarcode.phone.number, null, null);
-                insertToDb(barcodePhone);
+                barcodeWrapper.phoneNumber = mDetectedBarcode.phone.number;
+                insertToDb(barcodeWrapper);
                 break;
 
             case Barcode.GEO:
@@ -88,11 +88,9 @@ public class BarcodeResultActivity extends AppCompatActivity {
                 tvAction.setText(R.string.action_geo);
                 ibAction.setImageResource(R.drawable.ic_location_on_black_38dp);
 
-                GeoWrapper geo = new GeoWrapper(mDetectedBarcode.geoPoint.lat, mDetectedBarcode.geoPoint.lng);
-                BarcodeWrapper barcodeGeo = new BarcodeWrapper(mDetectedBarcode.valueFormat,
-                        mDetectedBarcode.displayValue, null,
-                        null, geo, null);
-                insertToDb(barcodeGeo);
+                barcodeWrapper.geoWrapper
+                        = new GeoWrapper(mDetectedBarcode.geoPoint.lat, mDetectedBarcode.geoPoint.lng);
+                insertToDb(barcodeWrapper);
                 break;
 
             case Barcode.CALENDAR_EVENT:
@@ -122,7 +120,7 @@ public class BarcodeResultActivity extends AppCompatActivity {
                 tvAction.setText(R.string.action_calender);
                 ibAction.setImageResource(R.drawable.ic_calender_black_38dp);
 
-                EventWrapper event = new EventWrapper(
+                barcodeWrapper.eventWrapper = new EventWrapper(
                         mCalEvent.description,
                         mCalEvent.location,
                         mCalEvent.organizer,
@@ -130,10 +128,7 @@ public class BarcodeResultActivity extends AppCompatActivity {
                         mCalEvent.summary,
                         mEventStart,
                         mEventEnd);
-                BarcodeWrapper barcodeEvent = new BarcodeWrapper(mDetectedBarcode.valueFormat,
-                        mDetectedBarcode.displayValue, null,
-                        null, null, event);
-                insertToDb(barcodeEvent);
+                insertToDb(barcodeWrapper);
                 break;
 
             case Barcode.WIFI:
@@ -167,10 +162,8 @@ public class BarcodeResultActivity extends AppCompatActivity {
                 tvAction.setVisibility(View.GONE);
                 ibAction.setVisibility(View.GONE);
 
-                BarcodeWrapper barcodeWifi = new BarcodeWrapper(mDetectedBarcode.valueFormat,
-                        mDetectedBarcode.displayValue, null,
-                        null, null, null);
-                insertToDb(barcodeWifi);
+                // No additional params to set, directly inserting to the DB
+                insertToDb(barcodeWrapper);
                 break;
 
             default:
@@ -178,10 +171,8 @@ public class BarcodeResultActivity extends AppCompatActivity {
                 tvAction.setVisibility(View.GONE);
                 ibAction.setVisibility(View.GONE);
 
-                BarcodeWrapper barcodeDefault = new BarcodeWrapper(mDetectedBarcode.valueFormat,
-                        mDetectedBarcode.displayValue, null,
-                        null, null, null);
-                insertToDb(barcodeDefault);
+                // No additional params to set, directly inserting to the DB
+                insertToDb(barcodeWrapper);
                 break;
         }
     }
