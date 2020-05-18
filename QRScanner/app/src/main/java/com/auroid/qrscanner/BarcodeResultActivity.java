@@ -28,9 +28,9 @@ import com.auroid.qrscanner.serializable.ContactWrapper;
 import com.auroid.qrscanner.serializable.EmailWrapper;
 import com.auroid.qrscanner.serializable.EventWrapper;
 import com.auroid.qrscanner.serializable.GeoWrapper;
-
 import com.auroid.qrscanner.serializable.PhoneWrapper;
 import com.auroid.qrscanner.utils.TypeSelector;
+
 import com.google.android.gms.vision.barcode.Barcode;
 import com.google.gson.Gson;
 
@@ -256,6 +256,7 @@ public class BarcodeResultActivity extends AppCompatActivity {
         }
     }
 
+    // TODO: Move this into ActionHandler
     private void openBrowser() {
         String url = mDetectedBarcode.url.url;
 
@@ -264,6 +265,7 @@ public class BarcodeResultActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    // TODO: Move this into ActionHandler
     private void openDialer() {
         String number = mDetectedBarcode.phone.number;
 
@@ -272,6 +274,7 @@ public class BarcodeResultActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    // TODO: Move this into ActionHandler
     private void openMaps() {
         double lat = mDetectedBarcode.geoPoint.lat;
         double lng = mDetectedBarcode.geoPoint.lng;
@@ -285,6 +288,7 @@ public class BarcodeResultActivity extends AppCompatActivity {
         }
     }
 
+    // TODO: Move this into ActionHandler
     private void addToCalender() {
         long startDate;
         long endDate;
@@ -320,6 +324,7 @@ public class BarcodeResultActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    // TODO: Move this into ActionHandler
     private void addToContacts() {
         Barcode.ContactInfo contactInfo = mDetectedBarcode.contactInfo;
 
@@ -327,8 +332,20 @@ public class BarcodeResultActivity extends AppCompatActivity {
         intent.setType(ContactsContract.Contacts.CONTENT_TYPE);
 
         intent.putExtra(ContactsContract.Intents.Insert.NAME, contactInfo.name.formattedName);
+        intent.putExtra(ContactsContract.Intents.Insert.COMPANY, contactInfo.organization);
+        intent.putExtra(ContactsContract.Intents.Insert.JOB_TITLE, contactInfo.title);
 
         ArrayList<ContentValues> data = new ArrayList<>();
+        // Adding URL's
+        for (int i = 0; i < mContact.urls.length; i++) {
+            ContentValues row = new ContentValues();
+            row.put(ContactsContract.RawContacts.Data.MIMETYPE,
+                    ContactsContract.CommonDataKinds.Website.CONTENT_ITEM_TYPE);
+
+            row.put(ContactsContract.CommonDataKinds.Website.URL, mContact.urls[i]);
+            data.add(row);
+        }
+
         // Adding phone numbers
         for (int i = 0; i < mContact.phones.length; i++) {
             ContentValues row = new ContentValues();
@@ -369,7 +386,7 @@ public class BarcodeResultActivity extends AppCompatActivity {
             row.put(ContactsContract.CommonDataKinds.StructuredPostal.FORMATTED_ADDRESS,
                     postalAddress.toString());
 
-            row.put(ContactsContract.CommonDataKinds.SipAddress.TYPE,
+            row.put(ContactsContract.CommonDataKinds.StructuredPostal.TYPE,
                     TypeSelector.selectAddressType(mContact.addresses[i].type));
             data.add(row);
         }
@@ -378,6 +395,7 @@ public class BarcodeResultActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    // TODO: Move this into ActionHandler
     public void copyToClipboard(View view) {
         ClipboardManager clipboardManager = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
         ClipData clip = ClipData.newPlainText("QRCode", mResult);
@@ -389,6 +407,7 @@ public class BarcodeResultActivity extends AppCompatActivity {
         }
     }
 
+    // TODO: Move this into ActionHandler
     public void webSearch(View view) {
         Intent intent = new Intent(Intent.ACTION_WEB_SEARCH);
         intent.putExtra(SearchManager.QUERY, mResult);

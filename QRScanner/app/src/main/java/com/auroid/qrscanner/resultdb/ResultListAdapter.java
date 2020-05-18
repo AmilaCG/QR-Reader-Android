@@ -113,6 +113,10 @@ public class ResultListAdapter extends ListAdapter<Result, ResultListAdapter.Res
                 actionHandler.addToCalender();
                 break;
 
+            case Barcode.CONTACT_INFO:
+                actionHandler.addToContacts();
+                break;
+
             default:
                 break;
         }
@@ -136,6 +140,10 @@ public class ResultListAdapter extends ListAdapter<Result, ResultListAdapter.Res
                 popupMenu.inflate(R.menu.menu_result_event);
                 break;
 
+            case Barcode.CONTACT_INFO:
+                popupMenu.inflate(R.menu.menu_result_contact);
+                break;
+
             default:
                 popupMenu.inflate(R.menu.menu_result_default);
                 break;
@@ -150,6 +158,10 @@ public class ResultListAdapter extends ListAdapter<Result, ResultListAdapter.Res
 
             case Barcode.PHONE:
                 holder.iconItemView.setImageResource(R.drawable.ic_phone_white_24dp);
+                break;
+
+            case Barcode.CONTACT_INFO:
+                holder.iconItemView.setImageResource(R.drawable.ic_person_white_24dp);
                 break;
 
             case Barcode.GEO:
