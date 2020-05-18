@@ -4,12 +4,14 @@ import android.annotation.SuppressLint;
 import android.app.SearchManager;
 import android.content.ClipData;
 import android.content.ClipboardManager;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.CalendarContract;
+import android.provider.ContactsContract;
 import android.util.Log;
-import android.util.Patterns;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -20,15 +22,21 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.auroid.qrscanner.resultdb.Result;
 import com.auroid.qrscanner.resultdb.ResultViewModel;
+import com.auroid.qrscanner.serializable.AddressWrapper;
 import com.auroid.qrscanner.serializable.BarcodeWrapper;
+import com.auroid.qrscanner.serializable.ContactWrapper;
+import com.auroid.qrscanner.serializable.EmailWrapper;
 import com.auroid.qrscanner.serializable.EventWrapper;
 import com.auroid.qrscanner.serializable.GeoWrapper;
 
+import com.auroid.qrscanner.serializable.PhoneWrapper;
+import com.auroid.qrscanner.utils.TypeSelector;
 import com.google.android.gms.vision.barcode.Barcode;
 import com.google.gson.Gson;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
@@ -42,6 +50,8 @@ public class BarcodeResultActivity extends AppCompatActivity {
     private Barcode.CalendarEvent mCalEvent;
     private String mEventStart;
     private String mEventEnd;
+
+    private Barcode.ContactInfo mContact;
 
     private Barcode mDetectedBarcode = MainActivity.mDetectedBarcode;
 
@@ -131,6 +141,51 @@ public class BarcodeResultActivity extends AppCompatActivity {
                 insertToDb(barcodeWrapper);
                 break;
 
+            case Barcode.CONTACT_INFO:
+                Log.d(TAG, "CONTACT_INFO");
+                mContact = mDetectedBarcode.contactInfo;
+
+                tvAction.setText(R.string.action_contact);
+                ibAction.setImageResource(R.drawable.ic_person_add_black_38dp);
+
+                AsyncTask.execute(() -> {
+                    int numOfPhones = mContact.phones.length;
+                    PhoneWrapper[] phoneWrappers = new PhoneWrapper[numOfPhones];
+                    for (int i = 0; i < numOfPhones; i++) {
+                        phoneWrappers[i] = new PhoneWrapper(
+                                mContact.phones[i].number,
+                                mContact.phones[i].type);
+                    }
+
+                    int numOfEmails = mContact.emails.length;
+                    EmailWrapper[] emailWrappers = new EmailWrapper[numOfEmails];
+                    for (int i = 0; i < numOfEmails; i++) {
+                        emailWrappers[i] = new EmailWrapper(
+                                mContact.emails[i].address,
+                                mContact.emails[i].type);
+                    }
+
+                    int numOfAddresses = mContact.addresses.length;
+                    AddressWrapper[] addressWrappers = new AddressWrapper[numOfAddresses];
+                    for (int i = 0; i < numOfAddresses; i++) {
+                        addressWrappers[i] = new AddressWrapper(
+                                mContact.addresses[i].addressLines,
+                                mContact.addresses[i].type);
+                    }
+
+                    barcodeWrapper.contactWrapper = new ContactWrapper(
+                            mContact.name.formattedName,
+                            mContact.organization,
+                            mContact.title,
+                            mContact.urls,
+                            phoneWrappers,
+                            emailWrappers,
+                            addressWrappers
+                    );
+                    insertToDb(barcodeWrapper);
+                });
+                break;
+
             case Barcode.WIFI:
                 Log.d(TAG, "WIFI");
                 Barcode.WiFi wifiParams = mDetectedBarcode.wifi;
@@ -194,21 +249,19 @@ public class BarcodeResultActivity extends AppCompatActivity {
             case Barcode.GEO:
                 openMaps();
                 break;
+
+            case Barcode.CONTACT_INFO:
+                addToContacts();
+                break;
         }
     }
 
     private void openBrowser() {
         String url = mDetectedBarcode.url.url;
-        boolean isValidURL = Patterns.WEB_URL.matcher(url).matches();
 
-        if (isValidURL) {
-            Intent intent = new Intent(Intent.ACTION_VIEW);
-            intent.setData(Uri.parse(url));
-            startActivity(intent);
-        } else {
-            Toast.makeText(this, getString(R.string.invalid_url),
-                    Toast.LENGTH_SHORT).show();
-        }
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(Uri.parse(url));
+        startActivity(intent);
     }
 
     private void openDialer() {
@@ -264,6 +317,64 @@ public class BarcodeResultActivity extends AppCompatActivity {
         intent.putExtra(CalendarContract.Events.STATUS, mCalEvent.status);
         intent.putExtra(CalendarContract.Events.DESCRIPTION, mCalEvent.description);
 
+        startActivity(intent);
+    }
+
+    private void addToContacts() {
+        Barcode.ContactInfo contactInfo = mDetectedBarcode.contactInfo;
+
+        Intent intent = new Intent(Intent.ACTION_INSERT);
+        intent.setType(ContactsContract.Contacts.CONTENT_TYPE);
+
+        intent.putExtra(ContactsContract.Intents.Insert.NAME, contactInfo.name.formattedName);
+
+        ArrayList<ContentValues> data = new ArrayList<>();
+        // Adding phone numbers
+        for (int i = 0; i < mContact.phones.length; i++) {
+            ContentValues row = new ContentValues();
+            row.put(ContactsContract.RawContacts.Data.MIMETYPE,
+                    ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE);
+
+            row.put(ContactsContract.CommonDataKinds.Phone.NUMBER, mContact.phones[i].number);
+
+            row.put(ContactsContract.CommonDataKinds.Phone.TYPE,
+                    TypeSelector.selectPhoneType(mContact.phones[i].type));
+
+            data.add(row);
+        }
+        // Adding email addressees
+        for (int i = 0; i < mContact.emails.length; i++) {
+            ContentValues row = new ContentValues();
+            row.put(ContactsContract.RawContacts.Data.MIMETYPE,
+                    ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE);
+
+            row.put(ContactsContract.CommonDataKinds.Email.ADDRESS, mContact.emails[i].address);
+
+            row.put(ContactsContract.CommonDataKinds.Email.TYPE,
+                    TypeSelector.selectEmailType(mContact.emails[i].type));
+
+            data.add(row);
+        }
+        // Adding addressees
+        for (int i = 0; i < mContact.addresses.length; i++) {
+            ContentValues row = new ContentValues();
+            row.put(ContactsContract.RawContacts.Data.MIMETYPE,
+                    ContactsContract.CommonDataKinds.StructuredPostal.CONTENT_ITEM_TYPE);
+
+            StringBuilder postalAddress = new StringBuilder();
+            for (int j = 0; j < mContact.addresses[i].addressLines.length; j++) {
+                postalAddress.append(mContact.addresses[i].addressLines[j]);
+                if (j > 0) postalAddress.append(" ");
+            }
+            row.put(ContactsContract.CommonDataKinds.StructuredPostal.FORMATTED_ADDRESS,
+                    postalAddress.toString());
+
+            row.put(ContactsContract.CommonDataKinds.SipAddress.TYPE,
+                    TypeSelector.selectAddressType(mContact.addresses[i].type));
+            data.add(row);
+        }
+
+        intent.putParcelableArrayListExtra(ContactsContract.Intents.Insert.DATA, data);
         startActivity(intent);
     }
 

@@ -20,4 +20,5 @@
     <string name="action_calender">Add to calender</string>
     <string name="action_copy">Copy to clipboard</string>
     <string name="action_web_search">Web search</string>
+    <string name="action_contact">Add to contacts</string>
 </resources>
