@@ -153,8 +153,11 @@ public class ActionHandler {
 
             data.add(row);
         }
+        // Due to some unknown reason, addresses are not passing to contacts in some devices.
+        // Therefore temporarily commented out below code and used an alternative method to set a
+        // single address. This issue will be fixed in the future.
         // Adding addressees
-        for (int i = 0; i < contactWrapper.addresses.length; i++) {
+        /*for (int i = 0; i < contactWrapper.addresses.length; i++) {
             ContentValues row = new ContentValues();
             row.put(ContactsContract.RawContacts.Data.MIMETYPE,
                     ContactsContract.CommonDataKinds.StructuredPostal.CONTENT_ITEM_TYPE);
@@ -170,6 +173,12 @@ public class ActionHandler {
             row.put(ContactsContract.CommonDataKinds.StructuredPostal.TYPE,
                     TypeSelector.selectAddressType(contactWrapper.addresses[i].type));
             data.add(row);
+        }*/
+        if (contactWrapper.addresses.length != 0) {
+            intent.putExtra(ContactsContract.Intents.Insert.POSTAL,
+                    contactWrapper.addresses[0].addressLines[0]);
+            intent.putExtra(ContactsContract.Intents.Insert.POSTAL_TYPE,
+                    TypeSelector.selectAddressType(contactWrapper.addresses[0].type));
         }
 
         intent.putParcelableArrayListExtra(ContactsContract.Intents.Insert.DATA, data);

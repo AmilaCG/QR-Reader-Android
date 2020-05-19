@@ -11,6 +11,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.CalendarContract;
 import android.provider.ContactsContract;
+import android.telephony.PhoneNumberUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
@@ -53,6 +54,7 @@ public class BarcodeResultActivity extends AppCompatActivity {
 
     private Barcode.ContactInfo mContact;
 
+    //TODO: Convert Barcode into BarcodeWrapper and make ActionHandler common
     private Barcode mDetectedBarcode = MainActivity.mDetectedBarcode;
 
     @SuppressLint("DefaultLocale")
@@ -147,6 +149,52 @@ public class BarcodeResultActivity extends AppCompatActivity {
 
                 tvAction.setText(R.string.action_contact);
                 ibAction.setImageResource(R.drawable.ic_person_add_black_38dp);
+
+                StringBuilder phoneNumbers = new StringBuilder();
+                for (int i = 0; i < mContact.phones.length; i++) {
+                    if (i == 0) phoneNumbers.append("Contact Numbers:\n");
+                    phoneNumbers.append(TypeSelector.phoneTypeAsString(mContact.phones[i].type));
+                    phoneNumbers.append(": ");
+                    phoneNumbers.append(PhoneNumberUtils.formatNumber(mContact.phones[i].number, "US"));
+                    phoneNumbers.append("\n");
+                }
+
+                StringBuilder emailAddresses = new StringBuilder();
+                for (int i = 0; i < mContact.emails.length; i++) {
+                    if (i == 0) emailAddresses.append("Email Addresses:\n");
+                    emailAddresses.append(TypeSelector.emailTypeAsString(mContact.emails[i].type));
+                    emailAddresses.append(": ");
+                    emailAddresses.append(mContact.emails[i].address);
+                    emailAddresses.append("\n");
+                }
+
+                StringBuilder websites = new StringBuilder();
+                for (int i = 0; i < mContact.urls.length; i++) {
+                    if (i == 0) websites.append("Websites:\n");
+                    websites.append(mContact.urls[i]);
+                    websites.append("\n");
+                }
+
+                StringBuilder addresses = new StringBuilder();
+                for (int i = 0; i < mContact.addresses.length; i++) {
+                    if (i == 0) addresses.append("Addresses:\n");
+                    if (i > 0) addresses.append("\n\n");
+                    addresses.append(TypeSelector.addressTypeAsString(mContact.addresses[i].type));
+                    addresses.append(":\n");
+                    addresses.append(mContact.addresses[i].addressLines[0]);
+                }
+
+                String strContact = "Name: " + mContact.name.formattedName + "\n"
+                        + "Title: " + mContact.title + "\n"
+                        + "Company: " + mContact.organization + "\n\n"
+                        + phoneNumbers + "\n"
+                        + emailAddresses + "\n"
+                        + websites + "\n"
+                        + addresses;
+
+                tvBarcodeResult.setText(strContact);
+                tvBarcodeResult.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
+                tvBarcodeResult.setTextSize(18);
 
                 AsyncTask.execute(() -> {
                     int numOfPhones = mContact.phones.length;
@@ -372,8 +420,11 @@ public class BarcodeResultActivity extends AppCompatActivity {
 
             data.add(row);
         }
+        // Due to some unknown reason, addresses are not passing to contacts in some devices.
+        // Therefore temporarily commented out below code and used an alternative method to set a
+        // single address. This issue will be fixed in the future.
         // Adding addressees
-        for (int i = 0; i < mContact.addresses.length; i++) {
+        /*for (int i = 0; i < mContact.addresses.length; i++) {
             ContentValues row = new ContentValues();
             row.put(ContactsContract.RawContacts.Data.MIMETYPE,
                     ContactsContract.CommonDataKinds.StructuredPostal.CONTENT_ITEM_TYPE);
@@ -389,6 +440,11 @@ public class BarcodeResultActivity extends AppCompatActivity {
             row.put(ContactsContract.CommonDataKinds.StructuredPostal.TYPE,
                     TypeSelector.selectAddressType(mContact.addresses[i].type));
             data.add(row);
+        }*/
+        if (mContact.addresses.length != 0) {
+            intent.putExtra(ContactsContract.Intents.Insert.POSTAL, mContact.addresses[0].addressLines[0]);
+            intent.putExtra(ContactsContract.Intents.Insert.POSTAL_TYPE,
+                    TypeSelector.selectAddressType(mContact.addresses[0].type));
         }
 
         intent.putParcelableArrayListExtra(ContactsContract.Intents.Insert.DATA, data);

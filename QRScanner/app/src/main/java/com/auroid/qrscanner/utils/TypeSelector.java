@@ -52,4 +52,49 @@ public class TypeSelector {
                 return ContactsContract.CommonDataKinds.StructuredPostal.TYPE_OTHER;
         }
     }
+
+    public static String phoneTypeAsString(int typeFromBarcode) {
+        switch (typeFromBarcode) {
+            case Barcode.Phone.HOME:
+                return "Home";
+
+            case Barcode.Phone.MOBILE:
+                return "Mobile";
+
+            case Barcode.Phone.WORK:
+                return "Work";
+
+            case Barcode.Phone.FAX:
+                return "Fax";
+
+            default:
+                return "Other";
+        }
+    }
+
+    public static String emailTypeAsString(int typeFromBarcode) {
+        switch (typeFromBarcode) {
+            case Barcode.Email.HOME:
+                return "Home";
+
+            case Barcode.Email.WORK:
+                return "Work";
+
+            default:
+                return "Other";
+        }
+    }
+
+    public static String addressTypeAsString(int typeFromBarcode) {
+        switch (typeFromBarcode) {
+            case Barcode.Address.HOME:
+                return "Home";
+
+            case Barcode.Address.WORK:
+                return "Work";
+
+            default:
+                return "Other";
+        }
+    }
 }
