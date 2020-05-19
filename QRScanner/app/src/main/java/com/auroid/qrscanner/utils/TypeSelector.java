@@ -42,14 +42,14 @@ public class TypeSelector {
 
     public static int selectAddressType(int typeFromBarcode) {
         switch (typeFromBarcode) {
-            case Barcode.Email.HOME:
-                return ContactsContract.CommonDataKinds.Email.TYPE_HOME;
+            case Barcode.Address.HOME:
+                return ContactsContract.CommonDataKinds.StructuredPostal.TYPE_HOME;
 
-            case Barcode.Email.WORK:
-                return ContactsContract.CommonDataKinds.Email.TYPE_WORK;
+            case Barcode.Address.WORK:
+                return ContactsContract.CommonDataKinds.StructuredPostal.TYPE_WORK;
 
             default:
-                return ContactsContract.CommonDataKinds.Email.TYPE_OTHER;
+                return ContactsContract.CommonDataKinds.StructuredPostal.TYPE_OTHER;
         }
     }
 }
