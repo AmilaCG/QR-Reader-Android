@@ -10,7 +10,6 @@ import android.net.Uri;
 import android.provider.CalendarContract;
 import android.provider.ContactsContract;
 import android.util.Log;
-import android.util.Patterns;
 import android.widget.Toast;
 
 import com.auroid.qrscanner.serializable.BarcodeWrapper;
@@ -37,16 +36,10 @@ public class ActionHandler {
 
     public void openBrowser() {
         String url = mBarcodeWrapper.url;
-        boolean isValidURL = Patterns.WEB_URL.matcher(url).matches();
 
-        if (isValidURL) {
-            Intent intent = new Intent(Intent.ACTION_VIEW);
-            intent.setData(Uri.parse(url));
-            mContext.startActivity(intent);
-        } else {
-            Toast.makeText(mContext, mContext.getString(R.string.invalid_url),
-                    Toast.LENGTH_SHORT).show();
-        }
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(Uri.parse(url));
+        mContext.startActivity(intent);
     }
 
     public void openDialer() {

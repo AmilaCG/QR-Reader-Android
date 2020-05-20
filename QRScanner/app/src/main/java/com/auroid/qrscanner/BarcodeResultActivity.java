@@ -1,22 +1,13 @@
 package com.auroid.qrscanner;
 
 import android.annotation.SuppressLint;
-import android.app.SearchManager;
-import android.content.ClipData;
-import android.content.ClipboardManager;
-import android.content.ContentValues;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.provider.CalendarContract;
-import android.provider.ContactsContract;
 import android.telephony.PhoneNumberUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
@@ -35,11 +26,7 @@ import com.auroid.qrscanner.utils.TypeSelector;
 import com.google.android.gms.vision.barcode.Barcode;
 import com.google.gson.Gson;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.Locale;
 
 public class BarcodeResultActivity extends AppCompatActivity {
 
@@ -54,8 +41,9 @@ public class BarcodeResultActivity extends AppCompatActivity {
 
     private Barcode.ContactInfo mContact;
 
-    //TODO: Convert Barcode into BarcodeWrapper and make ActionHandler common
     private Barcode mDetectedBarcode = MainActivity.mDetectedBarcode;
+
+    private BarcodeWrapper mBarcodeWrapper;
 
     @SuppressLint("DefaultLocale")
     @Override
@@ -73,8 +61,7 @@ public class BarcodeResultActivity extends AppCompatActivity {
         ImageButton ibAction = findViewById(R.id.ib_action);
 
         // Create BarcodeWrapper object which will be stored in the database
-        BarcodeWrapper barcodeWrapper =
-                new BarcodeWrapper(mResultType, mResult);
+        mBarcodeWrapper = new BarcodeWrapper(mResultType, mResult);
 
         switch (mResultType) {
             case Barcode.URL:
@@ -82,8 +69,8 @@ public class BarcodeResultActivity extends AppCompatActivity {
                 tvAction.setText(R.string.action_web);
                 ibAction.setImageResource(R.drawable.ic_public_black_44dp);
 
-                barcodeWrapper.url = mDetectedBarcode.url.url;
-                insertToDb(barcodeWrapper);
+                mBarcodeWrapper.url = mDetectedBarcode.url.url;
+                insertToDb(mBarcodeWrapper);
                 break;
 
             case Barcode.PHONE:
@@ -91,8 +78,8 @@ public class BarcodeResultActivity extends AppCompatActivity {
                 tvAction.setText(R.string.action_phone);
                 ibAction.setImageResource(R.drawable.ic_phone_black_38dp);
 
-                barcodeWrapper.phoneNumber = mDetectedBarcode.phone.number;
-                insertToDb(barcodeWrapper);
+                mBarcodeWrapper.phoneNumber = mDetectedBarcode.phone.number;
+                insertToDb(mBarcodeWrapper);
                 break;
 
             case Barcode.GEO:
@@ -100,9 +87,9 @@ public class BarcodeResultActivity extends AppCompatActivity {
                 tvAction.setText(R.string.action_geo);
                 ibAction.setImageResource(R.drawable.ic_location_on_black_38dp);
 
-                barcodeWrapper.geoWrapper
+                mBarcodeWrapper.geoWrapper
                         = new GeoWrapper(mDetectedBarcode.geoPoint.lat, mDetectedBarcode.geoPoint.lng);
-                insertToDb(barcodeWrapper);
+                insertToDb(mBarcodeWrapper);
                 break;
 
             case Barcode.CALENDAR_EVENT:
@@ -132,7 +119,7 @@ public class BarcodeResultActivity extends AppCompatActivity {
                 tvAction.setText(R.string.action_calender);
                 ibAction.setImageResource(R.drawable.ic_calender_black_38dp);
 
-                barcodeWrapper.eventWrapper = new EventWrapper(
+                mBarcodeWrapper.eventWrapper = new EventWrapper(
                         mCalEvent.description,
                         mCalEvent.location,
                         mCalEvent.organizer,
@@ -140,7 +127,7 @@ public class BarcodeResultActivity extends AppCompatActivity {
                         mCalEvent.summary,
                         mEventStart,
                         mEventEnd);
-                insertToDb(barcodeWrapper);
+                insertToDb(mBarcodeWrapper);
                 break;
 
             case Barcode.CONTACT_INFO:
@@ -221,7 +208,7 @@ public class BarcodeResultActivity extends AppCompatActivity {
                                 mContact.addresses[i].type);
                     }
 
-                    barcodeWrapper.contactWrapper = new ContactWrapper(
+                    mBarcodeWrapper.contactWrapper = new ContactWrapper(
                             mContact.name.formattedName,
                             mContact.organization,
                             mContact.title,
@@ -230,7 +217,7 @@ public class BarcodeResultActivity extends AppCompatActivity {
                             emailWrappers,
                             addressWrappers
                     );
-                    insertToDb(barcodeWrapper);
+                    insertToDb(mBarcodeWrapper);
                 });
                 break;
 
@@ -266,7 +253,7 @@ public class BarcodeResultActivity extends AppCompatActivity {
                 ibAction.setVisibility(View.GONE);
 
                 // No additional params to set, directly inserting to the DB
-                insertToDb(barcodeWrapper);
+                insertToDb(mBarcodeWrapper);
                 break;
 
             default:
@@ -275,199 +262,45 @@ public class BarcodeResultActivity extends AppCompatActivity {
                 ibAction.setVisibility(View.GONE);
 
                 // No additional params to set, directly inserting to the DB
-                insertToDb(barcodeWrapper);
+                insertToDb(mBarcodeWrapper);
                 break;
         }
     }
 
     public void doAction(View v) {
+        ActionHandler actionHandler = new ActionHandler(this, mBarcodeWrapper);
+
         switch (mResultType) {
             case Barcode.URL:
-                openBrowser();
+                actionHandler.openBrowser();
                 break;
 
             case Barcode.PHONE:
-                openDialer();
+                actionHandler.openDialer();
                 break;
 
             case Barcode.CALENDAR_EVENT:
-                addToCalender();
+                actionHandler.addToCalender();
                 break;
 
             case Barcode.GEO:
-                openMaps();
+                actionHandler.openMaps();
                 break;
 
             case Barcode.CONTACT_INFO:
-                addToContacts();
+                actionHandler.addToContacts();
                 break;
         }
     }
 
-    // TODO: Move this into ActionHandler
-    private void openBrowser() {
-        String url = mDetectedBarcode.url.url;
-
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setData(Uri.parse(url));
-        startActivity(intent);
-    }
-
-    // TODO: Move this into ActionHandler
-    private void openDialer() {
-        String number = mDetectedBarcode.phone.number;
-
-        Intent intent = new Intent(Intent.ACTION_DIAL);
-        intent.setData(Uri.parse("tel:"+number));
-        startActivity(intent);
-    }
-
-    // TODO: Move this into ActionHandler
-    private void openMaps() {
-        double lat = mDetectedBarcode.geoPoint.lat;
-        double lng = mDetectedBarcode.geoPoint.lng;
-        String geo = "geo:0,0?q=" + lat + "," + lng + "(Location)";
-        Uri coordinates = Uri.parse(geo);
-
-        Intent intent = new Intent(Intent.ACTION_VIEW, coordinates);
-        intent.setPackage("com.google.android.apps.maps");
-        if (intent.resolveActivity(getPackageManager()) != null) {
-            startActivity(intent);
-        }
-    }
-
-    // TODO: Move this into ActionHandler
-    private void addToCalender() {
-        long startDate;
-        long endDate;
-
-        Date dateStart = null;
-        Date dateEnd = null;
-        try {
-            dateStart = new SimpleDateFormat("yyyy/MM/dd HH:mm", Locale.US).parse(mEventStart);
-            dateEnd = new SimpleDateFormat("yyyy/MM/dd HH:mm", Locale.US).parse(mEventEnd);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-        if (dateStart == null || dateEnd == null) {
-            Log.e(TAG, "addToCalender: date is null");
-            return;
-        }
-
-        startDate = dateStart.getTime();
-        endDate = dateEnd.getTime();
-
-        Intent intent = new Intent(Intent.ACTION_INSERT);
-        intent.setType("vnd.android.cursor.item/event");
-
-        intent.putExtra(CalendarContract.Events.TITLE, mCalEvent.summary);
-        intent.putExtra(CalendarContract.Events.EVENT_LOCATION, mCalEvent.location);
-        intent.putExtra(CalendarContract.Events.ORGANIZER, mCalEvent.organizer);
-        intent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, startDate);
-        intent.putExtra(CalendarContract.EXTRA_EVENT_END_TIME, endDate);
-        intent.putExtra(CalendarContract.Events.STATUS, mCalEvent.status);
-        intent.putExtra(CalendarContract.Events.DESCRIPTION, mCalEvent.description);
-
-        startActivity(intent);
-    }
-
-    // TODO: Move this into ActionHandler
-    private void addToContacts() {
-        Barcode.ContactInfo contactInfo = mDetectedBarcode.contactInfo;
-
-        Intent intent = new Intent(Intent.ACTION_INSERT);
-        intent.setType(ContactsContract.Contacts.CONTENT_TYPE);
-
-        intent.putExtra(ContactsContract.Intents.Insert.NAME, contactInfo.name.formattedName);
-        intent.putExtra(ContactsContract.Intents.Insert.COMPANY, contactInfo.organization);
-        intent.putExtra(ContactsContract.Intents.Insert.JOB_TITLE, contactInfo.title);
-
-        ArrayList<ContentValues> data = new ArrayList<>();
-        // Adding URL's
-        for (int i = 0; i < mContact.urls.length; i++) {
-            ContentValues row = new ContentValues();
-            row.put(ContactsContract.RawContacts.Data.MIMETYPE,
-                    ContactsContract.CommonDataKinds.Website.CONTENT_ITEM_TYPE);
-
-            row.put(ContactsContract.CommonDataKinds.Website.URL, mContact.urls[i]);
-            data.add(row);
-        }
-
-        // Adding phone numbers
-        for (int i = 0; i < mContact.phones.length; i++) {
-            ContentValues row = new ContentValues();
-            row.put(ContactsContract.RawContacts.Data.MIMETYPE,
-                    ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE);
-
-            row.put(ContactsContract.CommonDataKinds.Phone.NUMBER, mContact.phones[i].number);
-
-            row.put(ContactsContract.CommonDataKinds.Phone.TYPE,
-                    TypeSelector.selectPhoneType(mContact.phones[i].type));
-
-            data.add(row);
-        }
-        // Adding email addressees
-        for (int i = 0; i < mContact.emails.length; i++) {
-            ContentValues row = new ContentValues();
-            row.put(ContactsContract.RawContacts.Data.MIMETYPE,
-                    ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE);
-
-            row.put(ContactsContract.CommonDataKinds.Email.ADDRESS, mContact.emails[i].address);
-
-            row.put(ContactsContract.CommonDataKinds.Email.TYPE,
-                    TypeSelector.selectEmailType(mContact.emails[i].type));
-
-            data.add(row);
-        }
-        // Due to some unknown reason, addresses are not passing to contacts in some devices.
-        // Therefore temporarily commented out below code and used an alternative method to set a
-        // single address. This issue will be fixed in the future.
-        // Adding addressees
-        /*for (int i = 0; i < mContact.addresses.length; i++) {
-            ContentValues row = new ContentValues();
-            row.put(ContactsContract.RawContacts.Data.MIMETYPE,
-                    ContactsContract.CommonDataKinds.StructuredPostal.CONTENT_ITEM_TYPE);
-
-            StringBuilder postalAddress = new StringBuilder();
-            for (int j = 0; j < mContact.addresses[i].addressLines.length; j++) {
-                postalAddress.append(mContact.addresses[i].addressLines[j]);
-                if (j > 0) postalAddress.append(" ");
-            }
-            row.put(ContactsContract.CommonDataKinds.StructuredPostal.FORMATTED_ADDRESS,
-                    postalAddress.toString());
-
-            row.put(ContactsContract.CommonDataKinds.StructuredPostal.TYPE,
-                    TypeSelector.selectAddressType(mContact.addresses[i].type));
-            data.add(row);
-        }*/
-        if (mContact.addresses.length != 0) {
-            intent.putExtra(ContactsContract.Intents.Insert.POSTAL, mContact.addresses[0].addressLines[0]);
-            intent.putExtra(ContactsContract.Intents.Insert.POSTAL_TYPE,
-                    TypeSelector.selectAddressType(mContact.addresses[0].type));
-        }
-
-        intent.putParcelableArrayListExtra(ContactsContract.Intents.Insert.DATA, data);
-        startActivity(intent);
-    }
-
-    // TODO: Move this into ActionHandler
     public void copyToClipboard(View view) {
-        ClipboardManager clipboardManager = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-        ClipData clip = ClipData.newPlainText("QRCode", mResult);
-        if (clipboardManager != null) {
-            clipboardManager.setPrimaryClip(clip);
-
-            Toast.makeText(this, getString(R.string.confirm_copy_to_clipboard),
-                    Toast.LENGTH_SHORT).show();
-        }
+        ActionHandler actionHandler = new ActionHandler(this, mBarcodeWrapper);
+        actionHandler.copyToClipboard();
     }
 
-    // TODO: Move this into ActionHandler
     public void webSearch(View view) {
-        Intent intent = new Intent(Intent.ACTION_WEB_SEARCH);
-        intent.putExtra(SearchManager.QUERY, mResult);
-        startActivity(intent);
+        ActionHandler actionHandler = new ActionHandler(this, mBarcodeWrapper);
+        actionHandler.webSearch();
     }
 
     public void back(View v) {
