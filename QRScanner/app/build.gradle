@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'com.google.gms.google-services'
 apply plugin: 'com.google.android.gms.oss-licenses-plugin'
 
 android {
@@ -56,4 +57,7 @@ dependencies {
     implementation 'com.google.android.gms:play-services-oss-licenses:17.0.0'
 
     implementation 'com.google.code.gson:gson:2.8.6'
+
+    // Firebase SDK for Google Analytics
+    implementation 'com.google.firebase:firebase-analytics:17.4.1'
 }
