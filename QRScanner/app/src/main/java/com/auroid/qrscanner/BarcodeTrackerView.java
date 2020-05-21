@@ -3,7 +3,9 @@ package com.auroid.qrscanner;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Canvas;
+import android.graphics.CornerPathEffect;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.Point;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -16,6 +18,7 @@ public class BarcodeTrackerView extends View {
 
     private Point[] mCornerPts;
     private Paint mPaint;
+    private Path mPath;
 
     private static int mPrevSizeWidth;
     private static int mPrevSizeHeight;
@@ -33,11 +36,19 @@ public class BarcodeTrackerView extends View {
     }
 
     private void init(Context context) {
+        float radius = 20.0f;
+        CornerPathEffect cornerPathEffect = new CornerPathEffect(radius);
+
         mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mPaint.setStrokeWidth(14);
+        mPaint.setStrokeWidth(8);
         mPaint.setColor(ContextCompat.getColor(context, R.color.colorAccent));
+        mPaint.setStyle(Paint.Style.STROKE);
+        mPaint.setStrokeJoin(Paint.Join.MITER);
+        mPaint.setPathEffect(cornerPathEffect);
 
         mCornerPts = null;
+
+        mPath = new Path();
     }
 
     @Override
@@ -45,14 +56,101 @@ public class BarcodeTrackerView extends View {
         super.onDraw(canvas);
         handleOrientation();
 
+        if(mCornerPts != null) {
+            Log.d(TAG, "onDraw: called");
+            drawCorners(canvas);
+        }
+    }
+
+    private void drawCorners(Canvas canvas) {
         float scaleX = (float) mCanvasWidth / mPrevSizeWidth;
         float scaleY = (float) mCanvasHeight / mPrevSizeHeight;
+        // Higher the value, smaller the corner size (1 = min value = full rectangle)
+        float cornerSizeFactor = 5.5f;
 
-        if(mCornerPts != null) {
-            for (int i = 0; i < 4; i++) {
-                canvas.drawCircle(mCornerPts[i].x * scaleX, mCornerPts[i].y * scaleY, 8f, mPaint);
-            }
-        }
+        float segX;
+        float segY;
+
+        mPath.reset();
+        mPath.moveTo(mCornerPts[0].x * scaleX, mCornerPts[0].y * scaleY);
+
+        segX = (mCornerPts[1].x * scaleX - mCornerPts[0].x * scaleX) / cornerSizeFactor;
+        segY = (mCornerPts[1].y * scaleX - mCornerPts[0].y * scaleX) / cornerSizeFactor;
+
+        //  __
+        //
+        //
+        //
+        //
+        mPath.lineTo(mCornerPts[0].x * scaleX + segX , mCornerPts[0].y * scaleY + segY);
+
+        mPath.moveTo(mCornerPts[1].x * scaleX - segX, mCornerPts[1].y * scaleY - segY);
+
+        //  __     __
+        //
+        //
+        //
+        //
+        mPath.lineTo(mCornerPts[1].x * scaleX , mCornerPts[1].y * scaleY);
+
+        segX = (mCornerPts[2].x * scaleX - mCornerPts[1].x * scaleX) / cornerSizeFactor;
+        segY = (mCornerPts[2].y * scaleX - mCornerPts[1].y * scaleX) / cornerSizeFactor;
+
+        //  __     __
+        //           |
+        //
+        //
+        //
+        mPath.lineTo(mCornerPts[1].x * scaleX + segX , mCornerPts[1].y * scaleY + segY);
+
+        mPath.moveTo(mCornerPts[2].x * scaleX - segX, mCornerPts[2].y * scaleY - segY);
+
+        //  __     __
+        //           |
+        //
+        //
+        //           |
+        mPath.lineTo(mCornerPts[2].x * scaleX , mCornerPts[2].y * scaleY);
+
+        segX = (mCornerPts[3].x * scaleX - mCornerPts[2].x * scaleX) / cornerSizeFactor;
+        segY = (mCornerPts[3].y * scaleX - mCornerPts[2].y * scaleX) / cornerSizeFactor;
+
+        //  __     __
+        //           |
+        //
+        //
+        //         __|
+        mPath.lineTo(mCornerPts[2].x * scaleX + segX , mCornerPts[2].y * scaleY + segY);
+
+        mPath.moveTo(mCornerPts[3].x * scaleX - segX, mCornerPts[3].y * scaleY - segY);
+
+        //  __     __
+        //           |
+        //
+        //
+        //  __     __|
+        mPath.lineTo(mCornerPts[3].x * scaleX , mCornerPts[3].y * scaleY);
+
+        segX = (mCornerPts[0].x * scaleX - mCornerPts[3].x * scaleX) / cornerSizeFactor;
+        segY = (mCornerPts[0].y * scaleX - mCornerPts[3].y * scaleX) / cornerSizeFactor;
+
+        //  __     __
+        //           |
+        //
+        //
+        // |__     __|
+        mPath.lineTo(mCornerPts[3].x * scaleX + segX , mCornerPts[3].y * scaleY + segY);
+
+        mPath.moveTo(mCornerPts[0].x * scaleX - segX, mCornerPts[0].y * scaleY - segY);
+
+        //  __     __
+        // |         |
+        //
+        //
+        // |__     __|
+        mPath.lineTo(mCornerPts[0].x * scaleX , mCornerPts[0].y * scaleY);
+
+        canvas.drawPath(mPath, mPaint);
     }
 
     @Override
