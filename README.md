@@ -12,10 +12,14 @@ A robust, minimalist QR code reader for Android powered by [Google Vision Barcod
 
 ## Functions
 
-- Open in browser, web search or copy scanned QR code
-- Option to directly open scanned QR code in the browser
+- Go to a website, copy or search scanned content on the web
+- Option to directly open scanned URL in the browser
+- Scan a QR code on a business card (vCard) then add to contacts
+- Open maps to navigate to a location embedded in a QR code
+- Open dialer to call or SMS to a number scanned from a QR code
+- Add an event to the calender by scanning a QR code
+- Save scan history and do above actions even from the history
 - Ability to use torch/flasher to scan in dark places
-- Save scan history with time and date
 - Delete individual items from scan history and undo mistaken deletions
 - Display corners of the decoded QR code in real-time
 
