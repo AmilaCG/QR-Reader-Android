@@ -12,7 +12,7 @@ A robust, minimalist QR code reader for Android powered by [Google Vision Barcod
 
 ## Functions
 
-- Go to a website, copy or search scanned content on the web
+- Go to a website, copy to clipboard or search scanned content on the web
 - Option to directly open scanned URL in the browser
 - Scan a QR code on a business card (vCard) then add to contacts
 - Open maps to navigate to a location embedded in a QR code
