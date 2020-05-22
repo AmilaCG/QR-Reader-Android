@@ -32,12 +32,7 @@ public class BarcodeResultActivity extends AppCompatActivity {
 
     private static final String TAG = "BarcodeResultActivity";
 
-    private String mResult;
     private int mResultType;
-
-    private Barcode.CalendarEvent mCalEvent;
-    private String mEventStart;
-    private String mEventEnd;
 
     private Barcode.ContactInfo mContact;
 
@@ -51,23 +46,25 @@ public class BarcodeResultActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_barcode_result);
 
-        mResult = mDetectedBarcode.displayValue;
+        String result = mDetectedBarcode.displayValue;
+        String rawValue = mDetectedBarcode.rawValue;
         mResultType = mDetectedBarcode.valueFormat;
 
         TextView tvBarcodeResult = findViewById(R.id.barcode_result);
-        tvBarcodeResult.setText(mResult);
+        tvBarcodeResult.setText(result);
 
         TextView tvAction = findViewById(R.id.txt_action);
         ImageButton ibAction = findViewById(R.id.ib_action);
 
         // Create BarcodeWrapper object which will be stored in the database
-        mBarcodeWrapper = new BarcodeWrapper(mResultType, mResult);
+        mBarcodeWrapper = new BarcodeWrapper(mResultType, result, rawValue);
 
         switch (mResultType) {
             case Barcode.URL:
                 Log.d(TAG, "URL");
                 tvAction.setText(R.string.action_web);
                 ibAction.setImageResource(R.drawable.ic_public_black_44dp);
+                tvBarcodeResult.setText(rawValue);
 
                 mBarcodeWrapper.url = mDetectedBarcode.url.url;
                 insertToDb(mBarcodeWrapper);
@@ -94,24 +91,24 @@ public class BarcodeResultActivity extends AppCompatActivity {
 
             case Barcode.CALENDAR_EVENT:
                 Log.d(TAG, "CALENDAR_EVENT");
-                mCalEvent = mDetectedBarcode.calendarEvent;
+                Barcode.CalendarEvent calEvent = mDetectedBarcode.calendarEvent;
 
-                mEventStart = mCalEvent.start.year + "/" + mCalEvent.start.month + "/" + mCalEvent.start.day
-                        + " " + String.format("%02d", mCalEvent.start.hours)
-                        + ":" + String.format("%02d", mCalEvent.start.minutes);
+                String eventStart = calEvent.start.year + "/" + calEvent.start.month + "/" + calEvent.start.day
+                        + " " + String.format("%02d", calEvent.start.hours)
+                        + ":" + String.format("%02d", calEvent.start.minutes);
 
-                mEventEnd = mCalEvent.end.year + "/" + mCalEvent.end.month + "/" + mCalEvent.end.day
-                        + " " + String.format("%02d", mCalEvent.end.hours)
-                        + ":" + String.format("%02d", mCalEvent.end.minutes);
+                String eventEnd = calEvent.end.year + "/" + calEvent.end.month + "/" + calEvent.end.day
+                        + " " + String.format("%02d", calEvent.end.hours)
+                        + ":" + String.format("%02d", calEvent.end.minutes);
 
                 String strEvent =
-                        "Title: " + mCalEvent.summary + "\n"
-                        + "Location: " + mCalEvent.location + "\n"
-                        + "Organizer: " + mCalEvent.organizer + "\n"
-                        + "Start: " + mEventStart + "\n"
-                        + "End: " + mEventEnd + "\n"
-                        + "Status: " + mCalEvent.status + "\n"
-                        + "Description: " + mCalEvent.description;
+                        "Title: " + calEvent.summary + "\n"
+                        + "Location: " + calEvent.location + "\n"
+                        + "Organizer: " + calEvent.organizer + "\n"
+                        + "Start: " + eventStart + "\n"
+                        + "End: " + eventEnd + "\n"
+                        + "Status: " + calEvent.status + "\n"
+                        + "Description: " + calEvent.description;
 
                 tvBarcodeResult.setText(strEvent);
                 tvBarcodeResult.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
@@ -120,13 +117,13 @@ public class BarcodeResultActivity extends AppCompatActivity {
                 ibAction.setImageResource(R.drawable.ic_calender_black_38dp);
 
                 mBarcodeWrapper.eventWrapper = new EventWrapper(
-                        mCalEvent.description,
-                        mCalEvent.location,
-                        mCalEvent.organizer,
-                        mCalEvent.status,
-                        mCalEvent.summary,
-                        mEventStart,
-                        mEventEnd);
+                        calEvent.description,
+                        calEvent.location,
+                        calEvent.organizer,
+                        calEvent.status,
+                        calEvent.summary,
+                        eventStart,
+                        eventEnd);
                 insertToDb(mBarcodeWrapper);
                 break;
 

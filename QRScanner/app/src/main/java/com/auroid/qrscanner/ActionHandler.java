@@ -37,8 +37,13 @@ public class ActionHandler {
     public void openBrowser() {
         String url = mBarcodeWrapper.url;
 
+        Uri webUri = Uri.parse(url);
+        if (!url.startsWith("http://") && !url.startsWith("https://")) {
+            webUri = Uri.parse("http://" + url);
+        }
+
         Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setData(Uri.parse(url));
+        intent.setData(webUri);
         mContext.startActivity(intent);
     }
 

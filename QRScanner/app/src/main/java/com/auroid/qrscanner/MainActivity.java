@@ -277,13 +277,16 @@ public class MainActivity extends AppCompatActivity {
                                         mSharedPrefs.getBoolean("open_browser", false);
 
                                 if (openInBrowser && mDetectedBarcode.valueFormat == Barcode.URL) {
-                                    Intent intent = new Intent(Intent.ACTION_VIEW);
-                                    intent.setData(Uri.parse(mDetectedBarcode.url.url));
-                                    startActivity(intent);
+                                    BarcodeWrapper barcode = new BarcodeWrapper(
+                                            mDetectedBarcode.valueFormat,
+                                            mDetectedBarcode.displayValue,
+                                            mDetectedBarcode.rawValue);
 
-                                    BarcodeWrapper barcode = new BarcodeWrapper(mDetectedBarcode.valueFormat,
-                                                    mDetectedBarcode.displayValue);
                                     barcode.url = mDetectedBarcode.url.url;
+
+                                    ActionHandler actionHandler = new ActionHandler(mContext, barcode);
+                                    actionHandler.openBrowser();
+
                                     Gson gson = new Gson();
                                     String resultJson = gson.toJson(barcode);
 
