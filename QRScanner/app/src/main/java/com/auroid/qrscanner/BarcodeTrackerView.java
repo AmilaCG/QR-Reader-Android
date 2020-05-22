@@ -72,21 +72,13 @@ public class BarcodeTrackerView extends View {
         float segY;
 
         mPath.reset();
-        mPath.moveTo(mCornerPts[0].x * scaleX, mCornerPts[0].y * scaleY);
 
         segX = (mCornerPts[1].x * scaleX - mCornerPts[0].x * scaleX) / cornerSizeFactor;
         segY = (mCornerPts[1].y * scaleX - mCornerPts[0].y * scaleX) / cornerSizeFactor;
 
-        //  __
-        //
-        //
-        //
-        //
-        mPath.lineTo(mCornerPts[0].x * scaleX + segX , mCornerPts[0].y * scaleY + segY);
-
         mPath.moveTo(mCornerPts[1].x * scaleX - segX, mCornerPts[1].y * scaleY - segY);
 
-        //  __     __
+        //         __
         //
         //
         //
@@ -96,7 +88,7 @@ public class BarcodeTrackerView extends View {
         segX = (mCornerPts[2].x * scaleX - mCornerPts[1].x * scaleX) / cornerSizeFactor;
         segY = (mCornerPts[2].y * scaleX - mCornerPts[1].y * scaleX) / cornerSizeFactor;
 
-        //  __     __
+        //         __
         //           |
         //
         //
@@ -105,7 +97,7 @@ public class BarcodeTrackerView extends View {
 
         mPath.moveTo(mCornerPts[2].x * scaleX - segX, mCornerPts[2].y * scaleY - segY);
 
-        //  __     __
+        //         __
         //           |
         //
         //
@@ -115,7 +107,7 @@ public class BarcodeTrackerView extends View {
         segX = (mCornerPts[3].x * scaleX - mCornerPts[2].x * scaleX) / cornerSizeFactor;
         segY = (mCornerPts[3].y * scaleX - mCornerPts[2].y * scaleX) / cornerSizeFactor;
 
-        //  __     __
+        //         __
         //           |
         //
         //
@@ -124,7 +116,7 @@ public class BarcodeTrackerView extends View {
 
         mPath.moveTo(mCornerPts[3].x * scaleX - segX, mCornerPts[3].y * scaleY - segY);
 
-        //  __     __
+        //         __
         //           |
         //
         //
@@ -134,7 +126,7 @@ public class BarcodeTrackerView extends View {
         segX = (mCornerPts[0].x * scaleX - mCornerPts[3].x * scaleX) / cornerSizeFactor;
         segY = (mCornerPts[0].y * scaleX - mCornerPts[3].y * scaleX) / cornerSizeFactor;
 
-        //  __     __
+        //         __
         //           |
         //
         //
@@ -143,12 +135,22 @@ public class BarcodeTrackerView extends View {
 
         mPath.moveTo(mCornerPts[0].x * scaleX - segX, mCornerPts[0].y * scaleY - segY);
 
-        //  __     __
+        //         __
         // |         |
         //
         //
         // |__     __|
         mPath.lineTo(mCornerPts[0].x * scaleX , mCornerPts[0].y * scaleY);
+
+        segX = (mCornerPts[1].x * scaleX - mCornerPts[0].x * scaleX) / cornerSizeFactor;
+        segY = (mCornerPts[1].y * scaleX - mCornerPts[0].y * scaleX) / cornerSizeFactor;
+
+        //  __     __
+        // |         |
+        //
+        //
+        // |__     __|
+        mPath.lineTo(mCornerPts[0].x * scaleX + segX , mCornerPts[0].y * scaleY + segY);
 
         canvas.drawPath(mPath, mPaint);
     }
