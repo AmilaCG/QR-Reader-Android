@@ -1,6 +1,5 @@
 package com.auroid.qrscanner.resultdb;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,6 +18,7 @@ import com.auroid.qrscanner.R;
 import com.auroid.qrscanner.serializable.BarcodeWrapper;
 
 import com.google.android.gms.vision.barcode.Barcode;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.gson.Gson;
 
 import java.text.SimpleDateFormat;
@@ -105,24 +105,24 @@ public class ResultListAdapter extends ListAdapter<Result, ResultListAdapter.Res
     private void displayInfo(int resultType, ActionHandler actionHandler, BarcodeWrapper bcWrapper) {
         switch (resultType) {
             case Barcode.URL:
-                android.app.AlertDialog.Builder adUrl = new AlertDialog.Builder(mContext);
-                adUrl.setTitle("URL / Text")
+                new MaterialAlertDialogBuilder(mContext)
+                        .setTitle("URL / Text")
                         .setMessage(bcWrapper.rawValue)
                         .setIcon(R.drawable.ic_public_white_24dp)
                         .show();
                 break;
 
             case Barcode.CONTACT_INFO:
-                android.app.AlertDialog.Builder adContact = new AlertDialog.Builder(mContext);
-                adContact.setTitle("Contact")
+                new MaterialAlertDialogBuilder(mContext)
+                        .setTitle("Contact")
                         .setMessage(actionHandler.getContactDetails())
                         .setIcon(R.drawable.ic_person_white_24dp)
                         .show();
                 break;
 
             case Barcode.CALENDAR_EVENT:
-                android.app.AlertDialog.Builder adEvent = new AlertDialog.Builder(mContext);
-                adEvent.setTitle("Calender Event")
+                new MaterialAlertDialogBuilder(mContext)
+                        .setTitle("Calender Event")
                         .setMessage(actionHandler.getEventDetails())
                         .setIcon(R.drawable.ic_calender_white_24dp)
                         .show();
