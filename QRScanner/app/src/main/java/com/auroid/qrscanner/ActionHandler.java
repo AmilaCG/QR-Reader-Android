@@ -9,11 +9,13 @@ import android.content.Intent;
 import android.net.Uri;
 import android.provider.CalendarContract;
 import android.provider.ContactsContract;
+import android.telephony.PhoneNumberUtils;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.auroid.qrscanner.serializable.BarcodeWrapper;
 import com.auroid.qrscanner.serializable.ContactWrapper;
+import com.auroid.qrscanner.serializable.EventWrapper;
 import com.auroid.qrscanner.utils.TypeSelector;
 
 import java.text.ParseException;
@@ -199,5 +201,63 @@ public class ActionHandler {
         Intent intent = new Intent(Intent.ACTION_WEB_SEARCH);
         intent.putExtra(SearchManager.QUERY, mBarcodeWrapper.displayValue);
         mContext.startActivity(intent);
+    }
+
+    public String getEventDetails() {
+        EventWrapper calEvent = mBarcodeWrapper.eventWrapper;
+
+        return "Title: " + calEvent.summary + "\n"
+                + "Location: " + calEvent.location + "\n"
+                + "Organizer: " + calEvent.organizer + "\n"
+                + "Start: " + calEvent.start + "\n"
+                + "End: " + calEvent.end + "\n"
+                + "Status: " + calEvent.status + "\n"
+                + "Description: " + calEvent.description;
+    }
+
+    public String getContactDetails() {
+        ContactWrapper contact = mBarcodeWrapper.contactWrapper;
+
+        StringBuilder phoneNumbers = new StringBuilder();
+        for (int i = 0; i < contact.phones.length; i++) {
+            if (i == 0) phoneNumbers.append("Contact Numbers:\n");
+            phoneNumbers.append(TypeSelector.phoneTypeAsString(contact.phones[i].type));
+            phoneNumbers.append(": ");
+            phoneNumbers.append(PhoneNumberUtils.formatNumber(contact.phones[i].number, "US"));
+            phoneNumbers.append("\n");
+        }
+
+        StringBuilder emailAddresses = new StringBuilder();
+        for (int i = 0; i < contact.emails.length; i++) {
+            if (i == 0) emailAddresses.append("Email Addresses:\n");
+            emailAddresses.append(TypeSelector.emailTypeAsString(contact.emails[i].type));
+            emailAddresses.append(": ");
+            emailAddresses.append(contact.emails[i].address);
+            emailAddresses.append("\n");
+        }
+
+        StringBuilder websites = new StringBuilder();
+        for (int i = 0; i < contact.urls.length; i++) {
+            if (i == 0) websites.append("Websites:\n");
+            websites.append(contact.urls[i]);
+            websites.append("\n");
+        }
+
+        StringBuilder addresses = new StringBuilder();
+        for (int i = 0; i < contact.addresses.length; i++) {
+            if (i == 0) addresses.append("Addresses:\n");
+            if (i > 0) addresses.append("\n\n");
+            addresses.append(TypeSelector.addressTypeAsString(contact.addresses[i].type));
+            addresses.append(":\n");
+            addresses.append(contact.addresses[i].addressLines[0]);
+        }
+
+        return "Name: " + contact.formattedName + "\n"
+                + "Title: " + contact.title + "\n"
+                + "Company: " + contact.organization + "\n\n"
+                + phoneNumbers + "\n"
+                + emailAddresses + "\n"
+                + websites + "\n"
+                + addresses;
     }
 }

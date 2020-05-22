@@ -1,5 +1,6 @@
 package com.auroid.qrscanner.resultdb;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -63,6 +64,8 @@ public class ResultListAdapter extends ListAdapter<Result, ResultListAdapter.Res
     public void onBindViewHolder(@NonNull ResultViewHolder holder, int position) {
         Result current = getItem(position);
         BarcodeWrapper barcodeWrapper = mGson.fromJson(current.getResult(), BarcodeWrapper.class);
+        int valueFormat = barcodeWrapper.valueFormat;
+
         holder.resultItemView.setText(barcodeWrapper.displayValue);
         holder.timeItemView.setText(mFormatter.format(current.getTime()));
         setIcon(barcodeWrapper.valueFormat, holder);
@@ -70,13 +73,17 @@ public class ResultListAdapter extends ListAdapter<Result, ResultListAdapter.Res
         holder.optionItemView.setOnClickListener(v -> {
             PopupMenu popupMenu = new PopupMenu(mContext, holder.optionItemView);
 
-            inflateMenu(barcodeWrapper.valueFormat, popupMenu);
+            inflateMenu(valueFormat, popupMenu);
             ActionHandler actionHandler = new ActionHandler(mContext, barcodeWrapper);
 
             popupMenu.setOnMenuItemClickListener(item -> {
                 switch (item.getItemId()) {
+                    case R.id.menu_item_more:
+                        displayInfo(valueFormat, actionHandler, barcodeWrapper);
+                        return true;
+
                     case R.id.menu_item_action:
-                        runAction(barcodeWrapper.valueFormat, actionHandler);
+                        runAction(valueFormat, actionHandler);
                         return true;
 
                     case R.id.menu_item_search:
@@ -93,6 +100,34 @@ public class ResultListAdapter extends ListAdapter<Result, ResultListAdapter.Res
             });
             popupMenu.show();
         });
+    }
+
+    private void displayInfo(int resultType, ActionHandler actionHandler, BarcodeWrapper bcWrapper) {
+        switch (resultType) {
+            case Barcode.URL:
+                android.app.AlertDialog.Builder adUrl = new AlertDialog.Builder(mContext);
+                adUrl.setTitle("URL / Text")
+                        .setMessage(bcWrapper.rawValue)
+                        .setIcon(R.drawable.ic_public_white_24dp)
+                        .show();
+                break;
+
+            case Barcode.CONTACT_INFO:
+                android.app.AlertDialog.Builder adContact = new AlertDialog.Builder(mContext);
+                adContact.setTitle("Contact")
+                        .setMessage(actionHandler.getContactDetails())
+                        .setIcon(R.drawable.ic_person_white_24dp)
+                        .show();
+                break;
+
+            case Barcode.CALENDAR_EVENT:
+                android.app.AlertDialog.Builder adEvent = new AlertDialog.Builder(mContext);
+                adEvent.setTitle("Calender Event")
+                        .setMessage(actionHandler.getEventDetails())
+                        .setIcon(R.drawable.ic_calender_white_24dp)
+                        .show();
+                break;
+        }
     }
 
     private void runAction(int resultType, ActionHandler actionHandler) {

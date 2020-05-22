@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/menu_item_more"
+        android:title="@string/view_more" />
     <item android:id="@+id/menu_item_action"
         android:title="@string/action_calender" />
     <item android:id="@+id/menu_item_search"
