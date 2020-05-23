@@ -6,10 +6,14 @@ import android.content.ClipboardManager;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.provider.CalendarContract;
 import android.provider.ContactsContract;
 import android.telephony.PhoneNumberUtils;
+import android.text.SpannableStringBuilder;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.StyleSpan;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -203,7 +207,7 @@ public class ActionHandler {
         mContext.startActivity(intent);
     }
 
-    public String getEventDetails() {
+    public String getFormattedEventDetails() {
         EventWrapper calEvent = mBarcodeWrapper.eventWrapper;
 
         return "Title: " + calEvent.summary + "\n"
@@ -215,49 +219,129 @@ public class ActionHandler {
                 + "Description: " + calEvent.description;
     }
 
-    public String getContactDetails() {
+    public SpannableStringBuilder getFormattedContactDetails() {
         ContactWrapper contact = mBarcodeWrapper.contactWrapper;
 
-        StringBuilder phoneNumbers = new StringBuilder();
+        int cursor = 0;
+
+        ForegroundColorSpan fcsAccent =
+                new ForegroundColorSpan(mContext.getResources().getColor(R.color.colorAccent));
+
+        SpannableStringBuilder ssb = new SpannableStringBuilder();
+
+        String nameHeading = "Name:\n";
+        ssb.append(nameHeading);
+        ssb.setSpan(new StyleSpan(Typeface.BOLD), cursor, cursor += nameHeading.length(), 0);
+
+        ssb.append(contact.formattedName);
+        cursor += contact.formattedName.length();
+
+        ssb.append("\n\n");
+        cursor += 2;
+
+        String titleHeading = "Title:\n";
+        ssb.append(titleHeading);
+        ssb.setSpan(new StyleSpan(Typeface.BOLD), cursor, cursor += titleHeading.length(), 0);
+
+        ssb.append(contact.title);
+        cursor += contact.title.length();
+
+        ssb.append("\n\n");
+        cursor += 2;
+
+        String orgHeading = "Company:\n";
+        ssb.append(orgHeading);
+        ssb.setSpan(new StyleSpan(Typeface.BOLD), cursor, cursor += orgHeading.length(), 0);
+
+        ssb.append(contact.organization);
+        cursor += contact.organization.length();
+
+        ssb.append("\n\n");
+        cursor += 2;
+
         for (int i = 0; i < contact.phones.length; i++) {
-            if (i == 0) phoneNumbers.append("Contact Numbers:\n");
-            phoneNumbers.append(TypeSelector.phoneTypeAsString(contact.phones[i].type));
-            phoneNumbers.append(": ");
-            phoneNumbers.append(PhoneNumberUtils.formatNumber(contact.phones[i].number, "US"));
-            phoneNumbers.append("\n");
+            if (i == 0) {
+                String contactHeading = "Contact Numbers:\n";
+                ssb.append(contactHeading);
+                ssb.setSpan(new StyleSpan(Typeface.BOLD), cursor, cursor += contactHeading.length(), 0);
+            }
+            String phoneType = TypeSelector.phoneTypeAsString(contact.phones[i].type);
+            ssb.append(phoneType);
+            ssb.setSpan(new StyleSpan(Typeface.ITALIC), cursor, cursor += phoneType.length(), 0);
+
+            ssb.append(": ");
+            cursor += 2;
+
+            ssb.append(PhoneNumberUtils.formatNumber(contact.phones[i].number, "US"));
+            cursor += PhoneNumberUtils.formatNumber(contact.phones[i].number, "US").length();
+
+            ssb.append("\n");
+            cursor += 1;
         }
 
-        StringBuilder emailAddresses = new StringBuilder();
+        ssb.append("\n");
+        cursor += 1;
+
         for (int i = 0; i < contact.emails.length; i++) {
-            if (i == 0) emailAddresses.append("Email Addresses:\n");
-            emailAddresses.append(TypeSelector.emailTypeAsString(contact.emails[i].type));
-            emailAddresses.append(": ");
-            emailAddresses.append(contact.emails[i].address);
-            emailAddresses.append("\n");
+            if (i == 0) {
+                String emailHeading = "Email Addresses:\n";
+                ssb.append(emailHeading);
+                ssb.setSpan(new StyleSpan(Typeface.BOLD), cursor, cursor += emailHeading.length(), 0);
+            }
+            String emailType = TypeSelector.emailTypeAsString(contact.emails[i].type);
+            ssb.append(emailType);
+            ssb.setSpan(new StyleSpan(Typeface.ITALIC), cursor, cursor += emailType.length(), 0);
+
+            ssb.append(": ");
+            cursor += 2;
+
+            ssb.append(contact.emails[i].address);
+            cursor += contact.emails[i].address.length();
+
+            ssb.append("\n");
+            cursor += 1;
         }
 
-        StringBuilder websites = new StringBuilder();
+        ssb.append("\n");
+        cursor += 1;
+
         for (int i = 0; i < contact.urls.length; i++) {
-            if (i == 0) websites.append("Websites:\n");
-            websites.append(contact.urls[i]);
-            websites.append("\n");
+            if (i == 0) {
+                String webHeading = "Websites:\n";
+                ssb.append(webHeading);
+                ssb.setSpan(new StyleSpan(Typeface.BOLD), cursor, cursor += webHeading.length(), 0);
+            }
+            ssb.append(contact.urls[i]);
+            cursor += contact.urls[i].length();
+
+            ssb.append("\n");
+            cursor += 1;
         }
 
-        StringBuilder addresses = new StringBuilder();
+        ssb.append("\n");
+        cursor += 1;
+
         for (int i = 0; i < contact.addresses.length; i++) {
-            if (i == 0) addresses.append("Addresses:\n");
-            if (i > 0) addresses.append("\n\n");
-            addresses.append(TypeSelector.addressTypeAsString(contact.addresses[i].type));
-            addresses.append(":\n");
-            addresses.append(contact.addresses[i].addressLines[0]);
+            if (i == 0) {
+                String addrHeading = "Addresses:\n";
+                ssb.append(addrHeading);
+                ssb.setSpan(new StyleSpan(Typeface.BOLD), cursor, cursor += addrHeading.length(), 0);
+            }
+            if (i > 0) {
+                ssb.append("\n\n");
+                cursor += 2;
+            }
+            String addressType = TypeSelector.addressTypeAsString(contact.addresses[i].type);
+            ssb.append(addressType);
+            ssb.setSpan(new StyleSpan(Typeface.ITALIC), cursor, cursor += addressType.length(), 0);
+
+            ssb.append(":\n");
+            cursor += 2;
+
+            ssb.append(contact.addresses[i].addressLines[0]);
+            cursor += contact.addresses[i].addressLines[0].length();
         }
 
-        return "Name: " + contact.formattedName + "\n"
-                + "Title: " + contact.title + "\n"
-                + "Company: " + contact.organization + "\n\n"
-                + phoneNumbers + "\n"
-                + emailAddresses + "\n"
-                + websites + "\n"
-                + addresses;
+        return ssb;
     }
 }

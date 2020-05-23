@@ -111,7 +111,7 @@ public class BarcodeResultActivity extends AppCompatActivity {
                         eventEnd);
 
                 ActionHandler actionEvent = new ActionHandler(this, mBarcodeWrapper);
-                tvBarcodeResult.setText(actionEvent.getEventDetails());
+                tvBarcodeResult.setText(actionEvent.getFormattedEventDetails());
                 tvBarcodeResult.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
 
                 tvAction.setText(R.string.action_calender);
@@ -159,7 +159,7 @@ public class BarcodeResultActivity extends AppCompatActivity {
                 );
 
                 ActionHandler actionContact = new ActionHandler(this, mBarcodeWrapper);
-                tvBarcodeResult.setText(actionContact.getContactDetails());
+                tvBarcodeResult.setText(actionContact.getFormattedContactDetails());
                 tvBarcodeResult.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
                 tvBarcodeResult.setTextSize(18);
 

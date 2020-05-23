@@ -115,7 +115,7 @@ public class ResultListAdapter extends ListAdapter<Result, ResultListAdapter.Res
             case Barcode.CONTACT_INFO:
                 new MaterialAlertDialogBuilder(mContext)
                         .setTitle("Contact")
-                        .setMessage(actionHandler.getContactDetails())
+                        .setMessage(actionHandler.getFormattedContactDetails())
                         .setIcon(R.drawable.ic_person_white_24dp)
                         .show();
                 break;
@@ -123,7 +123,7 @@ public class ResultListAdapter extends ListAdapter<Result, ResultListAdapter.Res
             case Barcode.CALENDAR_EVENT:
                 new MaterialAlertDialogBuilder(mContext)
                         .setTitle("Calender Event")
-                        .setMessage(actionHandler.getEventDetails())
+                        .setMessage(actionHandler.getFormattedEventDetails())
                         .setIcon(R.drawable.ic_calender_white_24dp)
                         .show();
                 break;
