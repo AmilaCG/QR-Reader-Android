@@ -12,8 +12,9 @@ import android.provider.CalendarContract;
 import android.provider.ContactsContract;
 import android.telephony.PhoneNumberUtils;
 import android.text.SpannableStringBuilder;
-import android.text.style.ForegroundColorSpan;
+import android.text.Spanned;
 import android.text.style.StyleSpan;
+import android.text.util.Linkify;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -224,14 +225,12 @@ public class ActionHandler {
 
         int cursor = 0;
 
-        ForegroundColorSpan fcsAccent =
-                new ForegroundColorSpan(mContext.getResources().getColor(R.color.colorAccent));
-
         SpannableStringBuilder ssb = new SpannableStringBuilder();
 
         String nameHeading = "Name:\n";
         ssb.append(nameHeading);
-        ssb.setSpan(new StyleSpan(Typeface.BOLD), cursor, cursor += nameHeading.length(), 0);
+        ssb.setSpan(new StyleSpan(Typeface.BOLD), cursor, cursor += nameHeading.length(),
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 
         ssb.append(contact.formattedName);
         cursor += contact.formattedName.length();
@@ -241,7 +240,8 @@ public class ActionHandler {
 
         String titleHeading = "Title:\n";
         ssb.append(titleHeading);
-        ssb.setSpan(new StyleSpan(Typeface.BOLD), cursor, cursor += titleHeading.length(), 0);
+        ssb.setSpan(new StyleSpan(Typeface.BOLD), cursor, cursor += titleHeading.length(),
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 
         ssb.append(contact.title);
         cursor += contact.title.length();
@@ -251,7 +251,8 @@ public class ActionHandler {
 
         String orgHeading = "Company:\n";
         ssb.append(orgHeading);
-        ssb.setSpan(new StyleSpan(Typeface.BOLD), cursor, cursor += orgHeading.length(), 0);
+        ssb.setSpan(new StyleSpan(Typeface.BOLD), cursor, cursor += orgHeading.length(),
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 
         ssb.append(contact.organization);
         cursor += contact.organization.length();
@@ -263,17 +264,23 @@ public class ActionHandler {
             if (i == 0) {
                 String contactHeading = "Contact Numbers:\n";
                 ssb.append(contactHeading);
-                ssb.setSpan(new StyleSpan(Typeface.BOLD), cursor, cursor += contactHeading.length(), 0);
+                ssb.setSpan(new StyleSpan(Typeface.BOLD), cursor, cursor += contactHeading.length(),
+                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             }
             String phoneType = TypeSelector.phoneTypeAsString(contact.phones[i].type);
             ssb.append(phoneType);
-            ssb.setSpan(new StyleSpan(Typeface.ITALIC), cursor, cursor += phoneType.length(), 0);
+            ssb.setSpan(new StyleSpan(Typeface.ITALIC), cursor, cursor += phoneType.length(),
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 
             ssb.append(": ");
             cursor += 2;
 
-            ssb.append(PhoneNumberUtils.formatNumber(contact.phones[i].number, "US"));
-            cursor += PhoneNumberUtils.formatNumber(contact.phones[i].number, "US").length();
+            String phoneNum = PhoneNumberUtils.formatNumber(contact.phones[i].number, "US");
+            ssb.append(phoneNum);
+            // Inserting a space to the end to avoid unintended behaviours when scrolling
+            ssb.append(" ");
+            // adding 1 to count the additional space character
+            cursor += phoneNum.length() + 1;
 
             ssb.append("\n");
             cursor += 1;
@@ -286,17 +293,23 @@ public class ActionHandler {
             if (i == 0) {
                 String emailHeading = "Email Addresses:\n";
                 ssb.append(emailHeading);
-                ssb.setSpan(new StyleSpan(Typeface.BOLD), cursor, cursor += emailHeading.length(), 0);
+                ssb.setSpan(new StyleSpan(Typeface.BOLD), cursor, cursor += emailHeading.length(),
+                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             }
             String emailType = TypeSelector.emailTypeAsString(contact.emails[i].type);
             ssb.append(emailType);
-            ssb.setSpan(new StyleSpan(Typeface.ITALIC), cursor, cursor += emailType.length(), 0);
+            ssb.setSpan(new StyleSpan(Typeface.ITALIC), cursor, cursor += emailType.length(),
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 
             ssb.append(": ");
             cursor += 2;
 
-            ssb.append(contact.emails[i].address);
-            cursor += contact.emails[i].address.length();
+            String emailAddr = contact.emails[i].address;
+            ssb.append(emailAddr);
+            // Inserting a space to the end to avoid unintended behaviours when scrolling
+            ssb.append(" ");
+            // adding 1 to count the additional space character
+            cursor += emailAddr.length() + 1;
 
             ssb.append("\n");
             cursor += 1;
@@ -309,10 +322,16 @@ public class ActionHandler {
             if (i == 0) {
                 String webHeading = "Websites:\n";
                 ssb.append(webHeading);
-                ssb.setSpan(new StyleSpan(Typeface.BOLD), cursor, cursor += webHeading.length(), 0);
+                ssb.setSpan(new StyleSpan(Typeface.BOLD), cursor, cursor += webHeading.length(),
+                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             }
-            ssb.append(contact.urls[i]);
-            cursor += contact.urls[i].length();
+
+            String url = contact.urls[i];
+            ssb.append(url);
+            // Inserting a space to the end to avoid unintended behaviours when scrolling
+            ssb.append(" ");
+            // adding 1 to count the additional space character
+            cursor += url.length() + 1;
 
             ssb.append("\n");
             cursor += 1;
@@ -325,7 +344,8 @@ public class ActionHandler {
             if (i == 0) {
                 String addrHeading = "Addresses:\n";
                 ssb.append(addrHeading);
-                ssb.setSpan(new StyleSpan(Typeface.BOLD), cursor, cursor += addrHeading.length(), 0);
+                ssb.setSpan(new StyleSpan(Typeface.BOLD), cursor, cursor += addrHeading.length(),
+                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             }
             if (i > 0) {
                 ssb.append("\n\n");
@@ -333,15 +353,21 @@ public class ActionHandler {
             }
             String addressType = TypeSelector.addressTypeAsString(contact.addresses[i].type);
             ssb.append(addressType);
-            ssb.setSpan(new StyleSpan(Typeface.ITALIC), cursor, cursor += addressType.length(), 0);
+            ssb.setSpan(new StyleSpan(Typeface.ITALIC), cursor, cursor += addressType.length(),
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 
             ssb.append(":\n");
             cursor += 2;
 
-            ssb.append(contact.addresses[i].addressLines[0]);
-            cursor += contact.addresses[i].addressLines[0].length();
+            String address = contact.addresses[i].addressLines[0];
+            ssb.append(address);
+            // Inserting a space to the end to avoid unintended behaviours when scrolling
+            ssb.append(" ");
+            // adding 1 to count the additional space character
+            cursor += address.length() + 1;
         }
 
+        Linkify.addLinks(ssb, Linkify.ALL);
         return ssb;
     }
 }

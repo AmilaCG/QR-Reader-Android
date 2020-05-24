@@ -1,6 +1,7 @@
 package com.auroid.qrscanner.resultdb;
 
 import android.content.Context;
+import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -113,9 +114,17 @@ public class ResultListAdapter extends ListAdapter<Result, ResultListAdapter.Res
                 break;
 
             case Barcode.CONTACT_INFO:
+                LayoutInflater inflater =
+                        (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                if (inflater == null) return;
+                View dialogView = inflater.inflate(R.layout.material_dialog_text, null);
+                TextView textView = dialogView.findViewById(R.id.tv_material);
+                textView.setText(actionHandler.getFormattedContactDetails());
+                textView.setMovementMethod(LinkMovementMethod.getInstance());
+
                 new MaterialAlertDialogBuilder(mContext)
                         .setTitle("Contact")
-                        .setMessage(actionHandler.getFormattedContactDetails())
+                        .setView(dialogView)
                         .setIcon(R.drawable.ic_person_white_24dp)
                         .show();
                 break;

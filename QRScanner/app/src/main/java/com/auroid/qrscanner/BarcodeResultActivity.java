@@ -2,6 +2,8 @@ package com.auroid.qrscanner;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.text.method.LinkMovementMethod;
+import android.text.util.Linkify;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
@@ -162,6 +164,7 @@ public class BarcodeResultActivity extends AppCompatActivity {
                 tvBarcodeResult.setText(actionContact.getFormattedContactDetails());
                 tvBarcodeResult.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
                 tvBarcodeResult.setTextSize(18);
+                tvBarcodeResult.setMovementMethod(LinkMovementMethod.getInstance());
 
                 tvAction.setText(R.string.action_contact);
                 ibAction.setImageResource(R.drawable.ic_person_add_black_38dp);
