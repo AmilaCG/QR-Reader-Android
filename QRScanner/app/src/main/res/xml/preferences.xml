@@ -32,6 +32,15 @@
             app:summary="Auroid Labs"/>
 
         <Preference
+            app:key="rate_me"
+            app:title="Rate this app"
+            app:summary="If this app made your life easy, don't hesitate to rate and support developers. It won't take more than a minute.">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="https://play.google.com/store/apps/details?id=com.auroid.qrscanner" />
+        </Preference>
+
+        <Preference
             app:title="Legal information"
             app:summary="Open source licenses">
             <intent

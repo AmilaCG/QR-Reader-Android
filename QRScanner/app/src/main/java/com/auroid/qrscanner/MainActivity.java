@@ -15,7 +15,6 @@ import android.graphics.Rect;
 import android.hardware.Camera;
 import android.media.AudioAttributes;
 import android.media.SoundPool;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
