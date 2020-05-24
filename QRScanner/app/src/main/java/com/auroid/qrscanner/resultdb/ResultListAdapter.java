@@ -74,7 +74,7 @@ public class ResultListAdapter extends ListAdapter<Result, ResultListAdapter.Res
         holder.optionItemView.setOnClickListener(v -> {
             PopupMenu popupMenu = new PopupMenu(mContext, holder.optionItemView);
 
-            inflateMenu(valueFormat, popupMenu);
+            inflateMenu(valueFormat, popupMenu, barcodeWrapper);
             ActionHandler actionHandler = new ActionHandler(mContext, barcodeWrapper);
 
             popupMenu.setOnMenuItemClickListener(item -> {
@@ -166,10 +166,14 @@ public class ResultListAdapter extends ListAdapter<Result, ResultListAdapter.Res
         }
     }
 
-    private void inflateMenu(int resultType, PopupMenu popupMenu) {
+    private void inflateMenu(int resultType, PopupMenu popupMenu, BarcodeWrapper bcWrapper) {
         switch(resultType) {
             case Barcode.URL:
-                popupMenu.inflate(R.menu.menu_result_web);
+                if (bcWrapper.rawValue.equals(bcWrapper.displayValue)) {
+                    popupMenu.inflate(R.menu.menu_result_web);
+                } else {
+                    popupMenu.inflate(R.menu.menu_result_web_ex);
+                }
                 break;
 
             case Barcode.PHONE:
