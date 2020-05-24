@@ -3,7 +3,6 @@ package com.auroid.qrscanner;
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.text.method.LinkMovementMethod;
-import android.text.util.Linkify;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
