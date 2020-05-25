@@ -145,7 +145,6 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG,"onResume");
         if (mBarcodeDetector == null) initBarcodeDetector();
         mTaskHandler.sendEmptyMessage(CameraState.INIT_CAMERA);
-        mSurfaceView.setVisibility(View.VISIBLE);
         mTvScanGuide.setVisibility(View.VISIBLE);
         mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
     }
@@ -157,7 +156,6 @@ public class MainActivity extends AppCompatActivity {
         mTrackerView.clearView();
         mTaskHandler.sendEmptyMessage(CameraState.STOP_CAMERA);
         mTvScanGuide.setVisibility(View.INVISIBLE);
-        mSurfaceView.setVisibility(View.GONE);
     }
 
     @Override
