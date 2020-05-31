@@ -71,7 +71,7 @@ public abstract class FrameProcessorBase<T> implements FrameProcessor {
             detectInImage(image)
                     .addOnSuccessListener(
                             results -> {
-                                Log.d(TAG, "Latency is: " + (SystemClock.elapsedRealtime() - startMs));
+                                //Log.d(TAG, "Latency is: " + (SystemClock.elapsedRealtime() - startMs));
                                 FrameProcessorBase.this.onSuccess(image, results, graphicOverlay);
                                 processLatestFrame(graphicOverlay);
                             })

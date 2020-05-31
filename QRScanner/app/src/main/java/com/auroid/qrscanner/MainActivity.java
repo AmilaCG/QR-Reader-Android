@@ -24,7 +24,12 @@ import com.google.android.material.chip.Chip;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.common.base.Objects;
 import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode;
+import com.google.gson.Gson;
 
+import com.auroid.qrscanner.resultdb.Result;
+import com.auroid.qrscanner.resultdb.ResultViewModel;
+import com.auroid.qrscanner.serializable.BarcodeWrapper;
+import com.auroid.qrscanner.settings.PreferenceUtils;
 import com.auroid.qrscanner.camera.GraphicOverlay;
 import com.auroid.qrscanner.camera.WorkflowModel;
 import com.auroid.qrscanner.camera.WorkflowModel.WorkflowState;
@@ -33,6 +38,7 @@ import com.auroid.qrscanner.camera.CameraSourcePreview;
 import com.auroid.qrscanner.barcodedetection.BarcodeProcessor;
 
 import java.io.IOException;
+import java.util.Date;
 
 public class MainActivity extends AppCompatActivity implements OnClickListener {
 
@@ -233,7 +239,32 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                 barcode -> {
                     if (barcode != null) {
                         mDetectedBarcode = barcode;
-                        startActivity(new Intent(this, BarcodeResultActivity.class));
+
+                        boolean openInBrowser = PreferenceUtils.shouldOpenDirectlyInBrowser(this);
+                        int barcodeValueType = mDetectedBarcode.getValueType();
+                        if (openInBrowser && barcodeValueType == FirebaseVisionBarcode.TYPE_URL) {
+                            BarcodeWrapper barcodeWrapper = new BarcodeWrapper(
+                                    barcodeValueType,
+                                    mDetectedBarcode.getDisplayValue(),
+                                    mDetectedBarcode.getRawValue());
+
+                            barcodeWrapper.url =
+                                    java.util.Objects.requireNonNull(mDetectedBarcode.getUrl()).getUrl();
+
+                            ActionHandler actionHandler = new ActionHandler(this, barcodeWrapper);
+                            actionHandler.openBrowser();
+
+                            Gson gson = new Gson();
+                            String resultJson = gson.toJson(barcodeWrapper);
+
+                            // Insert result to the database
+                            ResultViewModel resultViewModel =
+                                    new ViewModelProvider(this).get(ResultViewModel.class);
+                            Result result = new Result(resultJson, new Date());
+                            resultViewModel.insert(result);
+                        } else {
+                            startActivity(new Intent(this, BarcodeResultActivity.class));
+                        }
                     }
                 });
     }
