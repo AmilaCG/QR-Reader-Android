@@ -76,6 +76,10 @@ public class PreferenceUtils {
         return getBooleanPref(context, R.string.pref_key_open_directly_in_browser, false);
     }
 
+    public static boolean shouldPlayAudioBeep(Context context) {
+        return getBooleanPref(context, R.string.pref_key_play_audio_beep, true);
+    }
+
     private static int getIntPref(Context context, @StringRes int prefKeyId, int defaultValue) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         String prefKey = context.getString(prefKeyId);
