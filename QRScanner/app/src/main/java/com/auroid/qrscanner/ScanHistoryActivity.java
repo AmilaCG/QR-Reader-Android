@@ -1,6 +1,7 @@
 package com.auroid.qrscanner;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.ItemTouchHelper;
@@ -8,8 +9,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,15 +26,19 @@ public class ScanHistoryActivity extends AppCompatActivity {
     private static final String TAG = "ScanHistoryActivity";
 
     private ResultViewModel mResultViewModel;
-
     private Result mRecentlyDeletedItem;
+
+    private boolean mIsHistoryEmpty;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scan_history);
 
-        Button btnClear = findViewById(R.id.clear_db);
+        ActionBar actionBar = getSupportActionBar();
+        assert actionBar != null;
+        actionBar.setDisplayHomeAsUpEnabled(true);
+
         TextView tvGuide = findViewById(R.id.text_guide);
 
         RecyclerView recyclerView = findViewById(R.id.recyclerview);
@@ -47,12 +53,13 @@ public class ScanHistoryActivity extends AppCompatActivity {
             adapter.submitList(results);
 
             if (results.size() == 0) {
-                btnClear.setEnabled(false);
+                mIsHistoryEmpty = true;
                 tvGuide.setText(getString(R.string.empty_scan_history));
             } else {
-                btnClear.setEnabled(true);
+                mIsHistoryEmpty = false;
                 tvGuide.setText(getString(R.string.delete_guide));
             }
+            invalidateOptionsMenu();
         });
 
         new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0,
@@ -76,7 +83,36 @@ public class ScanHistoryActivity extends AppCompatActivity {
         }).attachToRecyclerView(recyclerView);
     }
 
-    public void clearAll(View view) {
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_scan_history, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        MenuItem clearItem = menu.findItem(R.id.action_clear_all);
+        clearItem.getIcon().setAlpha(mIsHistoryEmpty ? 64 : 255);
+        clearItem.setEnabled(!mIsHistoryEmpty);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.action_clear_all) {
+            clearAll();
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        this.finish();
+        return true;
+    }
+
+    public void clearAll() {
         new MaterialAlertDialogBuilder(this)
                 .setTitle(R.string.app_name)
                 .setMessage(R.string.clear_history_confirmation)
@@ -90,10 +126,6 @@ public class ScanHistoryActivity extends AppCompatActivity {
                     finish();
                 })
                 .show();
-    }
-
-    public void back(View view) {
-        finish();
     }
 
     private void showUndoSnackbar() {

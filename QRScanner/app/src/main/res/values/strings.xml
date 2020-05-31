@@ -2,17 +2,11 @@
     <string name="app_name">QR Code Reader</string>
     <string name="request_camera_permission">Need to access camera for scanning</string>
     <string name="no_camera_permission">This application cannot run because it does not have the camera permission. The application will now exit.</string>
-    <string name="low_storage_error">QR code reading dependencies cannot be downloaded due to low device storage</string>
-    <string name="unknown_download_error">QR code reading dependencies cannot be downloaded due to unknown reason</string>
     <string name="clear_history_confirmation">Are you sure you want to clear scan history?</string>
     <string name="empty_scan_history">Scan history is empty</string>
     <string name="confirm_copy_to_clipboard">Copied to clipboard</string>
-    <string name="scan_guide">Place a QR code inside this view to scan</string>
     <string name="confirm_clear_scan_history">Scan history has been cleared</string>
     <string name="confirm_result_delete">Item deleted</string>
-    <string name="invalid_url">Invalid URL, Try web search instead</string>
-    <string name="dependencies_not_found">Google Play Services will download required files in the background. This is a one time process.
-        Please make sure to connect to the internet and try again in a couple of minutes.</string>
     <string name="delete_guide">Swipe to delete items</string>
     <string name="action_web">Open in browser</string>
     <string name="action_phone">Open in dialer</string>
@@ -22,4 +16,20 @@
     <string name="action_web_search">Web search</string>
     <string name="action_contact">Add to contacts</string>
     <string name="view_more">More details</string>
+    <string name="flasher_fail">Failed to turn on flasher</string>
+    <string name="clearall">Clear All</string>
+    <string name="ok">OK</string>
+    <string name="cd_settings_button">Settings</string>
+    <string name="cd_flash_button">Toggle camera flash</string>
+    <string name="cd_history_button">Scan history</string>
+    <string name="prompt_point_at_a_barcode">Point your camera at a barcode</string>
+    <string name="prompt_move_camera_closer">Move closer to search</string>
+    <string name="prompt_searching">Searching&#8230;</string>
+    <string name="pref_key_rear_camera_preview_size" translatable="false">rcpvs</string>
+    <string name="pref_key_rear_camera_picture_size" translatable="false">rcpts</string>
+    <string name="pref_key_barcode_reticle_width" translatable="false">barcode_brw</string>
+    <string name="pref_key_barcode_reticle_height" translatable="false">barcode_brh</string>
+    <string name="pref_key_enable_barcode_size_check" translatable="false">barcode_ebsc</string>
+    <string name="pref_key_minimum_barcode_width" translatable="false">barcode_mbw</string>
+    <string name="pref_key_delay_loading_barcode_result" translatable="false">barcode_dlbr</string>
 </resources>

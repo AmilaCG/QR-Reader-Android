@@ -10,6 +10,7 @@ public class BarcodeWrapper {
     public GeoWrapper geoWrapper;
     public EventWrapper eventWrapper;
     public ContactWrapper contactWrapper;
+    public WiFiWrapper wifiWrapper;
 
     public BarcodeWrapper(int valueFormat, String displayValue, String rawValue) {
         this.valueFormat = valueFormat;
@@ -20,5 +21,6 @@ public class BarcodeWrapper {
         this.geoWrapper = null;
         this.eventWrapper = null;
         this.contactWrapper = null;
+        this.wifiWrapper = null;
     }
 }

@@ -38,10 +38,9 @@
         app:layout_constraintEnd_toStartOf="@+id/ib_action"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.75" />
+        app:layout_constraintVertical_bias="0.85" />
 
     <TextView
-        android:id="@+id/txt_copy"
         android:layout_width="66dp"
         android:layout_height="wrap_content"
         android:text="@string/action_copy"
@@ -64,7 +63,7 @@
         app:layout_constraintEnd_toStartOf="@+id/ib_search"
         app:layout_constraintStart_toEndOf="@id/ib_copy"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.75" />
+        app:layout_constraintVertical_bias="0.85" />
 
     <TextView
         android:id="@+id/txt_action"
@@ -91,10 +90,9 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/ib_action"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.75" />
+        app:layout_constraintVertical_bias="0.85" />
 
     <TextView
-        android:id="@+id/txt_search"
         android:layout_width="66dp"
         android:layout_height="wrap_content"
         android:text="@string/action_web_search"
@@ -105,16 +103,5 @@
         app:layout_constraintStart_toStartOf="@+id/ib_search"
         app:layout_constraintTop_toBottomOf="@+id/ib_search"
         app:layout_constraintVertical_bias="0.03" />
-
-    <Button
-        android:id="@+id/back"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="back"
-        android:text="Done"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txt_copy" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

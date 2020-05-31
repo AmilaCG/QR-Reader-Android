@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -20,11 +21,13 @@ import com.auroid.qrscanner.serializable.EmailWrapper;
 import com.auroid.qrscanner.serializable.EventWrapper;
 import com.auroid.qrscanner.serializable.GeoWrapper;
 import com.auroid.qrscanner.serializable.PhoneWrapper;
+import com.auroid.qrscanner.serializable.WiFiWrapper;
 
-import com.google.android.gms.vision.barcode.Barcode;
+import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode;
 import com.google.gson.Gson;
 
 import java.util.Date;
+import java.util.Objects;
 
 public class BarcodeResultActivity extends AppCompatActivity {
 
@@ -32,9 +35,7 @@ public class BarcodeResultActivity extends AppCompatActivity {
 
     private int mResultType;
 
-    private Barcode.ContactInfo mContact;
-
-    private Barcode mDetectedBarcode = MainActivity.mDetectedBarcode;
+    private FirebaseVisionBarcode mDetectedBarcode = MainActivity.mDetectedBarcode;
 
     private BarcodeWrapper mBarcodeWrapper;
 
@@ -44,9 +45,13 @@ public class BarcodeResultActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_barcode_result);
 
-        String result = mDetectedBarcode.displayValue;
-        String rawValue = mDetectedBarcode.rawValue;
-        mResultType = mDetectedBarcode.valueFormat;
+        ActionBar actionBar = getSupportActionBar();
+        assert actionBar != null;
+        actionBar.setDisplayHomeAsUpEnabled(true);
+
+        String result = mDetectedBarcode.getDisplayValue();
+        String rawValue = mDetectedBarcode.getRawValue();
+        mResultType = mDetectedBarcode.getValueType();
 
         TextView tvBarcodeResult = findViewById(R.id.barcode_result);
         tvBarcodeResult.setText(result);
@@ -58,56 +63,61 @@ public class BarcodeResultActivity extends AppCompatActivity {
         mBarcodeWrapper = new BarcodeWrapper(mResultType, result, rawValue);
 
         switch (mResultType) {
-            case Barcode.URL:
+            case FirebaseVisionBarcode.TYPE_URL:
                 Log.d(TAG, "URL");
                 tvBarcodeResult.setText(rawValue);
 
                 tvAction.setText(R.string.action_web);
                 ibAction.setImageResource(R.drawable.ic_public_black_44dp);
 
-                mBarcodeWrapper.url = mDetectedBarcode.url.url;
+                mBarcodeWrapper.url = Objects.requireNonNull(mDetectedBarcode.getUrl()).getUrl();
                 insertToDb(mBarcodeWrapper);
                 break;
 
-            case Barcode.PHONE:
+            case FirebaseVisionBarcode.TYPE_PHONE:
                 Log.d(TAG, "PHONE");
                 tvAction.setText(R.string.action_phone);
                 ibAction.setImageResource(R.drawable.ic_phone_black_38dp);
 
-                mBarcodeWrapper.phoneNumber = mDetectedBarcode.phone.number;
+                mBarcodeWrapper.phoneNumber =
+                        Objects.requireNonNull(mDetectedBarcode.getPhone()).getNumber();
                 insertToDb(mBarcodeWrapper);
                 break;
 
-            case Barcode.GEO:
+            case FirebaseVisionBarcode.TYPE_GEO:
                 Log.d(TAG, "GEO");
                 tvAction.setText(R.string.action_geo);
                 ibAction.setImageResource(R.drawable.ic_location_on_black_38dp);
 
-                mBarcodeWrapper.geoWrapper
-                        = new GeoWrapper(mDetectedBarcode.geoPoint.lat, mDetectedBarcode.geoPoint.lng);
+                mBarcodeWrapper.geoWrapper = new GeoWrapper(
+                        Objects.requireNonNull(mDetectedBarcode.getGeoPoint()).getLat(),
+                        mDetectedBarcode.getGeoPoint().getLng());
                 insertToDb(mBarcodeWrapper);
                 break;
 
-            case Barcode.CALENDAR_EVENT:
+            case FirebaseVisionBarcode.TYPE_CALENDAR_EVENT:
                 Log.d(TAG, "CALENDAR_EVENT");
-                Barcode.CalendarEvent calEvent = mDetectedBarcode.calendarEvent;
+                FirebaseVisionBarcode.CalendarEvent calEvent = mDetectedBarcode.getCalendarEvent();
 
-                String eventStart = calEvent.start.year + "/" + calEvent.start.month + "/"
-                        + calEvent.start.day
-                        + " " + String.format("%02d", calEvent.start.hours)
-                        + ":" + String.format("%02d", calEvent.start.minutes);
+                assert calEvent != null;
+                String eventStart = Objects.requireNonNull(calEvent.getStart()).getYear() + "/"
+                        + calEvent.getStart().getMonth() + "/"
+                        + calEvent.getStart().getDay()
+                        + " " + String.format("%02d", calEvent.getStart().getHours())
+                        + ":" + String.format("%02d", calEvent.getStart().getMinutes());
 
-                String eventEnd = calEvent.end.year + "/" + calEvent.end.month + "/"
-                        + calEvent.end.day
-                        + " " + String.format("%02d", calEvent.end.hours)
-                        + ":" + String.format("%02d", calEvent.end.minutes);
+                String eventEnd = Objects.requireNonNull(calEvent.getEnd()).getYear() + "/"
+                        + calEvent.getEnd().getMonth() + "/"
+                        + calEvent.getEnd().getDay()
+                        + " " + String.format("%02d", calEvent.getEnd().getHours())
+                        + ":" + String.format("%02d", calEvent.getEnd().getMinutes());
 
                 mBarcodeWrapper.eventWrapper = new EventWrapper(
-                        calEvent.description,
-                        calEvent.location,
-                        calEvent.organizer,
-                        calEvent.status,
-                        calEvent.summary,
+                        calEvent.getDescription(),
+                        calEvent.getLocation(),
+                        calEvent.getOrganizer(),
+                        calEvent.getStatus(),
+                        calEvent.getSummary(),
                         eventStart,
                         eventEnd);
 
@@ -121,39 +131,40 @@ public class BarcodeResultActivity extends AppCompatActivity {
                 insertToDb(mBarcodeWrapper);
                 break;
 
-            case Barcode.CONTACT_INFO:
+            case FirebaseVisionBarcode.TYPE_CONTACT_INFO:
                 Log.d(TAG, "CONTACT_INFO");
-                mContact = mDetectedBarcode.contactInfo;
+                FirebaseVisionBarcode.ContactInfo contact = mDetectedBarcode.getContactInfo();
 
-                int numOfPhones = mContact.phones.length;
+                assert contact != null;
+                int numOfPhones = contact.getPhones().size();
                 PhoneWrapper[] phoneWrappers = new PhoneWrapper[numOfPhones];
                 for (int i = 0; i < numOfPhones; i++) {
                     phoneWrappers[i] = new PhoneWrapper(
-                            mContact.phones[i].number,
-                            mContact.phones[i].type);
+                            contact.getPhones().get(i).getNumber(),
+                            contact.getPhones().get(i).getType());
                 }
 
-                int numOfEmails = mContact.emails.length;
+                int numOfEmails = contact.getEmails().size();
                 EmailWrapper[] emailWrappers = new EmailWrapper[numOfEmails];
                 for (int i = 0; i < numOfEmails; i++) {
                     emailWrappers[i] = new EmailWrapper(
-                            mContact.emails[i].address,
-                            mContact.emails[i].type);
+                            contact.getEmails().get(i).getAddress(),
+                            contact.getEmails().get(i).getType());
                 }
 
-                int numOfAddresses = mContact.addresses.length;
+                int numOfAddresses = contact.getAddresses().size();
                 AddressWrapper[] addressWrappers = new AddressWrapper[numOfAddresses];
                 for (int i = 0; i < numOfAddresses; i++) {
                     addressWrappers[i] = new AddressWrapper(
-                            mContact.addresses[i].addressLines,
-                            mContact.addresses[i].type);
+                            contact.getAddresses().get(i).getAddressLines(),
+                            contact.getAddresses().get(i).getType());
                 }
 
                 mBarcodeWrapper.contactWrapper = new ContactWrapper(
-                        mContact.name.formattedName,
-                        mContact.organization,
-                        mContact.title,
-                        mContact.urls,
+                        Objects.requireNonNull(contact.getName()).getFormattedName(),
+                        contact.getOrganization(),
+                        contact.getTitle(),
+                        contact.getUrls(),
                         phoneWrappers,
                         emailWrappers,
                         addressWrappers
@@ -171,38 +182,21 @@ public class BarcodeResultActivity extends AppCompatActivity {
                 insertToDb(mBarcodeWrapper);
                 break;
 
-            case Barcode.WIFI:
+            case FirebaseVisionBarcode.TYPE_WIFI:
                 Log.d(TAG, "WIFI");
-                Barcode.WiFi wifiParams = mDetectedBarcode.wifi;
 
-                String encryption;
-                switch (wifiParams.encryptionType) {
-                    case Barcode.WiFi.OPEN:
-                        encryption = "None";
-                        break;
+                mBarcodeWrapper.wifiWrapper = new WiFiWrapper(
+                        Objects.requireNonNull(mDetectedBarcode.getWifi()).getEncryptionType(),
+                        mDetectedBarcode.getWifi().getPassword(),
+                        mDetectedBarcode.getWifi().getSsid()
+                );
 
-                    case Barcode.WiFi.WPA:
-                        encryption = "WPA";
-                        break;
-
-                    case Barcode.WiFi.WEP:
-                        encryption = "WEP";
-                        break;
-
-                    default:
-                        encryption = "Unknown";
-                }
-
-                String wifiInfo = "Wi-Fi Network\n" +
-                        "\nName: " + wifiParams.ssid +
-                        "\nPassword: " + wifiParams.password +
-                        "\nEncryption: " + encryption;
-                tvBarcodeResult.setText(wifiInfo);
+                ActionHandler actionWifi = new ActionHandler(this, mBarcodeWrapper);
+                tvBarcodeResult.setText(actionWifi.getFormattedWiFiDetails());
 
                 tvAction.setVisibility(View.GONE);
                 ibAction.setVisibility(View.GONE);
 
-                // No additional params to set, directly inserting to the DB
                 insertToDb(mBarcodeWrapper);
                 break;
 
@@ -221,23 +215,23 @@ public class BarcodeResultActivity extends AppCompatActivity {
         ActionHandler actionHandler = new ActionHandler(this, mBarcodeWrapper);
 
         switch (mResultType) {
-            case Barcode.URL:
+            case FirebaseVisionBarcode.TYPE_URL:
                 actionHandler.openBrowser();
                 break;
 
-            case Barcode.PHONE:
+            case FirebaseVisionBarcode.TYPE_PHONE:
                 actionHandler.openDialer();
                 break;
 
-            case Barcode.CALENDAR_EVENT:
+            case FirebaseVisionBarcode.TYPE_CALENDAR_EVENT:
                 actionHandler.addToCalender();
                 break;
 
-            case Barcode.GEO:
+            case FirebaseVisionBarcode.TYPE_GEO:
                 actionHandler.openMaps();
                 break;
 
-            case Barcode.CONTACT_INFO:
+            case FirebaseVisionBarcode.TYPE_CONTACT_INFO:
                 actionHandler.addToContacts();
                 break;
         }
@@ -253,10 +247,6 @@ public class BarcodeResultActivity extends AppCompatActivity {
         actionHandler.webSearch();
     }
 
-    public void back(View v) {
-        finish();
-    }
-
     private void insertToDb(BarcodeWrapper barcode) {
         Gson gson = new Gson();
         String resultJson = gson.toJson(barcode);
@@ -264,5 +254,11 @@ public class BarcodeResultActivity extends AppCompatActivity {
         ResultViewModel resultViewModel = new ViewModelProvider(this).get(ResultViewModel.class);
         Result result = new Result(resultJson, new Date());
         resultViewModel.insert(result);
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        this.finish();
+        return true;
     }
 }

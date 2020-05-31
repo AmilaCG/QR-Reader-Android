@@ -21,7 +21,9 @@ import android.widget.Toast;
 import com.auroid.qrscanner.serializable.BarcodeWrapper;
 import com.auroid.qrscanner.serializable.ContactWrapper;
 import com.auroid.qrscanner.serializable.EventWrapper;
+import com.auroid.qrscanner.serializable.WiFiWrapper;
 import com.auroid.qrscanner.utils.TypeSelector;
+import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -369,5 +371,33 @@ public class ActionHandler {
 
         Linkify.addLinks(ssb, Linkify.ALL);
         return ssb;
+    }
+
+    public String getFormattedWiFiDetails() {
+        WiFiWrapper wifiParams = mBarcodeWrapper.wifiWrapper;
+
+        String encryption;
+        assert wifiParams != null;
+        switch (wifiParams.encryptionType) {
+            case FirebaseVisionBarcode.WiFi.TYPE_OPEN:
+                encryption = "None";
+                break;
+
+            case FirebaseVisionBarcode.WiFi.TYPE_WPA:
+                encryption = "WPA";
+                break;
+
+            case FirebaseVisionBarcode.WiFi.TYPE_WEP:
+                encryption = "WEP";
+                break;
+
+            default:
+                encryption = "Unknown";
+        }
+
+        return "Wi-Fi Network\n" +
+                "\nName: " + wifiParams.ssid +
+                "\nPassword: " + wifiParams.password +
+                "\nEncryption: " + encryption;
     }
 }
