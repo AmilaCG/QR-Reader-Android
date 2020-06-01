@@ -1,5 +1,5 @@
 # QR-Reader-Android
-A robust, minimalist QR code reader for Android powered by [Google Vision Barcode API](https://developers.google.com/vision/android/barcodes-overview).
+A robust, minimalist QR code reader for Android powered by [Firebase ML Kit's Barcode API](https://firebase.google.com/docs/ml-kit/read-barcodes).
 
 <a href="https://play.google.com/store/apps/details?id=com.auroid.qrscanner" rel="noopener noreferrer" target="_blank">
 <img src="google-play-badge.png" style="float:left" width="180" /></a>
@@ -30,6 +30,10 @@ Android API 21 (Android 5.0 - Lollipop) or greater
 ## How to setup
 
 Clone or [download](https://github.com/amila93/QR-Reader-Android/archive/master.zip) the repository and open "**QRScanner**" project using Android Studio.
+
+## Implementation using Google Vision Barcode API
+
+Implementation using the older Google Mobile Vision Barcode API can be found on **OldMobileVisionAPI** branch. Since Google will wind down Mobile Vision Barcode API, moved to Firebase ML Kit. Both API's are almost same. 
 
 ## Note
 
