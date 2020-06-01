@@ -21,6 +21,8 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.graphics.RectF;
+import android.os.Build;
+
 import androidx.core.content.ContextCompat;
 import com.auroid.qrscanner.camera.GraphicOverlay;
 import com.auroid.qrscanner.R;
@@ -58,16 +60,20 @@ class BarcodeReticleGraphic extends BarcodeGraphicBase {
     public void draw(Canvas canvas) {
         super.draw(canvas);
 
-        // Draws the ripple to simulate the breathing animation effect.
-        ripplePaint.setAlpha((int) (rippleAlpha * animator.getRippleAlphaScale()));
-        ripplePaint.setStrokeWidth(rippleStrokeWidth * animator.getRippleStrokeWidthScale());
-        float offset = rippleSizeOffset * animator.getRippleSizeScale();
-        RectF rippleRect =
-                new RectF(
-                        boxRect.left - offset,
-                        boxRect.top - offset,
-                        boxRect.right + offset,
-                        boxRect.bottom + offset);
-        canvas.drawRoundRect(rippleRect, boxCornerRadius, boxCornerRadius, ripplePaint);
+        // Ripple animation will visible only for API 26 and above because devices with low API
+        // levels are not displaying it properly.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            // Draws the ripple to simulate the breathing animation effect.
+            ripplePaint.setAlpha((int) (rippleAlpha * animator.getRippleAlphaScale()));
+            ripplePaint.setStrokeWidth(rippleStrokeWidth * animator.getRippleStrokeWidthScale());
+            float offset = rippleSizeOffset * animator.getRippleSizeScale();
+            RectF rippleRect =
+                    new RectF(
+                            boxRect.left - offset,
+                            boxRect.top - offset,
+                            boxRect.right + offset,
+                            boxRect.bottom + offset);
+            canvas.drawRoundRect(rippleRect, boxCornerRadius, boxCornerRadius, ripplePaint);
+        }
     }
 }
