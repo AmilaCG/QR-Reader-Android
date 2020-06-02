@@ -194,8 +194,8 @@ public class BarcodeResultActivity extends AppCompatActivity {
                 ActionHandler actionWifi = new ActionHandler(this, mBarcodeWrapper);
                 tvBarcodeResult.setText(actionWifi.getFormattedWiFiDetails());
 
-                tvAction.setVisibility(View.GONE);
-                ibAction.setVisibility(View.GONE);
+                tvAction.setText(R.string.action_wifi);
+                ibAction.setImageResource(R.drawable.ic_wifi_black_38);
 
                 insertToDb(mBarcodeWrapper);
                 break;
@@ -233,6 +233,10 @@ public class BarcodeResultActivity extends AppCompatActivity {
 
             case FirebaseVisionBarcode.TYPE_CONTACT_INFO:
                 actionHandler.addToContacts();
+                break;
+
+            case FirebaseVisionBarcode.TYPE_WIFI:
+                actionHandler.connectToWifi();
                 break;
         }
     }

@@ -8,6 +8,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.net.Uri;
+import android.net.wifi.WifiConfiguration;
+import android.net.wifi.WifiManager;
+import android.net.wifi.WifiNetworkSuggestion;
+import android.os.Build;
 import android.provider.CalendarContract;
 import android.provider.ContactsContract;
 import android.telephony.PhoneNumberUtils;
@@ -17,6 +21,8 @@ import android.text.style.StyleSpan;
 import android.text.util.Linkify;
 import android.util.Log;
 import android.widget.Toast;
+
+import androidx.annotation.RequiresApi;
 
 import com.auroid.qrscanner.serializable.BarcodeWrapper;
 import com.auroid.qrscanner.serializable.ContactWrapper;
@@ -29,6 +35,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 public class ActionHandler {
@@ -190,6 +197,41 @@ public class ActionHandler {
 
         intent.putParcelableArrayListExtra(ContactsContract.Intents.Insert.DATA, data);
         mContext.startActivity(intent);
+    }
+
+    public void connectToWifi() {
+        String ssid = mBarcodeWrapper.wifiWrapper.ssid;
+        String pass = mBarcodeWrapper.wifiWrapper.password;
+
+        Toast.makeText(mContext, "Connecting to: " + ssid + "..", Toast.LENGTH_LONG).show();
+        WifiManager wifiManager =
+                (WifiManager) mContext.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            int encryption = mBarcodeWrapper.wifiWrapper.encryptionType;
+            if (encryption == FirebaseVisionBarcode.WiFi.TYPE_WPA) {
+                // TODO: Need to find a proper way for API 29 (Q) and above
+                WifiNetworkSuggestion networkSuggestion = new WifiNetworkSuggestion.Builder()
+                        .setSsid(ssid)
+                        .setWpa2Passphrase(pass)
+                        .build();
+
+                List<WifiNetworkSuggestion> suggestionsList = new ArrayList<>();
+                suggestionsList.add(networkSuggestion);
+                wifiManager.addNetworkSuggestions(suggestionsList);
+            } else if (encryption == FirebaseVisionBarcode.WiFi.TYPE_WEP) {
+                Toast.makeText(mContext, R.string.unsupported_encryption, Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            if (!wifiManager.isWifiEnabled()) {
+                wifiManager.setWifiEnabled(true);
+            }
+            WifiConfiguration wifiConfiguration = new WifiConfiguration();
+            wifiConfiguration.SSID = String.format("\"%s\"", ssid);
+            wifiConfiguration.preSharedKey = String.format("\"%s\"", pass);
+            int wifiID = wifiManager.addNetwork(wifiConfiguration);
+            wifiManager.enableNetwork(wifiID, true);
+        }
     }
 
     public void copyToClipboard() {

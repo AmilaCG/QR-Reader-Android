@@ -136,6 +136,14 @@ public class ResultListAdapter extends ListAdapter<Result, ResultListAdapter.Res
                         .setIcon(R.drawable.ic_calender_white_24dp)
                         .show();
                 break;
+
+            case FirebaseVisionBarcode.TYPE_WIFI:
+                new MaterialAlertDialogBuilder(mContext)
+                        .setTitle("WiFi Network")
+                        .setMessage(actionHandler.getFormattedWiFiDetails())
+                        .setIcon(R.drawable.ic_wifi_white_24dp)
+                        .show();
+                break;
         }
     }
 
@@ -159,6 +167,10 @@ public class ResultListAdapter extends ListAdapter<Result, ResultListAdapter.Res
 
             case FirebaseVisionBarcode.TYPE_CONTACT_INFO:
                 actionHandler.addToContacts();
+                break;
+
+            case FirebaseVisionBarcode.TYPE_WIFI:
+                actionHandler.connectToWifi();
                 break;
 
             default:
@@ -190,6 +202,10 @@ public class ResultListAdapter extends ListAdapter<Result, ResultListAdapter.Res
 
             case FirebaseVisionBarcode.TYPE_CONTACT_INFO:
                 popupMenu.inflate(R.menu.menu_result_contact);
+                break;
+
+            case FirebaseVisionBarcode.TYPE_WIFI:
+                popupMenu.inflate(R.menu.menu_result_wifi);
                 break;
 
             default:
