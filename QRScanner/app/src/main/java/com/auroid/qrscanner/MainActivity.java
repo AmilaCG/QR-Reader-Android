@@ -20,9 +20,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.google.android.gms.common.internal.Objects;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.snackbar.Snackbar;
-import com.google.common.base.Objects;
 import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode;
 import com.google.gson.Gson;
 

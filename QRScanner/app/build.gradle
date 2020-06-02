@@ -63,6 +63,4 @@ dependencies {
     // Firebase barcode decoding libs
     implementation 'com.google.firebase:firebase-ml-vision:24.0.3'
     implementation 'com.google.firebase:firebase-ml-vision-barcode-model:16.1.1'
-
-    implementation("com.google.guava:guava:29.0-android")
 }
