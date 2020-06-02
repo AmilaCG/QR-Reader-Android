@@ -17,6 +17,7 @@ A robust, minimalist QR code reader for Android powered by [Firebase ML Kit's Ba
 - Scan a QR code on a business card (vCard) then add to contacts
 - Open maps to navigate to a location embedded in a QR code
 - Open dialer to call or SMS to a number scanned from a QR code
+- Connect to a WiFi network by scanning a QR code
 - Add an event to the calender by scanning a QR code
 - Save scan history and do above actions even from the history
 - Ability to use torch/flasher to scan in dark places
