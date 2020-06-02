@@ -31,17 +31,16 @@
         android:layout_width="66dp"
         android:layout_height="66dp"
         android:layout_marginStart="8dp"
+        android:layout_marginBottom="64dp"
         android:background="@drawable/btn_background"
         android:onClick="copyToClipboard"
         android:src="@drawable/ic_content_copy_black_36dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/ib_action"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.85" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
-        android:layout_width="66dp"
+        android:layout_width="72dp"
         android:layout_height="wrap_content"
         android:text="@string/action_copy"
         android:textAlignment="center"
@@ -56,18 +55,17 @@
         android:id="@+id/ib_action"
         android:layout_width="66dp"
         android:layout_height="66dp"
+        android:layout_marginBottom="64dp"
         android:background="@drawable/btn_background"
         android:onClick="doAction"
         android:src="@drawable/ic_public_black_44dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/ib_search"
-        app:layout_constraintStart_toEndOf="@id/ib_copy"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.85" />
+        app:layout_constraintStart_toEndOf="@id/ib_copy" />
 
     <TextView
         android:id="@+id/txt_action"
-        android:layout_width="66dp"
+        android:layout_width="72dp"
         android:layout_height="wrap_content"
         android:text="@string/action_web"
         android:textAlignment="center"
@@ -83,17 +81,16 @@
         android:layout_width="66dp"
         android:layout_height="66dp"
         android:layout_marginEnd="8dp"
+        android:layout_marginBottom="64dp"
         android:background="@drawable/btn_background"
         android:onClick="webSearch"
         android:src="@drawable/ic_search_black_44dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/ib_action"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.85" />
+        app:layout_constraintStart_toEndOf="@+id/ib_action" />
 
     <TextView
-        android:layout_width="66dp"
+        android:layout_width="72dp"
         android:layout_height="wrap_content"
         android:text="@string/action_web_search"
         android:textAlignment="center"

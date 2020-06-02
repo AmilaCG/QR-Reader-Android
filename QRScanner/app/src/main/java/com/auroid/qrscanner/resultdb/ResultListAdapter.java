@@ -18,8 +18,8 @@ import com.auroid.qrscanner.ActionHandler;
 import com.auroid.qrscanner.R;
 import com.auroid.qrscanner.serializable.BarcodeWrapper;
 
-import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode;
 import com.google.gson.Gson;
 
 import java.text.SimpleDateFormat;
@@ -105,7 +105,7 @@ public class ResultListAdapter extends ListAdapter<Result, ResultListAdapter.Res
 
     private void displayInfo(int resultType, ActionHandler actionHandler, BarcodeWrapper bcWrapper) {
         switch (resultType) {
-            case Barcode.URL:
+            case FirebaseVisionBarcode.TYPE_URL:
                 new MaterialAlertDialogBuilder(mContext)
                         .setTitle("URL / Text")
                         .setMessage(bcWrapper.rawValue)
@@ -113,7 +113,7 @@ public class ResultListAdapter extends ListAdapter<Result, ResultListAdapter.Res
                         .show();
                 break;
 
-            case Barcode.CONTACT_INFO:
+            case FirebaseVisionBarcode.TYPE_CONTACT_INFO:
                 LayoutInflater inflater =
                         (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 if (inflater == null) return;
@@ -129,7 +129,7 @@ public class ResultListAdapter extends ListAdapter<Result, ResultListAdapter.Res
                         .show();
                 break;
 
-            case Barcode.CALENDAR_EVENT:
+            case FirebaseVisionBarcode.TYPE_CALENDAR_EVENT:
                 new MaterialAlertDialogBuilder(mContext)
                         .setTitle("Calender Event")
                         .setMessage(actionHandler.getFormattedEventDetails())
@@ -141,23 +141,23 @@ public class ResultListAdapter extends ListAdapter<Result, ResultListAdapter.Res
 
     private void runAction(int resultType, ActionHandler actionHandler) {
         switch (resultType) {
-            case Barcode.URL:
+            case FirebaseVisionBarcode.TYPE_URL:
                 actionHandler.openBrowser();
                 break;
 
-            case Barcode.PHONE:
+            case FirebaseVisionBarcode.TYPE_PHONE:
                 actionHandler.openDialer();
                 break;
 
-            case Barcode.GEO:
+            case FirebaseVisionBarcode.TYPE_GEO:
                 actionHandler.openMaps();
                 break;
 
-            case Barcode.CALENDAR_EVENT:
+            case FirebaseVisionBarcode.TYPE_CALENDAR_EVENT:
                 actionHandler.addToCalender();
                 break;
 
-            case Barcode.CONTACT_INFO:
+            case FirebaseVisionBarcode.TYPE_CONTACT_INFO:
                 actionHandler.addToContacts();
                 break;
 
@@ -168,7 +168,7 @@ public class ResultListAdapter extends ListAdapter<Result, ResultListAdapter.Res
 
     private void inflateMenu(int resultType, PopupMenu popupMenu, BarcodeWrapper bcWrapper) {
         switch(resultType) {
-            case Barcode.URL:
+            case FirebaseVisionBarcode.TYPE_URL:
                 if (bcWrapper.rawValue.equals(bcWrapper.displayValue)) {
                     popupMenu.inflate(R.menu.menu_result_web);
                 } else {
@@ -176,19 +176,19 @@ public class ResultListAdapter extends ListAdapter<Result, ResultListAdapter.Res
                 }
                 break;
 
-            case Barcode.PHONE:
+            case FirebaseVisionBarcode.TYPE_PHONE:
                 popupMenu.inflate(R.menu.menu_result_phone);
                 break;
 
-            case Barcode.GEO:
+            case FirebaseVisionBarcode.TYPE_GEO:
                 popupMenu.inflate(R.menu.menu_result_geo);
                 break;
 
-            case Barcode.CALENDAR_EVENT:
+            case FirebaseVisionBarcode.TYPE_CALENDAR_EVENT:
                 popupMenu.inflate(R.menu.menu_result_event);
                 break;
 
-            case Barcode.CONTACT_INFO:
+            case FirebaseVisionBarcode.TYPE_CONTACT_INFO:
                 popupMenu.inflate(R.menu.menu_result_contact);
                 break;
 
@@ -200,27 +200,27 @@ public class ResultListAdapter extends ListAdapter<Result, ResultListAdapter.Res
 
     private void setIcon(int resultType, ResultViewHolder holder) {
         switch(resultType) {
-            case Barcode.URL:
+            case FirebaseVisionBarcode.TYPE_URL:
                 holder.iconItemView.setImageResource(R.drawable.ic_public_white_24dp);
                 break;
 
-            case Barcode.PHONE:
+            case FirebaseVisionBarcode.TYPE_PHONE:
                 holder.iconItemView.setImageResource(R.drawable.ic_phone_white_24dp);
                 break;
 
-            case Barcode.CONTACT_INFO:
+            case FirebaseVisionBarcode.TYPE_CONTACT_INFO:
                 holder.iconItemView.setImageResource(R.drawable.ic_person_white_24dp);
                 break;
 
-            case Barcode.GEO:
+            case FirebaseVisionBarcode.TYPE_GEO:
                 holder.iconItemView.setImageResource(R.drawable.ic_location_on_white_24dp);
                 break;
 
-            case Barcode.CALENDAR_EVENT:
+            case FirebaseVisionBarcode.TYPE_CALENDAR_EVENT:
                 holder.iconItemView.setImageResource(R.drawable.ic_calender_white_24dp);
                 break;
 
-            case Barcode.WIFI:
+            case FirebaseVisionBarcode.TYPE_WIFI:
                 holder.iconItemView.setImageResource(R.drawable.ic_wifi_white_24dp);
                 break;
 

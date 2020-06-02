@@ -2,7 +2,7 @@ package com.auroid.qrscanner.utils;
 
 import android.provider.ContactsContract;
 
-import com.google.android.gms.vision.barcode.Barcode;
+import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode;
 
 // This class converts "TYPE" constants of Barcode class to ContactsContract.CommonDataKinds class's
 // "TYPE" constants.
@@ -10,16 +10,16 @@ public class TypeSelector {
 
     public static int selectPhoneType(int typeFromBarcode) {
         switch (typeFromBarcode) {
-            case Barcode.Phone.HOME:
+            case FirebaseVisionBarcode.Phone.TYPE_HOME:
                 return ContactsContract.CommonDataKinds.Phone.TYPE_HOME;
 
-            case Barcode.Phone.MOBILE:
+            case FirebaseVisionBarcode.Phone.TYPE_MOBILE:
                 return ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE;
 
-            case Barcode.Phone.WORK:
+            case FirebaseVisionBarcode.Phone.TYPE_WORK:
                 return ContactsContract.CommonDataKinds.Phone.TYPE_WORK;
 
-            case Barcode.Phone.FAX:
+            case FirebaseVisionBarcode.Phone.TYPE_FAX:
                 return ContactsContract.CommonDataKinds.Phone.TYPE_OTHER_FAX;
 
             default:
@@ -29,10 +29,10 @@ public class TypeSelector {
 
     public static int selectEmailType(int typeFromBarcode) {
         switch (typeFromBarcode) {
-            case Barcode.Email.HOME:
+            case FirebaseVisionBarcode.Email.TYPE_HOME:
                 return ContactsContract.CommonDataKinds.Email.TYPE_HOME;
 
-            case Barcode.Email.WORK:
+            case FirebaseVisionBarcode.Email.TYPE_WORK:
                 return ContactsContract.CommonDataKinds.Email.TYPE_WORK;
 
             default:
@@ -42,10 +42,10 @@ public class TypeSelector {
 
     public static int selectAddressType(int typeFromBarcode) {
         switch (typeFromBarcode) {
-            case Barcode.Address.HOME:
+            case FirebaseVisionBarcode.Address.TYPE_HOME:
                 return ContactsContract.CommonDataKinds.StructuredPostal.TYPE_HOME;
 
-            case Barcode.Address.WORK:
+            case FirebaseVisionBarcode.Address.TYPE_WORK:
                 return ContactsContract.CommonDataKinds.StructuredPostal.TYPE_WORK;
 
             default:
@@ -55,16 +55,16 @@ public class TypeSelector {
 
     public static String phoneTypeAsString(int typeFromBarcode) {
         switch (typeFromBarcode) {
-            case Barcode.Phone.HOME:
+            case FirebaseVisionBarcode.Phone.TYPE_HOME:
                 return "Home";
 
-            case Barcode.Phone.MOBILE:
+            case FirebaseVisionBarcode.Phone.TYPE_MOBILE:
                 return "Mobile";
 
-            case Barcode.Phone.WORK:
+            case FirebaseVisionBarcode.Phone.TYPE_WORK:
                 return "Work";
 
-            case Barcode.Phone.FAX:
+            case FirebaseVisionBarcode.Phone.TYPE_FAX:
                 return "Fax";
 
             default:
@@ -74,10 +74,10 @@ public class TypeSelector {
 
     public static String emailTypeAsString(int typeFromBarcode) {
         switch (typeFromBarcode) {
-            case Barcode.Email.HOME:
+            case FirebaseVisionBarcode.Email.TYPE_HOME:
                 return "Home";
 
-            case Barcode.Email.WORK:
+            case FirebaseVisionBarcode.Email.TYPE_WORK:
                 return "Work";
 
             default:
@@ -87,10 +87,10 @@ public class TypeSelector {
 
     public static String addressTypeAsString(int typeFromBarcode) {
         switch (typeFromBarcode) {
-            case Barcode.Address.HOME:
+            case FirebaseVisionBarcode.Address.TYPE_HOME:
                 return "Home";
 
-            case Barcode.Address.WORK:
+            case FirebaseVisionBarcode.Address.TYPE_WORK:
                 return "Work";
 
             default:
