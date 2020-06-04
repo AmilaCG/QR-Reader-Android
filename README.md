@@ -13,7 +13,6 @@ A robust, minimalist QR code reader for Android powered by [Firebase ML Kit's Ba
 ## Functions
 
 - Go to a website, copy to clipboard or search scanned content on the web
-- Option to directly open scanned URL in the browser
 - Scan a QR code on a business card (vCard) then add to contacts
 - Open maps to navigate to a location embedded in a QR code
 - Open dialer to call or SMS to a number scanned from a QR code
@@ -21,7 +20,7 @@ A robust, minimalist QR code reader for Android powered by [Firebase ML Kit's Ba
 - Add an event to the calender by scanning a QR code
 - Save scan history and do above actions even from the history
 - Ability to use torch/flasher to scan in dark places
-- Delete individual items from scan history and undo mistaken deletions
+- Option to directly open scanned URL in the browser
 - Display corners of the decoded QR code in real-time
 
 ## Prerequisites
