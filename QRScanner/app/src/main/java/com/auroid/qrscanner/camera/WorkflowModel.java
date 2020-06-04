@@ -20,7 +20,7 @@ import android.app.Application;
 import androidx.annotation.MainThread;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
-import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode;
+import com.google.mlkit.vision.barcode.Barcode;
 
 /** View model for handling application workflow based on camera preview. */
 public class WorkflowModel extends AndroidViewModel {
@@ -40,7 +40,7 @@ public class WorkflowModel extends AndroidViewModel {
 
     public final MutableLiveData<WorkflowState> workflowState = new MutableLiveData<>();
 
-    public final MutableLiveData<FirebaseVisionBarcode> detectedBarcode = new MutableLiveData<>();
+    public final MutableLiveData<Barcode> detectedBarcode = new MutableLiveData<>();
 
     private boolean isCameraLive = false;
 

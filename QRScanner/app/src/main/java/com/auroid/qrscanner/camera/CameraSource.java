@@ -29,7 +29,6 @@ import com.google.android.gms.common.images.Size;
 import com.auroid.qrscanner.R;
 import com.auroid.qrscanner.utils.Utils;
 import com.auroid.qrscanner.settings.PreferenceUtils;
-import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.IdentityHashMap;
@@ -60,7 +59,7 @@ public class CameraSource {
     private static final float REQUESTED_CAMERA_FPS = 20.0f;
 
     private Camera camera;
-    @FirebaseVisionImageMetadata.Rotation private int rotation;
+    private int rotation;
 
     private Size previewSize;
 
@@ -305,7 +304,7 @@ public class CameraSource {
         Camera.getCameraInfo(CAMERA_FACING_BACK, cameraInfo);
         int angle = (cameraInfo.orientation - degrees + 360) % 360;
         // This corresponds to the rotation constants in FirebaseVisionImageMetadata.
-        this.rotation = angle / 90;
+        this.rotation = angle;
         camera.setDisplayOrientation(angle);
         parameters.setRotation(angle);
     }

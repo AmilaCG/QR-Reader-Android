@@ -5,14 +5,14 @@ import android.graphics.Path;
 import android.graphics.Point;
 
 import com.auroid.qrscanner.camera.GraphicOverlay;
-import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode;
+import com.google.mlkit.vision.barcode.Barcode;
 
 class BarcodeTrackerGraphic extends BarcodeGraphicBase {
 
     private final Point[] mCornerPts;
     private GraphicOverlay mOverlay;
 
-    BarcodeTrackerGraphic(GraphicOverlay overlay, FirebaseVisionBarcode barcode) {
+    BarcodeTrackerGraphic(GraphicOverlay overlay, Barcode barcode) {
         super(overlay);
         mOverlay = overlay;
         mCornerPts = barcode.getCornerPoints();

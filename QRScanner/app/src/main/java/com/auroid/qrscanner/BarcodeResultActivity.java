@@ -23,7 +23,7 @@ import com.auroid.qrscanner.serializable.GeoWrapper;
 import com.auroid.qrscanner.serializable.PhoneWrapper;
 import com.auroid.qrscanner.serializable.WiFiWrapper;
 
-import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode;
+import com.google.mlkit.vision.barcode.Barcode;
 import com.google.gson.Gson;
 
 import java.util.Date;
@@ -35,7 +35,7 @@ public class BarcodeResultActivity extends AppCompatActivity {
 
     private int mResultType;
 
-    private FirebaseVisionBarcode mDetectedBarcode = MainActivity.mDetectedBarcode;
+    private Barcode mDetectedBarcode = MainActivity.mDetectedBarcode;
 
     private BarcodeWrapper mBarcodeWrapper;
 
@@ -63,7 +63,7 @@ public class BarcodeResultActivity extends AppCompatActivity {
         mBarcodeWrapper = new BarcodeWrapper(mResultType, result, rawValue);
 
         switch (mResultType) {
-            case FirebaseVisionBarcode.TYPE_URL:
+            case Barcode.TYPE_URL:
                 Log.d(TAG, "URL");
                 tvBarcodeResult.setText(rawValue);
 
@@ -74,7 +74,7 @@ public class BarcodeResultActivity extends AppCompatActivity {
                 insertToDb(mBarcodeWrapper);
                 break;
 
-            case FirebaseVisionBarcode.TYPE_PHONE:
+            case Barcode.TYPE_PHONE:
                 Log.d(TAG, "PHONE");
                 tvAction.setText(R.string.action_phone);
                 ibAction.setImageResource(R.drawable.ic_phone_black_38dp);
@@ -84,7 +84,7 @@ public class BarcodeResultActivity extends AppCompatActivity {
                 insertToDb(mBarcodeWrapper);
                 break;
 
-            case FirebaseVisionBarcode.TYPE_GEO:
+            case Barcode.TYPE_GEO:
                 Log.d(TAG, "GEO");
                 tvAction.setText(R.string.action_geo);
                 ibAction.setImageResource(R.drawable.ic_location_on_black_38dp);
@@ -95,9 +95,9 @@ public class BarcodeResultActivity extends AppCompatActivity {
                 insertToDb(mBarcodeWrapper);
                 break;
 
-            case FirebaseVisionBarcode.TYPE_CALENDAR_EVENT:
+            case Barcode.TYPE_CALENDAR_EVENT:
                 Log.d(TAG, "CALENDAR_EVENT");
-                FirebaseVisionBarcode.CalendarEvent calEvent = mDetectedBarcode.getCalendarEvent();
+                Barcode.CalendarEvent calEvent = mDetectedBarcode.getCalendarEvent();
 
                 assert calEvent != null;
                 String eventStart = Objects.requireNonNull(calEvent.getStart()).getYear() + "/"
@@ -131,11 +131,17 @@ public class BarcodeResultActivity extends AppCompatActivity {
                 insertToDb(mBarcodeWrapper);
                 break;
 
-            case FirebaseVisionBarcode.TYPE_CONTACT_INFO:
+            case Barcode.TYPE_CONTACT_INFO:
                 Log.d(TAG, "CONTACT_INFO");
-                FirebaseVisionBarcode.ContactInfo contact = mDetectedBarcode.getContactInfo();
+                Barcode.ContactInfo contact = mDetectedBarcode.getContactInfo();
 
                 assert contact != null;
+                int numOfUrls = contact.getUrls().size();
+                String[] urls = new String[numOfUrls];
+                for (int i = 0; i < numOfUrls; i++) {
+                    urls[i] = contact.getUrls().get(i);
+                }
+
                 int numOfPhones = contact.getPhones().size();
                 PhoneWrapper[] phoneWrappers = new PhoneWrapper[numOfPhones];
                 for (int i = 0; i < numOfPhones; i++) {
@@ -164,7 +170,7 @@ public class BarcodeResultActivity extends AppCompatActivity {
                         Objects.requireNonNull(contact.getName()).getFormattedName(),
                         contact.getOrganization(),
                         contact.getTitle(),
-                        contact.getUrls(),
+                        urls,
                         phoneWrappers,
                         emailWrappers,
                         addressWrappers
@@ -182,7 +188,7 @@ public class BarcodeResultActivity extends AppCompatActivity {
                 insertToDb(mBarcodeWrapper);
                 break;
 
-            case FirebaseVisionBarcode.TYPE_WIFI:
+            case Barcode.TYPE_WIFI:
                 Log.d(TAG, "WIFI");
 
                 mBarcodeWrapper.wifiWrapper = new WiFiWrapper(
@@ -215,27 +221,27 @@ public class BarcodeResultActivity extends AppCompatActivity {
         ActionHandler actionHandler = new ActionHandler(this, mBarcodeWrapper);
 
         switch (mResultType) {
-            case FirebaseVisionBarcode.TYPE_URL:
+            case Barcode.TYPE_URL:
                 actionHandler.openBrowser();
                 break;
 
-            case FirebaseVisionBarcode.TYPE_PHONE:
+            case Barcode.TYPE_PHONE:
                 actionHandler.openDialer();
                 break;
 
-            case FirebaseVisionBarcode.TYPE_CALENDAR_EVENT:
+            case Barcode.TYPE_CALENDAR_EVENT:
                 actionHandler.addToCalender();
                 break;
 
-            case FirebaseVisionBarcode.TYPE_GEO:
+            case Barcode.TYPE_GEO:
                 actionHandler.openMaps();
                 break;
 
-            case FirebaseVisionBarcode.TYPE_CONTACT_INFO:
+            case Barcode.TYPE_CONTACT_INFO:
                 actionHandler.addToContacts();
                 break;
 
-            case FirebaseVisionBarcode.TYPE_WIFI:
+            case Barcode.TYPE_WIFI:
                 actionHandler.connectToWifi();
                 break;
         }

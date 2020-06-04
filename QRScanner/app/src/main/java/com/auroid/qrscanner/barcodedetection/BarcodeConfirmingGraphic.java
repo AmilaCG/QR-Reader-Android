@@ -20,14 +20,14 @@ import android.graphics.Canvas;
 import android.graphics.Path;
 import com.auroid.qrscanner.camera.GraphicOverlay;
 import com.auroid.qrscanner.settings.PreferenceUtils;
-import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode;
+import com.google.mlkit.vision.barcode.Barcode;
 
 /** Guides user to move camera closer to confirm the detected barcode. */
 class BarcodeConfirmingGraphic extends BarcodeGraphicBase {
 
-  private final FirebaseVisionBarcode barcode;
+  private final Barcode barcode;
 
-  BarcodeConfirmingGraphic(GraphicOverlay overlay, FirebaseVisionBarcode barcode) {
+  BarcodeConfirmingGraphic(GraphicOverlay overlay, Barcode barcode) {
     super(overlay);
     this.barcode = barcode;
   }

@@ -22,14 +22,13 @@ import android.text.util.Linkify;
 import android.util.Log;
 import android.widget.Toast;
 
-import androidx.annotation.RequiresApi;
-
 import com.auroid.qrscanner.serializable.BarcodeWrapper;
 import com.auroid.qrscanner.serializable.ContactWrapper;
 import com.auroid.qrscanner.serializable.EventWrapper;
 import com.auroid.qrscanner.serializable.WiFiWrapper;
 import com.auroid.qrscanner.utils.TypeSelector;
-import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode;
+
+import com.google.mlkit.vision.barcode.Barcode;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -209,7 +208,7 @@ public class ActionHandler {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             int encryption = mBarcodeWrapper.wifiWrapper.encryptionType;
-            if (encryption == FirebaseVisionBarcode.WiFi.TYPE_WPA) {
+            if (encryption == Barcode.WiFi.TYPE_WPA) {
                 // TODO: Need to find a proper way for API 29 (Q) and above
                 WifiNetworkSuggestion networkSuggestion = new WifiNetworkSuggestion.Builder()
                         .setSsid(ssid)
@@ -219,7 +218,7 @@ public class ActionHandler {
                 List<WifiNetworkSuggestion> suggestionsList = new ArrayList<>();
                 suggestionsList.add(networkSuggestion);
                 wifiManager.addNetworkSuggestions(suggestionsList);
-            } else if (encryption == FirebaseVisionBarcode.WiFi.TYPE_WEP) {
+            } else if (encryption == Barcode.WiFi.TYPE_WEP) {
                 Toast.makeText(mContext, R.string.unsupported_encryption, Toast.LENGTH_SHORT).show();
             }
         } else {
@@ -421,15 +420,15 @@ public class ActionHandler {
         String encryption;
         assert wifiParams != null;
         switch (wifiParams.encryptionType) {
-            case FirebaseVisionBarcode.WiFi.TYPE_OPEN:
+            case Barcode.WiFi.TYPE_OPEN:
                 encryption = "None";
                 break;
 
-            case FirebaseVisionBarcode.WiFi.TYPE_WPA:
+            case Barcode.WiFi.TYPE_WPA:
                 encryption = "WPA";
                 break;
 
-            case FirebaseVisionBarcode.WiFi.TYPE_WEP:
+            case Barcode.WiFi.TYPE_WEP:
                 encryption = "WEP";
                 break;
 

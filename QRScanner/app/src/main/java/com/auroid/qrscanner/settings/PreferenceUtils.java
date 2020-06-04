@@ -26,7 +26,7 @@ import com.google.android.gms.common.images.Size;
 import com.auroid.qrscanner.R;
 import com.auroid.qrscanner.camera.CameraSizePair;
 import com.auroid.qrscanner.camera.GraphicOverlay;
-import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode;
+import com.google.mlkit.vision.barcode.Barcode;
 
 /** Utility class to retrieve shared preferences. */
 public class PreferenceUtils {
@@ -40,7 +40,7 @@ public class PreferenceUtils {
     }
 
     public static float getProgressToMeetBarcodeSizeRequirement(
-            GraphicOverlay overlay, FirebaseVisionBarcode barcode) {
+            GraphicOverlay overlay, Barcode barcode) {
         Context context = overlay.getContext();
         if (getBooleanPref(context, R.string.pref_key_enable_barcode_size_check, false)) {
             float reticleBoxWidth = getBarcodeReticleBox(overlay).width();

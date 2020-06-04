@@ -22,39 +22,36 @@ import android.util.Log;
 import androidx.annotation.MainThread;
 import com.google.android.gms.tasks.Task;
 import com.auroid.qrscanner.camera.CameraReticleAnimator;
-import com.google.firebase.ml.vision.FirebaseVision;
-import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode;
-import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcodeDetector;
-import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcodeDetectorOptions;
-import com.google.firebase.ml.vision.common.FirebaseVisionImage;
+import com.google.mlkit.vision.barcode.Barcode;
+import com.google.mlkit.vision.barcode.BarcodeScanner;
+import com.google.mlkit.vision.barcode.BarcodeScannerOptions;
+import com.google.mlkit.vision.common.InputImage;
 import com.auroid.qrscanner.camera.GraphicOverlay;
 import com.auroid.qrscanner.camera.WorkflowModel;
 import com.auroid.qrscanner.camera.WorkflowModel.WorkflowState;
 import com.auroid.qrscanner.camera.FrameProcessorBase;
 import com.auroid.qrscanner.settings.PreferenceUtils;
-import java.io.IOException;
+import com.google.mlkit.vision.barcode.BarcodeScanning;
 import java.util.List;
 import java.util.Objects;
 
 /** A processor to run the barcode detector. */
-public class BarcodeProcessor extends FrameProcessorBase<List<FirebaseVisionBarcode>> {
+public class BarcodeProcessor extends FrameProcessorBase<List<Barcode>> {
 
     private static final String TAG = "BarcodeProcessor";
 
-    private final FirebaseVisionBarcodeDetectorOptions options =
-            new FirebaseVisionBarcodeDetectorOptions.Builder()
+    private final BarcodeScannerOptions options = new BarcodeScannerOptions.Builder()
             .setBarcodeFormats(
-                    FirebaseVisionBarcode.FORMAT_QR_CODE,
-                    FirebaseVisionBarcode.FORMAT_EAN_13,
-                    FirebaseVisionBarcode.FORMAT_EAN_8,
-                    FirebaseVisionBarcode.FORMAT_UPC_A,
-                    FirebaseVisionBarcode.FORMAT_UPC_E,
-                    FirebaseVisionBarcode.FORMAT_DATA_MATRIX,
-                    FirebaseVisionBarcode.FORMAT_CODE_128)
+                    Barcode.FORMAT_QR_CODE,
+                    Barcode.FORMAT_EAN_13,
+                    Barcode.FORMAT_EAN_8,
+                    Barcode.FORMAT_UPC_A,
+                    Barcode.FORMAT_UPC_E,
+                    Barcode.FORMAT_DATA_MATRIX,
+                    Barcode.FORMAT_CODE_128)
             .build();
 
-    private final FirebaseVisionBarcodeDetector detector =
-            FirebaseVision.getInstance().getVisionBarcodeDetector(options);
+    private final BarcodeScanner scanner = BarcodeScanning.getClient(options);
     private final WorkflowModel workflowModel;
     private final CameraReticleAnimator cameraReticleAnimator;
 
@@ -64,23 +61,23 @@ public class BarcodeProcessor extends FrameProcessorBase<List<FirebaseVisionBarc
     }
 
     @Override
-    protected Task<List<FirebaseVisionBarcode>> detectInImage(FirebaseVisionImage image) {
-        return detector.detectInImage(image);
+    protected Task<List<Barcode>> detectInImage(InputImage image) {
+        return scanner.process(image);
     }
 
     @MainThread
     @Override
     protected void onSuccess(
-            FirebaseVisionImage image,
-            List<FirebaseVisionBarcode> results,
+            InputImage image,
+            List<Barcode> results,
             GraphicOverlay graphicOverlay) {
         if (!workflowModel.isCameraLive()) {
             return;
         }
 
         // Picks the barcode, if exists, that covers the center of graphic overlay.
-        FirebaseVisionBarcode barcodeInCenter = null;
-        for (FirebaseVisionBarcode barcode : results) {
+        Barcode barcodeInCenter = null;
+        for (Barcode barcode : results) {
             RectF box = graphicOverlay.translateRect(Objects.requireNonNull(barcode.getBoundingBox()));
             if (box.contains(graphicOverlay.getWidth() / 2f, graphicOverlay.getHeight() / 2f)) {
                 barcodeInCenter = barcode;
@@ -122,7 +119,7 @@ public class BarcodeProcessor extends FrameProcessorBase<List<FirebaseVisionBarc
     }
 
     private ValueAnimator createLoadingAnimator(
-            GraphicOverlay graphicOverlay, FirebaseVisionBarcode barcode) {
+            GraphicOverlay graphicOverlay, Barcode barcode) {
         float endProgress = 1.1f;
         ValueAnimator loadingAnimator = ValueAnimator.ofFloat(0f, endProgress);
         loadingAnimator.setDuration(1000);
@@ -146,10 +143,6 @@ public class BarcodeProcessor extends FrameProcessorBase<List<FirebaseVisionBarc
 
     @Override
     public void stop() {
-        try {
-            detector.close();
-        } catch (IOException e) {
-            Log.e(TAG, "Failed to close barcode detector!", e);
-        }
+        scanner.close();
     }
 }

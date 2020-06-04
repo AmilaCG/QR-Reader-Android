@@ -23,7 +23,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.google.android.gms.common.internal.Objects;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.snackbar.Snackbar;
-import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode;
+import com.google.mlkit.vision.barcode.Barcode;
 import com.google.gson.Gson;
 
 import com.auroid.qrscanner.resultdb.Result;
@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
     private WorkflowState mCurrentWorkflowState;
     private AudioHandler mAudioHandler;
 
-    public static FirebaseVisionBarcode mDetectedBarcode;
+    public static Barcode mDetectedBarcode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -242,7 +242,7 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
 
                         boolean openInBrowser = PreferenceUtils.shouldOpenDirectlyInBrowser(this);
                         int barcodeValueType = mDetectedBarcode.getValueType();
-                        if (openInBrowser && barcodeValueType == FirebaseVisionBarcode.TYPE_URL) {
+                        if (openInBrowser && barcodeValueType == Barcode.TYPE_URL) {
                             BarcodeWrapper barcodeWrapper = new BarcodeWrapper(
                                     barcodeValueType,
                                     mDetectedBarcode.getDisplayValue(),
