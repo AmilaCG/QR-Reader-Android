@@ -33,5 +33,5 @@ Android API 21 (Android 5.0 - Lollipop) or greater
 
 ## Implementation using Mobile Vision Barcode API (Depricated)
 
-Implementation using the [older Google Mobile Vision Barcode API](https://developers.google.com/vision) can be found on **OldMobileVisionAPI** branch. Since Google will wind down Mobile Vision Barcode API, moved to Firebase ML Kit. Both API's are almost same. 
+Implementation using the [older Google Mobile Vision Barcode API](https://developers.google.com/vision) can be found on **OldMobileVisionAPI** branch. Since Google will wind down Mobile Vision Barcode API, migrated to Google ML Kit. Both API's are almost same. 
 
