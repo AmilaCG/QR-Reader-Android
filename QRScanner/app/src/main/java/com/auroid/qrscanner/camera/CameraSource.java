@@ -303,7 +303,6 @@ public class CameraSource {
         CameraInfo cameraInfo = new CameraInfo();
         Camera.getCameraInfo(CAMERA_FACING_BACK, cameraInfo);
         int angle = (cameraInfo.orientation - degrees + 360) % 360;
-        // This corresponds to the rotation constants in FirebaseVisionImageMetadata.
         this.rotation = angle;
         camera.setDisplayOrientation(angle);
         parameters.setRotation(angle);
