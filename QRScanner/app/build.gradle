@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'com.google.gms.google-services'
 apply plugin: 'com.google.android.gms.oss-licenses-plugin'
 
 android {
@@ -9,8 +10,8 @@ android {
         applicationId "com.auroid.qrscanner"
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 16
-        versionName "2.10"
+        versionCode 17
+        versionName "2.11"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -58,4 +59,7 @@ dependencies {
 
     // ML Kit barcode decoding components
     implementation 'com.google.mlkit:barcode-scanning:16.0.0'
+
+    // Google analytics components
+    implementation 'com.google.firebase:firebase-analytics:17.4.3'
 }
