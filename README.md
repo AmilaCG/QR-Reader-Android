@@ -1,5 +1,5 @@
 # QR-Reader-Android
-A robust, simple QR code reader for Android powered by [Google ML Kit's Barcode API](https://developers.google.com/ml-kit/vision/barcode-scanning/).
+A robust, simple Barcode reader for Android powered by [Google ML Kit's Barcode API](https://developers.google.com/ml-kit/vision/barcode-scanning/).
 
 <a href="https://play.google.com/store/apps/details?id=com.auroid.qrscanner" rel="noopener noreferrer" target="_blank">
 <img src="google-play-badge.png" style="float:left" width="180" /></a>
