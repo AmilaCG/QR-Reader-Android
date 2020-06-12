@@ -1,5 +1,6 @@
 package com.auroid.qrscanner;
 
+import android.annotation.SuppressLint;
 import android.util.Log;
 
 import androidx.lifecycle.ViewModelProvider;
@@ -39,6 +40,7 @@ class ResultHandler {
         return mResultJson;
     }
 
+    @SuppressLint("DefaultLocale")
     public void pushToDatabase() {
         String result = mBarcode.getDisplayValue();
         String rawValue = mBarcode.getRawValue();

@@ -1,6 +1,5 @@
 package com.auroid.qrscanner;
 
-import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
@@ -25,7 +24,6 @@ public class BarcodeResultActivity extends AppCompatActivity {
 
     private BarcodeWrapper mBarcodeWrapper;
 
-    @SuppressLint("DefaultLocale")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
