@@ -24,10 +24,7 @@ import com.google.android.gms.common.internal.Objects;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.mlkit.vision.barcode.Barcode;
-import com.google.gson.Gson;
 
-import com.auroid.qrscanner.resultdb.Result;
-import com.auroid.qrscanner.resultdb.ResultViewModel;
 import com.auroid.qrscanner.serializable.BarcodeWrapper;
 import com.auroid.qrscanner.settings.PreferenceUtils;
 import com.auroid.qrscanner.camera.GraphicOverlay;
@@ -38,7 +35,6 @@ import com.auroid.qrscanner.camera.CameraSourcePreview;
 import com.auroid.qrscanner.barcodedetection.BarcodeProcessor;
 
 import java.io.IOException;
-import java.util.Date;
 
 public class MainActivity extends AppCompatActivity implements OnClickListener {
 
@@ -47,6 +43,7 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
     private static final int RC_HANDLE_CAMERA_PERM = 24;
 
     private CameraSource mCameraSource;
+
     private CameraSourcePreview mPreview;
     private GraphicOverlay mGraphicOverlay;
     private View mSettingsButton;
@@ -54,11 +51,11 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
     private View mFlashButton;
     private Chip mGuideChip;
     private AnimatorSet mPromptChipAnimator;
+
     private WorkflowModel mWorkflowModel;
     private WorkflowState mCurrentWorkflowState;
-    private AudioHandler mAudioHandler;
 
-    public static Barcode mDetectedBarcode;
+    private AudioHandler mAudioHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -238,33 +235,29 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                 this,
                 barcode -> {
                     if (barcode != null) {
-                        mDetectedBarcode = barcode;
+                        ResultHandler resultHandler = new ResultHandler(barcode, this);
+                        resultHandler.pushToDatabase();
 
                         boolean openInBrowser = PreferenceUtils.shouldOpenDirectlyInBrowser(this);
-                        int barcodeValueType = mDetectedBarcode.getValueType();
+                        int barcodeValueType = barcode.getValueType();
                         if (openInBrowser && barcodeValueType == Barcode.TYPE_URL) {
                             BarcodeWrapper barcodeWrapper = new BarcodeWrapper(
                                     barcodeValueType,
-                                    mDetectedBarcode.getDisplayValue(),
-                                    mDetectedBarcode.getRawValue());
-
+                                    barcode.getDisplayValue(),
+                                    barcode.getRawValue());
                             barcodeWrapper.url =
-                                    java.util.Objects.requireNonNull(mDetectedBarcode.getUrl()).getUrl();
+                                    java.util.Objects.requireNonNull(barcode.getUrl()).getUrl();
 
                             ActionHandler actionHandler = new ActionHandler(this, barcodeWrapper);
                             actionHandler.openBrowser();
-
-                            Gson gson = new Gson();
-                            String resultJson = gson.toJson(barcodeWrapper);
-
-                            // Insert result to the database
-                            ResultViewModel resultViewModel =
-                                    new ViewModelProvider(this).get(ResultViewModel.class);
-                            Result result = new Result(resultJson, new Date());
-                            resultViewModel.insert(result);
                         } else {
-                            startActivity(new Intent(this, BarcodeResultActivity.class));
+                            String detectedBarcode = resultHandler.getResultJson();
+
+                            Intent intent = new Intent(this, BarcodeResultActivity.class);
+                            intent.putExtra("RESULT", detectedBarcode);
+                            startActivity(intent);
                         }
+                        resultHandler.release();
                     }
                 });
     }
