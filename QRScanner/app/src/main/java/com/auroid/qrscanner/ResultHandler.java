@@ -51,14 +51,12 @@ class ResultHandler {
             case Barcode.TYPE_URL:
                 Log.d(TAG, "URL");
                 barcodeWrapper.url = Objects.requireNonNull(mBarcode.getUrl()).getUrl();
-                insertToDb(barcodeWrapper);
                 break;
 
             case Barcode.TYPE_PHONE:
                 Log.d(TAG, "PHONE");
                 barcodeWrapper.phoneNumber =
                         Objects.requireNonNull(mBarcode.getPhone()).getNumber();
-                insertToDb(barcodeWrapper);
                 break;
 
             case Barcode.TYPE_GEO:
@@ -66,7 +64,6 @@ class ResultHandler {
                 barcodeWrapper.geoWrapper = new GeoWrapper(
                         Objects.requireNonNull(mBarcode.getGeoPoint()).getLat(),
                         mBarcode.getGeoPoint().getLng());
-                insertToDb(barcodeWrapper);
                 break;
 
             case Barcode.TYPE_CALENDAR_EVENT:
@@ -94,7 +91,6 @@ class ResultHandler {
                         calEvent.getSummary(),
                         eventStart,
                         eventEnd);
-                insertToDb(barcodeWrapper);
                 break;
 
             case Barcode.TYPE_CONTACT_INFO:
@@ -141,7 +137,6 @@ class ResultHandler {
                         emailWrappers,
                         addressWrappers
                 );
-                insertToDb(barcodeWrapper);
                 break;
 
             case Barcode.TYPE_WIFI:
@@ -152,15 +147,15 @@ class ResultHandler {
                         mBarcode.getWifi().getPassword(),
                         mBarcode.getWifi().getSsid()
                 );
-                insertToDb(barcodeWrapper);
                 break;
 
             default:
                 Log.d(TAG, "default");
                 // No additional params to set, directly inserting to the DB
-                insertToDb(barcodeWrapper);
                 break;
         }
+
+        insertToDb(barcodeWrapper);
     }
 
     public void release() {
