@@ -235,8 +235,8 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                 this,
                 barcode -> {
                     if (barcode != null) {
-                        ResultHandler resultHandler = new ResultHandler(barcode, this);
-                        resultHandler.pushToDatabase();
+                        ResultHandler resultHandler = new ResultHandler(this);
+                        resultHandler.pushToDatabase(barcode);
 
                         boolean openInBrowser = PreferenceUtils.shouldOpenDirectlyInBrowser(this);
                         int barcodeValueType = barcode.getValueType();
@@ -251,10 +251,8 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                             ActionHandler actionHandler = new ActionHandler(this, barcodeWrapper);
                             actionHandler.openBrowser();
                         } else {
-                            String detectedBarcode = resultHandler.getResultJson();
-
                             Intent intent = new Intent(this, BarcodeResultActivity.class);
-                            intent.putExtra("RESULT", detectedBarcode);
+                            intent.putExtra("RESULT", resultHandler.getResultJson());
                             startActivity(intent);
                         }
                         resultHandler.release();

@@ -26,13 +26,10 @@ import java.util.Objects;
 class ResultHandler {
 
     private static final String TAG = "ResultHandler";
-
-    private Barcode mBarcode;
     private ViewModelStoreOwner mViewModelStoreOwner;
     private String mResultJson;
 
-    public ResultHandler(Barcode barcode, ViewModelStoreOwner viewModelStoreOwner) {
-        this.mBarcode = barcode;
+    public ResultHandler(ViewModelStoreOwner viewModelStoreOwner) {
         this.mViewModelStoreOwner = viewModelStoreOwner;
     }
 
@@ -41,10 +38,10 @@ class ResultHandler {
     }
 
     @SuppressLint("DefaultLocale")
-    public void pushToDatabase() {
-        String result = mBarcode.getDisplayValue();
-        String rawValue = mBarcode.getRawValue();
-        int resultType = mBarcode.getValueType();
+    public void pushToDatabase(Barcode barcode) {
+        String result = barcode.getDisplayValue();
+        String rawValue = barcode.getRawValue();
+        int resultType = barcode.getValueType();
 
         // Create BarcodeWrapper object which will be stored in the database
         BarcodeWrapper barcodeWrapper = new BarcodeWrapper(resultType, result, rawValue);
@@ -52,25 +49,24 @@ class ResultHandler {
         switch (resultType) {
             case Barcode.TYPE_URL:
                 Log.d(TAG, "URL");
-                barcodeWrapper.url = Objects.requireNonNull(mBarcode.getUrl()).getUrl();
+                barcodeWrapper.url = Objects.requireNonNull(barcode.getUrl()).getUrl();
                 break;
 
             case Barcode.TYPE_PHONE:
                 Log.d(TAG, "PHONE");
-                barcodeWrapper.phoneNumber =
-                        Objects.requireNonNull(mBarcode.getPhone()).getNumber();
+                barcodeWrapper.phoneNumber = Objects.requireNonNull(barcode.getPhone()).getNumber();
                 break;
 
             case Barcode.TYPE_GEO:
                 Log.d(TAG, "GEO");
                 barcodeWrapper.geoWrapper = new GeoWrapper(
-                        Objects.requireNonNull(mBarcode.getGeoPoint()).getLat(),
-                        mBarcode.getGeoPoint().getLng());
+                        Objects.requireNonNull(barcode.getGeoPoint()).getLat(),
+                        barcode.getGeoPoint().getLng());
                 break;
 
             case Barcode.TYPE_CALENDAR_EVENT:
                 Log.d(TAG, "CALENDAR_EVENT");
-                Barcode.CalendarEvent calEvent = mBarcode.getCalendarEvent();
+                Barcode.CalendarEvent calEvent = barcode.getCalendarEvent();
 
                 assert calEvent != null;
                 String eventStart = Objects.requireNonNull(calEvent.getStart()).getYear() + "/"
@@ -97,7 +93,7 @@ class ResultHandler {
 
             case Barcode.TYPE_CONTACT_INFO:
                 Log.d(TAG, "CONTACT_INFO");
-                Barcode.ContactInfo contact = mBarcode.getContactInfo();
+                Barcode.ContactInfo contact = barcode.getContactInfo();
 
                 assert contact != null;
                 int numOfUrls = contact.getUrls().size();
@@ -143,11 +139,10 @@ class ResultHandler {
 
             case Barcode.TYPE_WIFI:
                 Log.d(TAG, "WIFI");
-
                 barcodeWrapper.wifiWrapper = new WiFiWrapper(
-                        Objects.requireNonNull(mBarcode.getWifi()).getEncryptionType(),
-                        mBarcode.getWifi().getPassword(),
-                        mBarcode.getWifi().getSsid()
+                        Objects.requireNonNull(barcode.getWifi()).getEncryptionType(),
+                        barcode.getWifi().getPassword(),
+                        barcode.getWifi().getSsid()
                 );
                 break;
 
@@ -161,7 +156,6 @@ class ResultHandler {
     }
 
     public void release() {
-        mBarcode = null;
         mViewModelStoreOwner = null;
         mResultJson = null;
     }
