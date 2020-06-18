@@ -23,6 +23,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.google.android.gms.common.internal.Objects;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.mlkit.vision.barcode.Barcode;
 
 import com.auroid.qrscanner.serializable.BarcodeWrapper;
@@ -57,6 +58,8 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
 
     private AudioHandler mAudioHandler;
 
+    private FirebaseAnalytics mFirebaseAnalytics;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -81,6 +84,8 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
 
         mAudioHandler = new AudioHandler(this);
         mAudioHandler.setupAudioBeep();
+
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
         setUpWorkflowModel();
     }
@@ -129,6 +134,7 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                 // Sets as disabled to prevent the user from clicking on it too fast.
                 mHistoryButton.setEnabled(false);
                 startActivity(new Intent(this, ScanHistoryActivity.class));
+                mFirebaseAnalytics.logEvent("open_history", null);
                 break;
 
             case R.id.flash_button:
@@ -255,6 +261,7 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                             intent.putExtra("RESULT", resultHandler.getResultJson());
                             startActivity(intent);
                         }
+                        mFirebaseAnalytics.logEvent("scan_barcode", null);
                         resultHandler.release();
                     }
                 });

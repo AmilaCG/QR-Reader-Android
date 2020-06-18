@@ -30,14 +30,7 @@ Android API 21 (Android 5.0 - Lollipop) or greater
 
 * Clone or [download](https://github.com/amila93/QR-Reader-Android/archive/master.zip) the repository and open "**QRScanner**" project using Android Studio
 
-#### Setup without Firebase Analytics:
-
-* Remove `implementation 'com.google.firebase:firebase-analytics:17.4.3'` from the app-level Gradle file ([app/build.gradle](./QRScanner/app/build.gradle))
-* Build and run
-
-#### Setup with Firebase Analytics:
-
-* [Create a Firebase project in the Firebase console, if you don't already have one](https://firebase.google.com/docs/android/setup)
+* [Create a Firebase project in the Firebase console, if you don't already have one](https://firebase.google.com/docs/android/setup) (Using Firebase only for Analytics)
 * Add a new Android app into your Firebase project with package name **com.auroid.qrscanner**
 * Download the config file (google-services.json) from the new added app and move it into the module folder (i.e. [app/](./QRScanner/app/))
 * Build and run

@@ -28,6 +28,7 @@ import com.auroid.qrscanner.serializable.EventWrapper;
 import com.auroid.qrscanner.serializable.WiFiWrapper;
 import com.auroid.qrscanner.utils.TypeSelector;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.mlkit.vision.barcode.Barcode;
 
 import java.text.ParseException;
@@ -43,13 +44,16 @@ public class ActionHandler {
 
     private Context mContext;
     private BarcodeWrapper mBarcodeWrapper;
+    private FirebaseAnalytics mFirebaseAnalytics;
 
-    public ActionHandler(Context context, BarcodeWrapper mBarcodeWrapper) {
-        this.mBarcodeWrapper = mBarcodeWrapper;
+    public ActionHandler(Context context, BarcodeWrapper barcodeWrapper) {
+        this.mBarcodeWrapper = barcodeWrapper;
         this.mContext = context;
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(context);
     }
 
     public void openBrowser() {
+        mFirebaseAnalytics.logEvent("action_open_browser", null);
         String url = mBarcodeWrapper.url;
 
         Uri webUri = Uri.parse(url);
@@ -63,6 +67,7 @@ public class ActionHandler {
     }
 
     public void openDialer() {
+        mFirebaseAnalytics.logEvent("action_open_dialer", null);
         String number = mBarcodeWrapper.phoneNumber;
 
         Intent intent = new Intent(Intent.ACTION_DIAL);
@@ -71,6 +76,7 @@ public class ActionHandler {
     }
 
     public void openMaps() {
+        mFirebaseAnalytics.logEvent("action_open_maps", null);
         double lat = mBarcodeWrapper.geoWrapper.lat;
         double lng = mBarcodeWrapper.geoWrapper.lng;
         String geo = "geo:0,0?q=" + lat + "," + lng + "(Location)";
@@ -84,6 +90,7 @@ public class ActionHandler {
     }
 
     public void addToCalender() {
+        mFirebaseAnalytics.logEvent("action_add_to_calender", null);
         long startDate;
         long endDate;
 
@@ -120,6 +127,7 @@ public class ActionHandler {
     }
 
     public void addToContacts() {
+        mFirebaseAnalytics.logEvent("action_add_to_contacts", null);
         ContactWrapper contactWrapper = mBarcodeWrapper.contactWrapper;
 
         Intent intent = new Intent(Intent.ACTION_INSERT);
@@ -199,6 +207,7 @@ public class ActionHandler {
     }
 
     public void connectToWifi() {
+        mFirebaseAnalytics.logEvent("action_connect_to_wifi", null);
         String ssid = mBarcodeWrapper.wifiWrapper.ssid;
         String pass = mBarcodeWrapper.wifiWrapper.password;
 
@@ -234,6 +243,7 @@ public class ActionHandler {
     }
 
     public void copyToClipboard() {
+        mFirebaseAnalytics.logEvent("action_copy_to_clipboard", null);
         ClipboardManager clipboardManager =
                 (ClipboardManager) mContext.getSystemService(Context.CLIPBOARD_SERVICE);
         ClipData clip = ClipData.newPlainText("QRCode", mBarcodeWrapper.displayValue);
@@ -246,6 +256,7 @@ public class ActionHandler {
     }
 
     public void webSearch() {
+        mFirebaseAnalytics.logEvent("action_web_search", null);
         Intent intent = new Intent(Intent.ACTION_WEB_SEARCH);
         intent.putExtra(SearchManager.QUERY, mBarcodeWrapper.displayValue);
         mContext.startActivity(intent);
