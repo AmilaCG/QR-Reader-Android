@@ -10,5 +10,8 @@
     <color name="reticle_ripple">#9AFFFFFF</color>
     <color name="barcode_reticle_background">#99000000</color>
     <color name="barcode_reticle_stroke">#40000000</color>
-    <color name="button_bg">#BB86FC</color>
+    <color name="colorTracker">#03DAC5</color>
+    <color name="colorPrimaryOther">#00695c</color>
+    <color name="colorPrimaryOtherDark">#003d33</color>
+    <color name="colorTinyIcon">#00bfa5</color>
 </resources>

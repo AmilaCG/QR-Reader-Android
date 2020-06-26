@@ -1,21 +1,37 @@
 package com.auroid.qrscanner.barcodedetection;
 
 import android.graphics.Canvas;
+import android.graphics.CornerPathEffect;
+import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Point;
 
+import androidx.core.content.ContextCompat;
+
+import com.auroid.qrscanner.R;
 import com.auroid.qrscanner.camera.GraphicOverlay;
 import com.google.mlkit.vision.barcode.Barcode;
 
 class BarcodeTrackerGraphic extends BarcodeGraphicBase {
 
     private final Point[] mCornerPts;
+    private final Paint mTrackerPaint;
     private GraphicOverlay mOverlay;
 
     BarcodeTrackerGraphic(GraphicOverlay overlay, Barcode barcode) {
         super(overlay);
         mOverlay = overlay;
         mCornerPts = barcode.getCornerPoints();
+
+        int trackerCornerRadius =
+                context.getResources().getDimensionPixelOffset(R.dimen.barcode_tracker_corner_radius);
+
+        mTrackerPaint = new Paint();
+        mTrackerPaint.setColor(ContextCompat.getColor(context, R.color.colorTracker));
+        mTrackerPaint.setStyle(Paint.Style.STROKE);
+        mTrackerPaint.setStrokeJoin(Paint.Join.MITER);
+        mTrackerPaint.setStrokeWidth(8);
+        mTrackerPaint.setPathEffect(new CornerPathEffect(trackerCornerRadius));
     }
 
     @Override
@@ -132,6 +148,6 @@ class BarcodeTrackerGraphic extends BarcodeGraphicBase {
         path.lineTo(mOverlay.translateX(mCornerPts[0].x) + segX,
                 mOverlay.translateY(mCornerPts[0].y) + segY);
 
-        canvas.drawPath(path, trackerPaint);
+        canvas.drawPath(path, mTrackerPaint);
     }
 }

@@ -39,8 +39,6 @@ abstract class BarcodeGraphicBase extends Graphic {
     final int boxCornerRadius;
     final Paint pathPaint;
     final RectF boxRect;
-    final int trackerCornerRadius;
-    final Paint trackerPaint;
 
     BarcodeGraphicBase(GraphicOverlay overlay) {
         super(overlay);
@@ -67,16 +65,6 @@ abstract class BarcodeGraphicBase extends Graphic {
         pathPaint.setPathEffect(new CornerPathEffect(boxCornerRadius));
 
         boxRect = PreferenceUtils.getBarcodeReticleBox(overlay);
-
-        trackerCornerRadius =
-                context.getResources().getDimensionPixelOffset(R.dimen.barcode_tracker_corner_radius);
-
-        trackerPaint = new Paint();
-        trackerPaint.setColor(ContextCompat.getColor(context, R.color.colorAccent));
-        trackerPaint.setStyle(Paint.Style.STROKE);
-        trackerPaint.setStrokeJoin(Paint.Join.MITER);
-        trackerPaint.setStrokeWidth(8);
-        trackerPaint.setPathEffect(new CornerPathEffect(trackerCornerRadius));
     }
 
     @Override

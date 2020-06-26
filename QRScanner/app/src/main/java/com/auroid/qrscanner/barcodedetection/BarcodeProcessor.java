@@ -16,7 +16,6 @@
 
 package com.auroid.qrscanner.barcodedetection;
 
-import android.animation.ValueAnimator;
 import android.graphics.RectF;
 import android.util.Log;
 import androidx.annotation.MainThread;
@@ -99,41 +98,13 @@ public class BarcodeProcessor extends FrameProcessorBase<List<Barcode>> {
                 // Barcode in the camera view is too small, so prompt user to move camera closer.
                 graphicOverlay.add(new BarcodeConfirmingGraphic(graphicOverlay, barcodeInCenter));
                 workflowModel.setWorkflowState(WorkflowState.CONFIRMING);
-
             } else {
-                // Barcode size in the camera view is sufficient.
-                if (PreferenceUtils.shouldDelayLoadingBarcodeResult(graphicOverlay.getContext())) {
-                    ValueAnimator loadingAnimator = createLoadingAnimator(graphicOverlay, barcodeInCenter);
-                    loadingAnimator.start();
-                    graphicOverlay.add(new BarcodeLoadingGraphic(graphicOverlay, loadingAnimator));
-                    workflowModel.setWorkflowState(WorkflowState.SEARCHING);
-
-                } else {
-                    graphicOverlay.add(new BarcodeTrackerGraphic(graphicOverlay, barcodeInCenter));
-                    workflowModel.setWorkflowState(WorkflowState.DETECTED);
-                    workflowModel.detectedBarcode.setValue(barcodeInCenter);
-                }
+                graphicOverlay.add(new BarcodeTrackerGraphic(graphicOverlay, barcodeInCenter));
+                workflowModel.setWorkflowState(WorkflowState.DETECTED);
+                workflowModel.detectedBarcode.setValue(barcodeInCenter);
             }
         }
         graphicOverlay.invalidate();
-    }
-
-    private ValueAnimator createLoadingAnimator(
-            GraphicOverlay graphicOverlay, Barcode barcode) {
-        float endProgress = 1.1f;
-        ValueAnimator loadingAnimator = ValueAnimator.ofFloat(0f, endProgress);
-        loadingAnimator.setDuration(1000);
-        loadingAnimator.addUpdateListener(
-                animation -> {
-                    if (Float.compare((float) loadingAnimator.getAnimatedValue(), endProgress) >= 0) {
-                        graphicOverlay.clear();
-                        workflowModel.setWorkflowState(WorkflowState.SEARCHED);
-                        workflowModel.detectedBarcode.setValue(barcode);
-                    } else {
-                        graphicOverlay.invalidate();
-                    }
-                });
-        return loadingAnimator;
     }
 
     @Override

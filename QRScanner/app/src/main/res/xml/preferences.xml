@@ -34,7 +34,8 @@
         <Preference
             app:key="rate_me"
             app:title="Rate this app"
-            app:summary="If this app made your life easy, don't hesitate to rate and support developers. It won't take more than a minute.">
+            app:summary="If you love this app, would you mind taking a moment to rate it? It won't take more than a minute."
+            app:icon="@drawable/ic_baseline_star_border_24">
             <intent
                 android:action="android.intent.action.VIEW"
                 android:data="https://play.google.com/store/apps/details?id=com.auroid.qrscanner" />

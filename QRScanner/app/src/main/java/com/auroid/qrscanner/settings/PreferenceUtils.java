@@ -68,10 +68,6 @@ public class PreferenceUtils {
         return new RectF(cx - boxWidth / 2, cy - boxWidth / 2, cx + boxWidth / 2, cy + boxWidth / 2);
     }
 
-    public static boolean shouldDelayLoadingBarcodeResult(Context context) {
-        return getBooleanPref(context, R.string.pref_key_delay_loading_barcode_result, false);
-    }
-
     public static boolean shouldOpenDirectlyInBrowser(Context context) {
         return getBooleanPref(context, R.string.pref_key_open_directly_in_browser, false);
     }
