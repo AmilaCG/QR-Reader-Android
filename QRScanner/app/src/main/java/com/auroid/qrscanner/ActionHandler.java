@@ -292,27 +292,31 @@ public class ActionHandler {
         ssb.append("\n\n");
         cursor += 2;
 
-        String titleHeading = "Title:\n";
-        ssb.append(titleHeading);
-        ssb.setSpan(new StyleSpan(Typeface.BOLD), cursor, cursor += titleHeading.length(),
-                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        if (!contact.title.equals("")) {
+            String titleHeading = "Title:\n";
+            ssb.append(titleHeading);
+            ssb.setSpan(new StyleSpan(Typeface.BOLD), cursor, cursor += titleHeading.length(),
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 
-        ssb.append(contact.title);
-        cursor += contact.title.length();
+            ssb.append(contact.title);
+            cursor += contact.title.length();
 
-        ssb.append("\n\n");
-        cursor += 2;
+            ssb.append("\n\n");
+            cursor += 2;
+        }
 
-        String orgHeading = "Company:\n";
-        ssb.append(orgHeading);
-        ssb.setSpan(new StyleSpan(Typeface.BOLD), cursor, cursor += orgHeading.length(),
-                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        if (!contact.organization.equals("")) {
+            String orgHeading = "Company:\n";
+            ssb.append(orgHeading);
+            ssb.setSpan(new StyleSpan(Typeface.BOLD), cursor, cursor += orgHeading.length(),
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 
-        ssb.append(contact.organization);
-        cursor += contact.organization.length();
+            ssb.append(contact.organization);
+            cursor += contact.organization.length();
 
-        ssb.append("\n\n");
-        cursor += 2;
+            ssb.append("\n\n");
+            cursor += 2;
+        }
 
         for (int i = 0; i < contact.phones.length; i++) {
             if (i == 0) {
