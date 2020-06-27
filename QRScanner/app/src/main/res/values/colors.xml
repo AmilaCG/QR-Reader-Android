@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimaryDark">#292929</color>
+    <color name="colorPrimary">#00695c</color>
+    <color name="colorPrimaryDark">#003d33</color>
     <color name="colorAccent">#03DAC5</color>
     <color name="colorText">#F4F4F4</color>
     <color name="transparent">#00000000</color>
@@ -11,7 +12,5 @@
     <color name="barcode_reticle_background">#99000000</color>
     <color name="barcode_reticle_stroke">#40000000</color>
     <color name="colorTracker">#03DAC5</color>
-    <color name="colorPrimaryOther">#00695c</color>
-    <color name="colorPrimaryOtherDark">#003d33</color>
     <color name="colorTinyIcon">#00bfa5</color>
 </resources>

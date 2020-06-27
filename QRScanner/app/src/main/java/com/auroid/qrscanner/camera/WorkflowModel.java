@@ -31,11 +31,7 @@ public class WorkflowModel extends AndroidViewModel {
     public enum WorkflowState {
         NOT_STARTED,
         DETECTING,
-        DETECTED,
-        CONFIRMING,
-        CONFIRMED,
-        SEARCHING,
-        SEARCHED
+        DETECTED
     }
 
     public final MutableLiveData<WorkflowState> workflowState = new MutableLiveData<>();

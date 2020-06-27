@@ -208,19 +208,7 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                             mGuideChip.setText(R.string.prompt_point_at_a_barcode);
                             startCameraPreview();
                             break;
-                        case CONFIRMING:
-                            mGuideChip.setVisibility(View.VISIBLE);
-                            mGuideChip.setText(R.string.prompt_move_camera_closer);
-                            startCameraPreview();
-                            break;
-                        case SEARCHING:
-                            mGuideChip.setVisibility(View.VISIBLE);
-                            mGuideChip.setText(R.string.prompt_searching);
-                            mAudioHandler.playAudioBeep();
-                            stopCameraPreview();
-                            break;
                         case DETECTED:
-                        case SEARCHED:
                             mGuideChip.setVisibility(View.GONE);
                             mAudioHandler.playAudioBeep();
                             stopCameraPreview();

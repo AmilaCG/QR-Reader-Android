@@ -29,7 +29,6 @@ import com.auroid.qrscanner.camera.GraphicOverlay;
 import com.auroid.qrscanner.camera.WorkflowModel;
 import com.auroid.qrscanner.camera.WorkflowModel.WorkflowState;
 import com.auroid.qrscanner.camera.FrameProcessorBase;
-import com.auroid.qrscanner.settings.PreferenceUtils;
 import com.google.mlkit.vision.barcode.BarcodeScanning;
 import java.util.List;
 import java.util.Objects;
@@ -89,20 +88,11 @@ public class BarcodeProcessor extends FrameProcessorBase<List<Barcode>> {
             cameraReticleAnimator.start();
             graphicOverlay.add(new BarcodeReticleGraphic(graphicOverlay, cameraReticleAnimator));
             workflowModel.setWorkflowState(WorkflowState.DETECTING);
-
         } else {
             cameraReticleAnimator.cancel();
-            float sizeProgress =
-                    PreferenceUtils.getProgressToMeetBarcodeSizeRequirement(graphicOverlay, barcodeInCenter);
-            if (sizeProgress < 1) {
-                // Barcode in the camera view is too small, so prompt user to move camera closer.
-                graphicOverlay.add(new BarcodeConfirmingGraphic(graphicOverlay, barcodeInCenter));
-                workflowModel.setWorkflowState(WorkflowState.CONFIRMING);
-            } else {
-                graphicOverlay.add(new BarcodeTrackerGraphic(graphicOverlay, barcodeInCenter));
-                workflowModel.setWorkflowState(WorkflowState.DETECTED);
-                workflowModel.detectedBarcode.setValue(barcodeInCenter);
-            }
+            graphicOverlay.add(new BarcodeTrackerGraphic(graphicOverlay, barcodeInCenter));
+            workflowModel.setWorkflowState(WorkflowState.DETECTED);
+            workflowModel.detectedBarcode.setValue(barcodeInCenter);
         }
         graphicOverlay.invalidate();
     }
