@@ -10,6 +10,7 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
@@ -114,19 +115,13 @@ public class ResultListAdapter extends ListAdapter<Result, ResultListAdapter.Res
                 break;
 
             case Barcode.TYPE_CONTACT_INFO:
-                LayoutInflater inflater =
-                        (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                if (inflater == null) return;
-                View dialogView = inflater.inflate(R.layout.material_dialog_text, null);
-                TextView textView = dialogView.findViewById(R.id.tv_material);
-                textView.setText(actionHandler.getFormattedContactDetails());
-                textView.setMovementMethod(LinkMovementMethod.getInstance());
-
-                new MaterialAlertDialogBuilder(mContext)
+                AlertDialog dialog = new MaterialAlertDialogBuilder(mContext)
                         .setTitle("Contact")
-                        .setView(dialogView)
+                        .setMessage(actionHandler.getFormattedContactDetails())
                         .setIcon(R.drawable.ic_person_white_24dp)
                         .show();
+                ((TextView) dialog.findViewById(android.R.id.message)).
+                        setMovementMethod(LinkMovementMethod.getInstance());
                 break;
 
             case Barcode.TYPE_CALENDAR_EVENT:
