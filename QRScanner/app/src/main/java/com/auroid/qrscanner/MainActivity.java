@@ -37,6 +37,8 @@ import com.auroid.qrscanner.barcodedetection.BarcodeProcessor;
 
 import java.io.IOException;
 
+import hotchemi.android.rate.AppRate;
+
 public class MainActivity extends AppCompatActivity implements OnClickListener {
 
     private static final String TAG = "LiveBarcodeActivity";
@@ -88,6 +90,14 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
         setUpWorkflowModel();
+
+        // Rate me dialog
+        AppRate.with(this)
+                .setInstallDays(3)
+                .setLaunchTimes(3)
+                .setRemindInterval(5)
+                .monitor();
+        AppRate.showRateDialogIfMeetsConditions(this);
     }
 
     @Override

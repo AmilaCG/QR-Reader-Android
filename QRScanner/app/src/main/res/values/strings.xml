@@ -31,4 +31,7 @@
     <string name="pref_key_open_directly_in_browser">open_browser</string>
     <string name="pref_key_play_audio_beep">audio_beep</string>
     <string name="unsupported_encryption">WiFi encryption is not supported</string>
+
+    <string name="rate_dialog_title">Rate QR Code Reader</string>
+    <string name="rate_dialog_message">If you love this app, would you mind taking a moment to rate it? It won\'t take more than a minute. Your valuable feedback is much appreciated!</string>
 </resources>

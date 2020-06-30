@@ -62,4 +62,7 @@ dependencies {
 
     // Google analytics components
     implementation 'com.google.firebase:firebase-analytics:17.4.3'
+
+    // Rating library
+    implementation 'com.github.hotchemi:android-rate:1.0.1'
 }
