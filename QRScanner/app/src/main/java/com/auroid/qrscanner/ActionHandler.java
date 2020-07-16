@@ -334,6 +334,9 @@ public class ActionHandler {
             cursor += 2;
 
             String phoneNum = PhoneNumberUtils.formatNumber(contact.phones[i].number, "US");
+            if (phoneNum == null) {
+                phoneNum = contact.phones[i].number.replaceAll("[-,+]","");
+            }
             ssb.append(phoneNum);
             // Inserting a space to the end to avoid unintended behaviours when scrolling
             ssb.append(" ");
