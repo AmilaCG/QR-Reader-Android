@@ -3,6 +3,7 @@
     package="com.auroid.qrscanner">
 
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
 
@@ -23,29 +24,29 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
+        <activity
+            android:name=".ImageScanningActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="nosensor"
+            android:theme="@style/OtherActivities" />
         <activity
             android:name=".SettingsActivity"
             android:label="Settings"
             android:screenOrientation="nosensor"
             android:theme="@style/OtherActivities" />
-
         <activity
             android:name=".BarcodeResultActivity"
             android:label="@string/app_name"
             android:screenOrientation="nosensor"
             android:theme="@style/OtherActivities" />
-
         <activity
             android:name=".ScanHistoryActivity"
             android:label="Scan History"
             android:screenOrientation="nosensor"
             android:theme="@style/OtherActivities" />
-
         <activity
             android:name="com.google.android.gms.oss.licenses.OssLicensesMenuActivity"
             android:theme="@style/OtherActivities" />
-
         <activity
             android:name="com.google.android.gms.oss.licenses.OssLicensesActivity"
             android:theme="@style/OtherActivities" />

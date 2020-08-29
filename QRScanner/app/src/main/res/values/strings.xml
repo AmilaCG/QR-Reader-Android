@@ -1,7 +1,8 @@
 <resources>
     <string name="app_name">QR Code Reader</string>
     <string name="request_camera_permission">Need to access camera for scanning</string>
-    <string name="no_camera_permission">This application cannot run because it does not have the camera permission. The application will now exit.</string>
+    <string name="no_camera_permission">Camera permission is mandatory for barcode scanning. The application will now exit.</string>
+    <string name="no_gallery_permission">Storage permission is required to scan pictures.</string>
     <string name="clear_history_confirmation">Are you sure you want to clear scan history?</string>
     <string name="empty_scan_history">Scan history is empty</string>
     <string name="confirm_copy_to_clipboard">Copied to clipboard</string>

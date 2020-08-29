@@ -34,7 +34,7 @@
         <Preference
             app:key="rate_me"
             app:title="Rate this app"
-            app:summary="If you love this app, would you mind taking a moment to rate it? It won't take more than a minute."
+            app:summary="Your reviews keep our small team motivated to make this app even better. (:"
             app:icon="@drawable/ic_baseline_star_border_24">
             <intent
                 android:action="android.intent.action.VIEW"
