@@ -44,39 +44,31 @@ public class ImageScanningActivity extends AppCompatActivity {
 
     private void convertAndDecode(Uri uri) {
         final Bitmap[] bitmap = new Bitmap[1];
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            ImageDecoder.Source source =
-                    ImageDecoder.createSource(getContentResolver(), uri);
-            imageDecodeExecutor.execute(() -> {
+        imageDecodeExecutor.execute(() -> {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                ImageDecoder.Source source = ImageDecoder.createSource(getContentResolver(), uri);
                 try {
                     bitmap[0] = ImageDecoder.decodeBitmap(source);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                runOnUiThread(() -> {
-                    decodeImage(bitmap[0]);
-                    progressBar.setVisibility(View.GONE);
-                });
-            });
-        } else {
-            imageDecodeExecutor.execute(() -> {
+            } else {
                 try {
-                    bitmap[0] = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri);
+                    bitmap[0] = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                runOnUiThread(() -> {
-                    decodeImage(bitmap[0]);
-                    progressBar.setVisibility(View.GONE);
-                });
+            }
+            decodeImage(bitmap[0]);
+            runOnUiThread(() -> {
+                progressBar.setVisibility(View.GONE);
+                mImagePreview.setImageBitmap(bitmap[0]);
             });
-        }
+        });
     }
 
     private void decodeImage(Bitmap bitmap) {
         if (bitmap != null) {
-            mImagePreview.setImageBitmap(bitmap);
-
             ImageScanner imageScanner = new ImageScanner(bitmap);
             imageScanner.decode();
             imageScanner.release();
