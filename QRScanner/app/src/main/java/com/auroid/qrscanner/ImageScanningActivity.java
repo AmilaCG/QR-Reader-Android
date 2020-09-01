@@ -28,9 +28,15 @@ import android.widget.Toast;
 
 import com.auroid.qrscanner.imagescanner.DetectedBarcode;
 import com.auroid.qrscanner.imagescanner.ImageScanner;
+import com.auroid.qrscanner.imagescanner.PreviewCardAdapter;
 import com.auroid.qrscanner.imagescanner.TrackerDotView;
+import com.auroid.qrscanner.serializable.BarcodeWrapper;
+import com.auroid.qrscanner.settings.PreferenceUtils;
 import com.auroid.qrscanner.utils.Utils;
 
+import com.google.android.material.chip.Chip;
+import com.google.common.collect.ImmutableList;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.mlkit.vision.barcode.Barcode;
 
 import java.io.IOException;
@@ -40,7 +46,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class ImageScanningActivity extends AppCompatActivity
-        implements View.OnClickListener, ImageScanner.DecodeListener {
+        implements View.OnClickListener, ImageScanner.DecodeListener, PreviewCardAdapter.CardItemListener {
 
     private static final String TAG = "ImageScanningActivity";
 
@@ -51,12 +57,17 @@ public class ImageScanningActivity extends AppCompatActivity
     private ImageView mImagePreview;
     private ProgressBar mProgressBar;
     private TextView mDecodingText;
+    private Chip mPromptChip;
+
     private final ExecutorService imageDecodeExecutor = Executors.newSingleThreadExecutor();
     private ImageScanner mImageScanner;
 
     private RecyclerView mPreviewCardCarousel;
     private ViewGroup mDotViewContainer;
     private int mDotViewSize;
+    private int mCurrentSelectedBarcodeIndex = 0;
+
+    private FirebaseAnalytics mFirebaseAnalytics;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +77,7 @@ public class ImageScanningActivity extends AppCompatActivity
         mImagePreview = findViewById(R.id.image_preview);
         mProgressBar = findViewById(R.id.progressBar);
         mDecodingText = findViewById(R.id.text_decoding);
+        mPromptChip = findViewById(R.id.bottom_prompt_chip);
 
         findViewById(R.id.close_button).setOnClickListener(this);
         findViewById(R.id.photo_library_button).setOnClickListener(this);
@@ -83,6 +95,8 @@ public class ImageScanningActivity extends AppCompatActivity
         if (pickedImageUri != null) {
             decodeImage(pickedImageUri);
         }
+
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
     }
 
     @Override
@@ -117,7 +131,12 @@ public class ImageScanningActivity extends AppCompatActivity
     }
 
     private void decodeImage(Uri imageUri) {
+        mPreviewCardCarousel.setAdapter(new PreviewCardAdapter(ImmutableList.of(), this));
+        mPreviewCardCarousel.clearOnScrollListeners();
+        mPromptChip.setVisibility(View.GONE);
         mDotViewContainer.removeAllViews();
+        mCurrentSelectedBarcodeIndex = 0;
+
         imageDecodeExecutor.execute(() -> {
             try {
                 mInputImage = Utils.loadImage(this, imageUri, MAX_IMAGE_SIZE);
@@ -132,6 +151,7 @@ public class ImageScanningActivity extends AppCompatActivity
                     mImagePreview.setVisibility(View.VISIBLE);
                 }
                 mImagePreview.setImageBitmap(mInputImage);
+                showPromptChip(getString(R.string.static_image_prompt_detected_results));
             });
 
             mImageScanner = new ImageScanner(this);
@@ -144,18 +164,51 @@ public class ImageScanningActivity extends AppCompatActivity
     @Override
     public void onSuccessfulDecode(List<Barcode> barcodes) {
         if (barcodes.size() > 0) {
-            Toast.makeText(this, "Detected barcodes: " + barcodes.size(),
+            Toast.makeText(this, barcodes.size() + " barcode(s) detected",
                     Toast.LENGTH_SHORT).show();
-
-            mImagePreview.setImageBitmap(mImageScanner.addTrackers(barcodes));
 
             List<DetectedBarcode> detectedBarcodeList = new ArrayList<>();
             for (int i = 0; i < barcodes.size(); i++) {
                 detectedBarcodeList.add(new DetectedBarcode(barcodes.get(i), i));
             }
 
-            for(DetectedBarcode detectedBarcode : detectedBarcodeList) {
+            mPreviewCardCarousel.setAdapter(
+                    new PreviewCardAdapter(ImmutableList.copyOf(detectedBarcodeList), this));
+            mPreviewCardCarousel.addOnScrollListener(
+                    new RecyclerView.OnScrollListener() {
+                        @Override
+                        public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                            Log.d(TAG, "New card scroll state: " + newState);
+                            if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                                for (int i = 0; i < recyclerView.getChildCount(); i++) {
+                                    View childView = recyclerView.getChildAt(i);
+                                    if (childView.getX() >= 0) {
+                                        int cardIndex = recyclerView.getChildAdapterPosition(childView);
+                                        if (cardIndex != mCurrentSelectedBarcodeIndex) {
+                                            selectNewBarcode(cardIndex);
+                                        }
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+            );
+
+            for (DetectedBarcode detectedBarcode : detectedBarcodeList) {
                 TrackerDotView dotView = createDotView(detectedBarcode);
+                dotView.setOnClickListener(
+                        v -> {
+                            if (detectedBarcode.getBarcodeIndex() == mCurrentSelectedBarcodeIndex) {
+                                showBarcodeResult(detectedBarcode.getBarcode());
+                            } else {
+                                selectNewBarcode(detectedBarcode.getBarcodeIndex());
+                                showBarcodeResult(detectedBarcode.getBarcode());
+                                mPreviewCardCarousel.smoothScrollToPosition(
+                                        detectedBarcode.getBarcodeIndex());
+                            }
+                        });
+
                 mDotViewContainer.addView(dotView);
                 AnimatorSet animatorSet =
                         ((AnimatorSet) AnimatorInflater.loadAnimator(
@@ -165,7 +218,12 @@ public class ImageScanningActivity extends AppCompatActivity
             }
         }
     }
-    
+
+    @Override
+    public void onUnsuccessfulDecode() {
+        showPromptChip(getString(R.string.static_image_prompt_detected_no_results));
+    }
+
     private TrackerDotView createDotView(DetectedBarcode detectedBarcode) {
         float viewCoordinateScale;
         float horizontalGap;
@@ -202,6 +260,53 @@ public class ImageScanningActivity extends AppCompatActivity
                 (int)(dotCenter.x - mDotViewSize / 2f), (int)(dotCenter.y - mDotViewSize / 2f), 0, 0);
         dotView.setLayoutParams(layoutParams);
         return dotView;
+    }
+
+    private void selectNewBarcode(int objectIndex) {
+        TrackerDotView dotViewToDeselect =
+                (TrackerDotView) mDotViewContainer.getChildAt(mCurrentSelectedBarcodeIndex);
+        dotViewToDeselect.playAnimationWithSelectedState(false);
+
+        mCurrentSelectedBarcodeIndex = objectIndex;
+
+        TrackerDotView selectedDotView =
+                (TrackerDotView) mDotViewContainer.getChildAt(mCurrentSelectedBarcodeIndex);
+        selectedDotView.playAnimationWithSelectedState(true);
+    }
+
+    @Override
+    public void onPreviewCardClicked(DetectedBarcode detectedBarcode) {
+        showBarcodeResult(detectedBarcode.getBarcode());
+    }
+
+    private void showBarcodeResult(Barcode barcode) {
+        ResultHandler resultHandler = new ResultHandler(this);
+        resultHandler.pushToDatabase(barcode);
+
+        boolean openInBrowser = PreferenceUtils.shouldOpenDirectlyInBrowser(this);
+        int barcodeValueType = barcode.getValueType();
+        if (openInBrowser && barcodeValueType == Barcode.TYPE_URL) {
+            BarcodeWrapper barcodeWrapper = new BarcodeWrapper(
+                    barcodeValueType,
+                    barcode.getDisplayValue(),
+                    barcode.getRawValue());
+            barcodeWrapper.url =
+                    java.util.Objects.requireNonNull(barcode.getUrl()).getUrl();
+
+            ActionHandler actionHandler = new ActionHandler(this, barcodeWrapper);
+            actionHandler.openBrowser();
+        } else {
+            Intent intent = new Intent(this, BarcodeResultActivity.class);
+            intent.putExtra("RESULT", resultHandler.getResultJson());
+            startActivity(intent);
+        }
+        mFirebaseAnalytics.logEvent("scan_barcode_static_image", null);
+        resultHandler.release();
+    }
+
+    private void showPromptChip(String message) {
+        mPromptChip.setVisibility(View.VISIBLE);
+        mPromptChip.setText(message);
     }
 
     private static class CardItemDecoration extends RecyclerView.ItemDecoration {

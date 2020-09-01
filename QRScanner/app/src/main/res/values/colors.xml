@@ -15,4 +15,6 @@
     <color name="colorTinyIcon">#00bfa5</color>
     <color name="lighter_grey">#DDDDDD</color>
     <color name="product_description">#5F6368</color>
+    <color name="tracker_dot">#9403DAC5</color>
+    <color name="card_background_dark">#FF424242</color>
 </resources>

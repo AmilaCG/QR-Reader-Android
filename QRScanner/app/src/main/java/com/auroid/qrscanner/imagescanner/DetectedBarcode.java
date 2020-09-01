@@ -20,4 +20,8 @@ public class DetectedBarcode {
     public Rect getBoundingBox() {
         return mBarcode.getBoundingBox();
     }
+
+    public Barcode getBarcode() {
+        return mBarcode;
+    }
 }

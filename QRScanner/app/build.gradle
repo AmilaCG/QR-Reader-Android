@@ -65,4 +65,6 @@ dependencies {
 
     // Rating library
     implementation 'com.github.hotchemi:android-rate:1.0.1'
+
+    api 'com.google.guava:guava:28.2-jre'
 }

@@ -19,7 +19,6 @@ package com.auroid.qrscanner.imagescanner;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.view.View;
 
@@ -85,7 +84,7 @@ public class TrackerDotView extends View {
 
         float cx = getWidth() / 2f;
         float cy = getHeight() / 2f;
-        paint.setColor(Color.WHITE);
+        paint.setColor(getResources().getColor(R.color.tracker_dot));
         canvas.drawCircle(cx, cy, unselectedDotRadius + currentRadiusOffset, paint);
     }
 }

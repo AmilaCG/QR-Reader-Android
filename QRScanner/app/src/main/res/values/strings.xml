@@ -35,13 +35,18 @@
     <string name="pref_key_play_audio_beep">audio_beep</string>
     <string name="unsupported_encryption">WiFi encryption is not supported</string>
     <string name="wait_for_decode">Scanning..</string>
-    <string name="static_image_card_no_result_title">No result found</string>
 
-    <plurals name="bottom_sheet_title">
-        <item quantity="one">%d barcode detected</item>
-        <item quantity="other">%d barcodes detected</item>
-    </plurals>
+    <string name="static_image_prompt_detected_no_results">No barcodes detected</string>
+    <string name="static_image_prompt_detected_results">Tap on a dot to inspect</string>
 
     <string name="rate_dialog_title">Rate QR Code Reader</string>
-    <string name="rate_dialog_message">If you love this app, would you mind taking a moment to rate it? It won\'t take more than a minute. Your valuable feedback is much appreciated!</string>
+    <string name="rate_dialog_message">Your reviews keep our small team motivated to make this app even better. It won\'t take more than a minute.</string>
+
+    <string name="preview_card_title_qr">QR Code</string>
+    <string name="preview_card_title_ean13">EAN-13</string>
+    <string name="preview_card_title_ean8">EAN-8</string>
+    <string name="preview_card_title_upca">UPC-A</string>
+    <string name="preview_card_title_upce">UPC-E</string>
+    <string name="preview_card_title_datamatrix">Data Matrix</string>
+    <string name="preview_card_title_code128">Code 128</string>
 </resources>

@@ -7,7 +7,6 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Point;
-import android.widget.Toast;
 
 import com.google.mlkit.vision.barcode.Barcode;
 import com.google.mlkit.vision.barcode.BarcodeScanner;
@@ -21,6 +20,7 @@ public class ImageScanner {
 
     public interface DecodeListener {
         void onSuccessfulDecode(List<Barcode> barcodes);
+        void onUnsuccessfulDecode();
     }
 
     private Context mContext;
@@ -54,7 +54,7 @@ public class ImageScanner {
             if (barcodes.size() > 0) {
                 listener.onSuccessfulDecode(barcodes);
             } else {
-                Toast.makeText(mContext, "No barcodes detected", Toast.LENGTH_SHORT).show();
+                listener.onUnsuccessfulDecode();
             }
         });
     }

@@ -29,6 +29,23 @@
         android:layout_marginBottom="@dimen/preview_card_carousel_height"
         android:background="@color/transparent" />
 
+    <com.google.android.material.chip.Chip
+        android:id="@+id/bottom_prompt_chip"
+        style="@style/Widget.MaterialComponents.Chip.Entry"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:layout_gravity="top|center_horizontal"
+        android:checkable="false"
+        android:clickable="false"
+        android:fontFamily="sans-serif"
+        android:textColor="@color/white"
+        android:textSize="@dimen/bottom_prompt_chip_text_size"
+        android:visibility="gone"
+        app:chipCornerRadius="@dimen/bottom_prompt_chip_corner_radius"
+        app:chipSurfaceColor="@color/dark"
+        app:closeIconVisible="false"/>
+
     <ProgressBar
         android:id="@+id/progressBar"
         android:layout_width="wrap_content"
@@ -50,6 +67,6 @@
         android:layout_height="@dimen/preview_card_carousel_height"
         android:layout_gravity="bottom"
         android:paddingBottom="@dimen/preview_card_carousel_padding_bottom"
-        android:paddingTop="@dimen/preview_card_carousel_padding_top"/>
+        android:paddingTop="@dimen/preview_card_carousel_padding_top" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
