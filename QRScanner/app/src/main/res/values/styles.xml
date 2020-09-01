@@ -17,6 +17,7 @@
     </style>
 
     <style name="ImageScanningActivity" parent="Theme.MaterialComponents.NoActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
         <item name="android:colorEdgeEffect">@color/colorAccent</item>
     </style>
 
