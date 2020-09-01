@@ -13,4 +13,6 @@
     <color name="barcode_reticle_stroke">#40000000</color>
     <color name="colorTracker">#03DAC5</color>
     <color name="colorTinyIcon">#00bfa5</color>
+    <color name="lighter_grey">#DDDDDD</color>
+    <color name="product_description">#5F6368</color>
 </resources>

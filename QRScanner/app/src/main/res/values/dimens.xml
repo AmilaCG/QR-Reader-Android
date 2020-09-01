@@ -10,4 +10,37 @@
     <dimen name="barcode_reticle_stroke_width">4dp</dimen>
     <dimen name="barcode_reticle_corner_radius">8dp</dimen>
     <dimen name="barcode_tracker_corner_radius">20dp</dimen>
+    <dimen name="bottom_sheet_title_margin">16dp</dimen>
+    <dimen name="bottom_sheet_title_size">16sp</dimen>
+    <dimen name="divider_height">1dp</dimen>
+    <dimen name="preview_card_width">240dp</dimen>
+    <dimen name="preview_card_height">96dp</dimen>
+    <dimen name="preview_card_corner_radius">8dp</dimen>
+    <dimen name="preview_card_image_size">80dp</dimen>
+    <dimen name="preview_card_image_margin">8dp</dimen>
+    <dimen name="preview_card_title_text_size">14sp</dimen>
+    <dimen name="preview_card_title_padding_top">12dp</dimen>
+    <dimen name="preview_card_subtitle_text_size">14sp</dimen>
+    <dimen name="preview_card_subtitle_padding_top">4dp</dimen>
+
+    <dimen name="object_thumbnail_height">120dp</dimen>
+    <dimen name="object_thumbnail_margin">24dp</dimen>
+    <dimen name="bounding_box_confirmed_stroke_width">2dp</dimen>
+    <dimen name="object_thumbnail_stroke_width">@dimen/bounding_box_confirmed_stroke_width</dimen>
+    <dimen name="bounding_box_corner_radius">12dp</dimen>
+
+    <dimen name="product_item_padding">16dp</dimen>
+    <dimen name="product_item_image_size">80dp</dimen>
+    <dimen name="product_item_image_margin_end">16dp</dimen>
+    <dimen name="product_item_title_size">18sp</dimen>
+    <dimen name="product_item_subtitle_size">14sp</dimen>
+
+    <dimen name="preview_card_carousel_padding_top">16dp</dimen>
+    <dimen name="preview_card_carousel_padding_bottom">8dp</dimen>
+    <dimen name="preview_card_carousel_height">120dp</dimen>
+    <dimen name="preview_card_spacing">8dp</dimen>
+
+    <dimen name="static_image_dot_view_size">48dp</dimen>
+    <dimen name="static_image_dot_radius_selected">14dp</dimen>
+    <dimen name="static_image_dot_radius_unselected">10dp</dimen>
 </resources>

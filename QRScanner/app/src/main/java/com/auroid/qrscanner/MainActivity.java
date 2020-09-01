@@ -8,7 +8,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -23,6 +22,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.auroid.qrscanner.utils.Utils;
 import com.google.android.gms.common.internal.Objects;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.snackbar.Snackbar;
@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
 
     private static final int RC_HANDLE_CAMERA_PERM = 24;
     private static final int READ_EXT_STORAGE_PERM = 25;
-    private static final int IMAGE_PICK_CODE = 26;
+    private static final int RC_PHOTO_LIBRARY = 26;
 
     private CameraSource mCameraSource;
 
@@ -180,10 +180,10 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                         String[] permissions = {Manifest.permission.READ_EXTERNAL_STORAGE};
                         requestPermissions(permissions, READ_EXT_STORAGE_PERM);
                     } else {
-                        pickImageFromGallery();
+                        Utils.openImagePicker(this);
                     }
                 } else {
-                    pickImageFromGallery();
+                    Utils.openImagePicker(this);
                 }
                 break;
         }
@@ -289,23 +289,14 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                 });
     }
 
-    private void pickImageFromGallery() {
-        Intent intent = new Intent(Intent.ACTION_PICK);
-        intent.setType("image/*");
-        startActivityForResult(intent, IMAGE_PICK_CODE);
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (data == null || data.getData() == null) {
-            return;
-        }
-        if (resultCode == RESULT_OK && requestCode == IMAGE_PICK_CODE) {
-            Uri pickedImageUri = data.getData();
+        if (resultCode == RESULT_OK && requestCode == RC_PHOTO_LIBRARY && data != null) {
             Intent intent = new Intent(this, ImageScanningActivity.class);
-            intent.putExtra("IMAGE", pickedImageUri.toString());
+            intent.setData(data.getData());
             startActivity(intent);
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
         }
     }
 
@@ -336,7 +327,7 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
             case READ_EXT_STORAGE_PERM: {
                 if (grantResults.length != 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Log.d(TAG, "Gallery permission granted");
-                    pickImageFromGallery();
+                    Utils.openImagePicker(this);
                 } else {
                     AlertDialog.Builder builder = new AlertDialog.Builder(this);
                     builder.setTitle("Image Scanning")
