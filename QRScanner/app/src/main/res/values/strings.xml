@@ -31,7 +31,7 @@
     <string name="pref_key_rear_camera_picture_size" translatable="false">rcpts</string>
     <string name="pref_key_barcode_reticle_width" translatable="false">barcode_brw</string>
     <string name="pref_key_barcode_reticle_height" translatable="false">barcode_brh</string>
-    <string name="pref_key_open_directly_in_browser">open_browser</string>
+    <string name="pref_key_open_browser">open_browser</string>
     <string name="pref_key_play_audio_beep">audio_beep</string>
     <string name="unsupported_encryption">WiFi encryption is not supported</string>
     <string name="wait_for_decode">Scanning..</string>
@@ -49,4 +49,16 @@
     <string name="preview_card_title_upce">UPC-E</string>
     <string name="preview_card_title_datamatrix">Data Matrix</string>
     <string name="preview_card_title_code128">Code 128</string>
+
+    <string name="pref_cat_title_scanning">Scanning</string>
+    <string name="pref_cat_title_about">About</string>
+    <string name="pref_title_open_browser">Open browser directly</string>
+    <string name="pref_title_audio_beep">Beep sound on decode</string>
+    <string name="pref_title_version">Version</string>
+    <string name="pref_title_developer">Developer</string>
+    <string name="pref_summary_developer">Auroid Labs</string>
+    <string name="pref_title_rate">Rate this app</string>
+    <string name="pref_summary_rate">Your reviews keep our small team motivated to make this app even better. :)</string>
+    <string name="pref_title_legal">Legal information</string>
+    <string name="pref_summary_legal">Open source licenses</string>
 </resources>

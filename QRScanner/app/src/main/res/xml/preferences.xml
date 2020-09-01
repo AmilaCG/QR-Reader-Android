@@ -3,38 +3,34 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <PreferenceCategory
-        app:key="scanning"
-        app:title="Scanning">
+        app:title="@string/pref_cat_title_scanning">
         <SwitchPreference
             app:defaultValue="false"
-            app:key="open_browser"
-            app:title="Open browser directly"
+            app:key="@string/pref_key_open_browser"
+            app:title="@string/pref_title_open_browser"
             app:icon="@drawable/ic_public_white_24dp" />
 
         <SwitchPreference
             app:defaultValue="true"
-            app:key="audio_beep"
-            app:title="Beep sound on decode"
+            app:key="@string/pref_key_play_audio_beep"
+            app:title="@string/pref_title_audio_beep"
             app:icon="@drawable/ic_volume_up_white_24dp" />
     </PreferenceCategory>
 
     <PreferenceCategory
-        app:key="about"
-        app:title="About">
+        app:title="@string/pref_cat_title_about">
         <Preference
-            app:key="version"
             app:title="Version"
             app:summary="@string/versionName" />
 
         <Preference
-            app:key="developer"
-            app:title="Developer"
-            app:summary="Auroid Labs"/>
+            app:title="@string/pref_title_developer"
+            app:summary="@string/pref_summary_developer" />
 
         <Preference
             app:key="rate_me"
-            app:title="Rate this app"
-            app:summary="Your reviews keep our small team motivated to make this app even better. (:"
+            app:title="@string/pref_title_rate"
+            app:summary="@string/pref_summary_rate"
             app:icon="@drawable/ic_baseline_star_border_24">
             <intent
                 android:action="android.intent.action.VIEW"
@@ -42,8 +38,8 @@
         </Preference>
 
         <Preference
-            app:title="Legal information"
-            app:summary="Open source licenses">
+            app:title="@string/pref_title_legal"
+            app:summary="@string/pref_summary_legal">
             <intent
                 android:targetPackage="com.auroid.qrscanner"
                 android:targetClass="com.google.android.gms.oss.licenses.OssLicensesMenuActivity" />

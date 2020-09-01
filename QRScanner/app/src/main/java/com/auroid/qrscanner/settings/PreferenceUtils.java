@@ -54,7 +54,7 @@ public class PreferenceUtils {
     }
 
     public static boolean shouldOpenDirectlyInBrowser(Context context) {
-        return getBooleanPref(context, R.string.pref_key_open_directly_in_browser, false);
+        return getBooleanPref(context, R.string.pref_key_open_browser, false);
     }
 
     public static boolean shouldPlayAudioBeep(Context context) {
