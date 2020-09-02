@@ -1,104 +1,105 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".BarcodeResultActivity"
-    android:fitsSystemWindows="true">
+<androidx.constraintlayout.widget.ConstraintLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  android:fitsSystemWindows="true"
+  tools:context=".BarcodeResultActivity">
 
-    <TextView
-        android:id="@+id/barcode_result"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginEnd="24dp"
-        android:layout_marginBottom="16dp"
-        android:text="Result"
-        android:gravity="center"
-        android:textAppearance="@style/TextAppearance.AppCompat.Large"
-        android:textColor="@color/colorText"
-        android:textIsSelectable="true"
-        android:scrollbars="vertical"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/ib_copy" />
+  <TextView
+    android:id="@+id/barcode_result"
+    android:layout_width="0dp"
+    android:layout_height="0dp"
+    android:layout_marginStart="24dp"
+    android:layout_marginTop="16dp"
+    android:layout_marginEnd="24dp"
+    android:layout_marginBottom="16dp"
+    android:gravity="center"
+    android:scrollbars="vertical"
+    android:text="Result"
+    android:textAppearance="@style/TextAppearance.AppCompat.Large"
+    android:textColor="@color/colorText"
+    android:textIsSelectable="true"
+    app:layout_constraintBottom_toTopOf="@id/ib_copy"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageButton
-        android:id="@+id/ib_copy"
-        android:layout_width="66dp"
-        android:layout_height="66dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginBottom="64dp"
-        android:background="@drawable/btn_background"
-        android:onClick="copyToClipboard"
-        android:src="@drawable/ic_content_copy_black_36dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/ib_action"
-        app:layout_constraintStart_toStartOf="parent" />
+  <ImageButton
+    android:id="@+id/ib_copy"
+    android:layout_width="66dp"
+    android:layout_height="66dp"
+    android:layout_marginStart="8dp"
+    android:layout_marginBottom="64dp"
+    android:background="@drawable/btn_background"
+    android:onClick="copyToClipboard"
+    android:src="@drawable/ic_content_copy_black_36dp"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toStartOf="@+id/ib_action"
+    app:layout_constraintStart_toStartOf="parent" />
 
-    <TextView
-        android:layout_width="72dp"
-        android:layout_height="wrap_content"
-        android:text="@string/action_copy"
-        android:textAlignment="center"
-        android:textColor="@color/colorText"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/ib_copy"
-        app:layout_constraintStart_toStartOf="@+id/ib_copy"
-        app:layout_constraintTop_toBottomOf="@+id/ib_copy"
-        app:layout_constraintVertical_bias="0.03" />
+  <TextView
+    android:layout_width="72dp"
+    android:layout_height="wrap_content"
+    android:text="@string/action_copy"
+    android:textAlignment="center"
+    android:textColor="@color/colorText"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toEndOf="@+id/ib_copy"
+    app:layout_constraintStart_toStartOf="@+id/ib_copy"
+    app:layout_constraintTop_toBottomOf="@+id/ib_copy"
+    app:layout_constraintVertical_bias="0.03" />
 
-    <ImageButton
-        android:id="@+id/ib_action"
-        android:layout_width="66dp"
-        android:layout_height="66dp"
-        android:layout_marginBottom="64dp"
-        android:background="@drawable/btn_background"
-        android:onClick="doAction"
-        android:src="@drawable/ic_public_black_44dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/ib_search"
-        app:layout_constraintStart_toEndOf="@id/ib_copy" />
+  <ImageButton
+    android:id="@+id/ib_action"
+    android:layout_width="66dp"
+    android:layout_height="66dp"
+    android:layout_marginBottom="64dp"
+    android:background="@drawable/btn_background"
+    android:onClick="doAction"
+    android:src="@drawable/ic_public_black_44dp"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toStartOf="@+id/ib_search"
+    app:layout_constraintStart_toEndOf="@id/ib_copy" />
 
-    <TextView
-        android:id="@+id/txt_action"
-        android:layout_width="72dp"
-        android:layout_height="wrap_content"
-        android:text="@string/action_web"
-        android:textAlignment="center"
-        android:textColor="@color/colorText"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/ib_action"
-        app:layout_constraintStart_toStartOf="@+id/ib_action"
-        app:layout_constraintTop_toBottomOf="@+id/ib_action"
-        app:layout_constraintVertical_bias="0.03" />
+  <TextView
+    android:id="@+id/txt_action"
+    android:layout_width="72dp"
+    android:layout_height="wrap_content"
+    android:text="@string/action_web"
+    android:textAlignment="center"
+    android:textColor="@color/colorText"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toEndOf="@+id/ib_action"
+    app:layout_constraintStart_toStartOf="@+id/ib_action"
+    app:layout_constraintTop_toBottomOf="@+id/ib_action"
+    app:layout_constraintVertical_bias="0.03" />
 
-    <ImageButton
-        android:id="@+id/ib_search"
-        android:layout_width="66dp"
-        android:layout_height="66dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="64dp"
-        android:background="@drawable/btn_background"
-        android:onClick="webSearch"
-        android:src="@drawable/ic_search_black_44dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/ib_action" />
+  <ImageButton
+    android:id="@+id/ib_search"
+    android:layout_width="66dp"
+    android:layout_height="66dp"
+    android:layout_marginEnd="8dp"
+    android:layout_marginBottom="64dp"
+    android:background="@drawable/btn_background"
+    android:onClick="webSearch"
+    android:src="@drawable/ic_search_black_44dp"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toEndOf="@+id/ib_action" />
 
-    <TextView
-        android:layout_width="72dp"
-        android:layout_height="wrap_content"
-        android:text="@string/action_web_search"
-        android:textAlignment="center"
-        android:textColor="@color/colorText"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/ib_search"
-        app:layout_constraintStart_toStartOf="@+id/ib_search"
-        app:layout_constraintTop_toBottomOf="@+id/ib_search"
-        app:layout_constraintVertical_bias="0.03" />
+  <TextView
+    android:layout_width="72dp"
+    android:layout_height="wrap_content"
+    android:text="@string/action_web_search"
+    android:textAlignment="center"
+    android:textColor="@color/colorText"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toEndOf="@+id/ib_search"
+    app:layout_constraintStart_toStartOf="@+id/ib_search"
+    app:layout_constraintTop_toBottomOf="@+id/ib_search"
+    app:layout_constraintVertical_bias="0.03" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

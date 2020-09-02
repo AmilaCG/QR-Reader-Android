@@ -1,62 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  android:layout_width="match_parent"
+  android:layout_height="wrap_content"
+  android:layout_marginBottom="6dp"
+  app:cardBackgroundColor="@color/card_background_dark"
+  app:cardCornerRadius="4dp">
+
+  <androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginBottom="6dp"
-    app:cardCornerRadius="4dp"
-    app:cardBackgroundColor="@color/card_background_dark">
+    android:layout_height="match_parent"
+    android:layout_margin="4dp">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_margin="4dp">
+    <ImageView
+      android:id="@+id/imgview_history"
+      android:layout_width="30dp"
+      android:layout_height="30dp"
+      android:padding="2dp"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toTopOf="parent" />
 
-        <ImageView
-            android:id="@+id/imgview_history"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:padding="2dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent" />
+    <TextView
+      android:id="@+id/textViewResult"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:layout_marginStart="4dp"
+      android:text="Result"
+      android:textAppearance="@android:style/TextAppearance.Material.Medium"
+      android:textColor="@color/white"
+      android:textIsSelectable="true"
+      app:layout_constraintEnd_toStartOf="@id/textThreeDot"
+      app:layout_constraintStart_toEndOf="@id/imgview_history"
+      app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:id="@+id/textViewResult"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
-            android:textAppearance="@android:style/TextAppearance.Material.Medium"
-            android:text="Result"
-            android:textColor="@color/white"
-            android:textIsSelectable="true"
-            app:layout_constraintStart_toEndOf="@id/imgview_history"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/textThreeDot" />
+    <TextView
+      android:id="@+id/textViewTime"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:layout_marginStart="4dp"
+      android:text="Date/Time"
+      app:layout_constraintEnd_toStartOf="@id/textThreeDot"
+      app:layout_constraintStart_toEndOf="@id/imgview_history"
+      app:layout_constraintTop_toBottomOf="@id/textViewResult" />
 
-        <TextView
-            android:id="@+id/textViewTime"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
-            android:text="Date/Time"
-            app:layout_constraintStart_toEndOf="@id/imgview_history"
-            app:layout_constraintTop_toBottomOf="@id/textViewResult"
-            app:layout_constraintEnd_toStartOf="@id/textThreeDot" />
+    <TextView
+      android:id="@+id/textThreeDot"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:paddingStart="6dp"
+      android:paddingEnd="8dp"
+      android:text="  ⋮"
+      android:textSize="22dp"
+      android:textStyle="bold"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:id="@+id/textThreeDot"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingStart="6dp"
-            android:paddingEnd="8dp"
-            android:text="  ⋮"
-            android:textStyle="bold"
-            android:textSize="22dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+  </androidx.constraintlayout.widget.ConstraintLayout>
 
 </com.google.android.material.card.MaterialCardView>

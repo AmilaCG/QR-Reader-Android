@@ -1,72 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  android:background="@color/black">
+
+  <include
+    layout="@layout/top_action_bar"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/top_action_bar_height"
+    android:layout_gravity="top" />
+
+  <ImageView
+    android:id="@+id/image_preview"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/black">
+    android:layout_marginTop="@dimen/top_action_bar_height"
+    android:layout_marginBottom="@dimen/preview_card_carousel_height"
+    android:adjustViewBounds="true"
+    android:scaleType="centerInside" />
 
-    <include
-        layout="@layout/top_action_bar"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/top_action_bar_height"
-        android:layout_gravity="top" />
+  <FrameLayout
+    android:id="@+id/dot_view_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginTop="@dimen/top_action_bar_height"
+    android:layout_marginBottom="@dimen/preview_card_carousel_height"
+    android:background="@color/transparent" />
 
-    <ImageView
-        android:id="@+id/image_preview"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="@dimen/top_action_bar_height"
-        android:layout_marginBottom="@dimen/preview_card_carousel_height"
-        android:scaleType="centerInside"
-        android:adjustViewBounds="true" />
+  <com.google.android.material.chip.Chip
+    android:id="@+id/bottom_prompt_chip"
+    style="@style/Widget.MaterialComponents.Chip.Entry"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="top|center_horizontal"
+    android:layout_marginTop="32dp"
+    android:checkable="false"
+    android:clickable="false"
+    android:fontFamily="sans-serif"
+    android:textColor="@color/white"
+    android:textSize="@dimen/bottom_prompt_chip_text_size"
+    android:visibility="gone"
+    app:chipCornerRadius="@dimen/bottom_prompt_chip_corner_radius"
+    app:chipSurfaceColor="@color/dark"
+    app:closeIconVisible="false" />
 
-    <FrameLayout
-        android:id="@+id/dot_view_container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="@dimen/top_action_bar_height"
-        android:layout_marginBottom="@dimen/preview_card_carousel_height"
-        android:background="@color/transparent" />
+  <ProgressBar
+    android:id="@+id/progressBar"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center" />
 
-    <com.google.android.material.chip.Chip
-        android:id="@+id/bottom_prompt_chip"
-        style="@style/Widget.MaterialComponents.Chip.Entry"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:layout_gravity="top|center_horizontal"
-        android:checkable="false"
-        android:clickable="false"
-        android:fontFamily="sans-serif"
-        android:textColor="@color/white"
-        android:textSize="@dimen/bottom_prompt_chip_text_size"
-        android:visibility="gone"
-        app:chipCornerRadius="@dimen/bottom_prompt_chip_corner_radius"
-        app:chipSurfaceColor="@color/dark"
-        app:closeIconVisible="false"/>
+  <TextView
+    android:id="@+id/text_decoding"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center|bottom"
+    android:text="@string/wait_for_decode"
+    app:layout_anchor="@id/progressBar"
+    app:layout_anchorGravity="bottom|center_horizontal" />
 
-    <ProgressBar
-        android:id="@+id/progressBar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center" />
-
-    <TextView
-        android:id="@+id/text_decoding"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/wait_for_decode"
-        android:layout_gravity="center|bottom"
-        app:layout_anchorGravity="bottom|center_horizontal"
-        app:layout_anchor="@id/progressBar" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/card_recycler_view"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/preview_card_carousel_height"
-        android:layout_gravity="bottom"
-        android:paddingBottom="@dimen/preview_card_carousel_padding_bottom"
-        android:paddingTop="@dimen/preview_card_carousel_padding_top" />
+  <androidx.recyclerview.widget.RecyclerView
+    android:id="@+id/card_recycler_view"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/preview_card_carousel_height"
+    android:layout_gravity="bottom"
+    android:paddingTop="@dimen/preview_card_carousel_padding_top"
+    android:paddingBottom="@dimen/preview_card_carousel_padding_bottom" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

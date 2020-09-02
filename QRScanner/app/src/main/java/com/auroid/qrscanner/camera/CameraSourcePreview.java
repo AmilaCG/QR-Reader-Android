@@ -109,7 +109,7 @@ public class CameraSourcePreview extends FrameLayout {
             int excessLenInHalf = (childWidth - layoutWidth) / 2;
             for (int i = 0; i < getChildCount(); ++i) {
                 View childView = getChildAt(i);
-                if (childView.getId() == R.id.static_overlay_container) {
+                if (childView.getId() == R.id.main_layout) {
                     getChildAt(i).layout(0, 0, layoutWidth, layoutHeight);
                 } else {
                     childView.layout(-excessLenInHalf, 0, layoutWidth + excessLenInHalf, layoutHeight);
@@ -123,7 +123,7 @@ public class CameraSourcePreview extends FrameLayout {
             int excessLenInHalf = (childHeight - layoutHeight) / 2;
             for (int i = 0; i < getChildCount(); ++i) {
                 View childView = getChildAt(i);
-                if (childView.getId() == R.id.static_overlay_container) {
+                if (childView.getId() == R.id.main_layout) {
                     childView.layout(0, 0, layoutWidth, layoutHeight);
                 } else {
                     childView.layout(0, -excessLenInHalf, layoutWidth, layoutHeight + excessLenInHalf);
