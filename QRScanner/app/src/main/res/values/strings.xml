@@ -61,4 +61,7 @@
     <string name="pref_summary_rate">Your reviews keep our small team motivated to make this app even better. :)</string>
     <string name="pref_title_legal">Legal information</string>
     <string name="pref_summary_legal">Open source licenses</string>
+
+    <string name="error_web_search">Web search failed. Try changing the default browser.</string>
+    <string name="error_open_browser">Opening browser failed. Try changing the default browser.</string>
 </resources>

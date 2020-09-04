@@ -27,6 +27,7 @@ import com.google.android.gms.common.internal.Objects;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.analytics.FirebaseAnalytics;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.google.mlkit.vision.barcode.Barcode;
 
 import com.auroid.qrscanner.serializable.BarcodeWrapper;
@@ -167,7 +168,7 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                     } catch (RuntimeException e) {
                         mFlashButton.setSelected(false);
                         Toast.makeText(this, getText(R.string.flasher_fail), Toast.LENGTH_SHORT).show();
-                        e.printStackTrace();
+                        Log.e(TAG, "Failed to turn on flash", e);
                     }
                 }
                 break;
@@ -204,6 +205,7 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                 mWorkflowModel.markCameraLive();
                 mPreview.start(mCameraSource);
             } catch (IOException e) {
+                FirebaseCrashlytics.getInstance().recordException(e);
                 Log.e(TAG, "Failed to start camera preview!", e);
                 mCameraSource.release();
                 mCameraSource = null;

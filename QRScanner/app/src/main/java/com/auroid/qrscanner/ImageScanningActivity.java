@@ -37,6 +37,7 @@ import com.auroid.qrscanner.utils.Utils;
 import com.google.android.material.chip.Chip;
 import com.google.common.collect.ImmutableList;
 import com.google.firebase.analytics.FirebaseAnalytics;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.google.mlkit.vision.barcode.Barcode;
 
 import java.io.IOException;
@@ -141,6 +142,7 @@ public class ImageScanningActivity extends AppCompatActivity
             try {
                 mInputImage = Utils.loadImage(this, imageUri, MAX_IMAGE_SIZE);
             } catch (IOException e) {
+                FirebaseCrashlytics.getInstance().recordException(e);
                 Log.e(TAG, "Failed to load file: " + imageUri, e);
                 finish();
             }

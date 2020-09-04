@@ -1,6 +1,7 @@
 package com.auroid.qrscanner;
 
 import android.app.SearchManager;
+import android.content.ActivityNotFoundException;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.ContentValues;
@@ -29,6 +30,7 @@ import com.auroid.qrscanner.serializable.WiFiWrapper;
 import com.auroid.qrscanner.utils.TypeSelector;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.google.mlkit.vision.barcode.Barcode;
 
 import java.text.ParseException;
@@ -63,7 +65,13 @@ public class ActionHandler {
 
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.setData(webUri);
-        mContext.startActivity(intent);
+        try {
+            mContext.startActivity(intent);
+        } catch (ActivityNotFoundException e) {
+            Toast.makeText(mContext, R.string.error_open_browser, Toast.LENGTH_LONG).show();
+            FirebaseCrashlytics.getInstance().recordException(e);
+            Log.e(TAG, "Open browser failed", e);
+        }
     }
 
     public void openDialer() {
@@ -102,7 +110,8 @@ public class ActionHandler {
             dateEnd = new SimpleDateFormat("yyyy/MM/dd HH:mm", Locale.US)
                     .parse(mBarcodeWrapper.eventWrapper.end);
         } catch (ParseException e) {
-            e.printStackTrace();
+            FirebaseCrashlytics.getInstance().recordException(e);
+            Log.e(TAG, "addToCalender: Date parsing failed", e);
         }
         if (dateStart == null || dateEnd == null) {
             Log.e(TAG, "addToCalender: date is null");
@@ -250,7 +259,7 @@ public class ActionHandler {
         if (clipboardManager != null) {
             clipboardManager.setPrimaryClip(clip);
 
-            Toast.makeText(mContext, mContext.getString(R.string.confirm_copy_to_clipboard),
+            Toast.makeText(mContext, R.string.confirm_copy_to_clipboard,
                     Toast.LENGTH_SHORT).show();
         }
     }
@@ -259,7 +268,13 @@ public class ActionHandler {
         mFirebaseAnalytics.logEvent("action_web_search", null);
         Intent intent = new Intent(Intent.ACTION_WEB_SEARCH);
         intent.putExtra(SearchManager.QUERY, mBarcodeWrapper.displayValue);
-        mContext.startActivity(intent);
+        try {
+            mContext.startActivity(intent);
+        } catch (ActivityNotFoundException e) {
+            Toast.makeText(mContext, R.string.error_web_search, Toast.LENGTH_LONG).show();
+            FirebaseCrashlytics.getInstance().recordException(e);
+            Log.e(TAG, "Web search failed", e);
+        }
     }
 
     public String getFormattedEventDetails() {

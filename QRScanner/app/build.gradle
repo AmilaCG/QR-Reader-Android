@@ -1,6 +1,7 @@
 apply plugin: 'com.android.application'
 apply plugin: 'com.google.gms.google-services'
 apply plugin: 'com.google.android.gms.oss-licenses-plugin'
+apply plugin: 'com.google.firebase.crashlytics'
 
 android {
     compileSdkVersion 29
@@ -67,4 +68,7 @@ dependencies {
     implementation 'com.github.hotchemi:android-rate:1.0.1'
 
     api 'com.google.guava:guava:28.2-jre'
+
+    // Firebase Crashlytics
+    implementation 'com.google.firebase:firebase-crashlytics:17.2.1'
 }
