@@ -167,7 +167,7 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                         mCameraSource.updateFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
                     } catch (RuntimeException e) {
                         mFlashButton.setSelected(false);
-                        Toast.makeText(this, getText(R.string.flasher_fail), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, R.string.flasher_fail, Toast.LENGTH_SHORT).show();
                         Log.e(TAG, "Failed to turn on flash", e);
                     }
                 }

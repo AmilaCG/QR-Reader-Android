@@ -39,7 +39,7 @@ public class BarcodeResultActivity extends AppCompatActivity {
             Gson gson = new Gson();
             mBarcodeWrapper = gson.fromJson(barcodeJson, BarcodeWrapper.class);
         } else {
-            Toast.makeText(this, "Oops! Something went wrong", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.error_unknown, Toast.LENGTH_SHORT).show();
             Log.e(TAG, "onCreate: Intent bundle is null");
             finish();
         }

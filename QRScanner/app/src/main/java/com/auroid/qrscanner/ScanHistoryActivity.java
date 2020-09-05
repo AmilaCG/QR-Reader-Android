@@ -121,7 +121,7 @@ public class ScanHistoryActivity extends AppCompatActivity {
                 })
                 .setPositiveButton("OK", (dialog, which) -> {
                     mResultViewModel.clearAll();
-                    Toast.makeText(this, getString(R.string.confirm_clear_scan_history),
+                    Toast.makeText(this, R.string.confirm_clear_scan_history,
                             Toast.LENGTH_SHORT).show();
                     finish();
                 })

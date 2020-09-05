@@ -62,6 +62,9 @@
     <string name="pref_title_legal">Legal information</string>
     <string name="pref_summary_legal">Open source licenses</string>
 
+    <string name="error_unknown">Oops! Something went wrong. Please try again.</string>
     <string name="error_web_search">Web search failed. Try changing the default browser.</string>
     <string name="error_open_browser">Opening browser failed. Try changing the default browser.</string>
+    <string name="error_open_maps">Unable to open maps. Make sure to have Google Maps installed.</string>
+    <string name="error_open_calender">Unable to open calender. Make sure to have a calender app installed.</string>
 </resources>

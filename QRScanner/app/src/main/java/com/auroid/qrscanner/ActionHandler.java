@@ -94,6 +94,8 @@ public class ActionHandler {
         intent.setPackage("com.google.android.apps.maps");
         if (intent.resolveActivity(mContext.getPackageManager()) != null) {
             mContext.startActivity(intent);
+        } else {
+            Toast.makeText(mContext, R.string.error_open_maps, Toast.LENGTH_LONG).show();
         }
     }
 
@@ -132,7 +134,13 @@ public class ActionHandler {
         intent.putExtra(CalendarContract.Events.STATUS, mBarcodeWrapper.eventWrapper.status);
         intent.putExtra(CalendarContract.Events.DESCRIPTION, mBarcodeWrapper.eventWrapper.description);
 
-        mContext.startActivity(intent);
+        try {
+            mContext.startActivity(intent);
+        } catch (ActivityNotFoundException e) {
+            Toast.makeText(mContext, R.string.error_open_calender, Toast.LENGTH_LONG).show();
+            FirebaseCrashlytics.getInstance().recordException(e);
+            Log.e(TAG, "Open calender failed", e);
+        }
     }
 
     public void addToContacts() {
