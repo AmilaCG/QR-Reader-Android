@@ -1,13 +1,22 @@
 package com.auroid.qrscanner.serializable;
 
+import com.google.gson.annotations.SerializedName;
+
 public class ContactWrapper {
 
+    @SerializedName("formattedName")
     public String formattedName;
+    @SerializedName("organization")
     public String organization;
+    @SerializedName("title")
     public String title;
+    @SerializedName("urls")
     public String[] urls;
+    @SerializedName("phones")
     public PhoneWrapper[] phones;
+    @SerializedName("emails")
     public EmailWrapper[] emails;
+    @SerializedName("addresses")
     public AddressWrapper[] addresses;
 
     public ContactWrapper(String formattedName,
