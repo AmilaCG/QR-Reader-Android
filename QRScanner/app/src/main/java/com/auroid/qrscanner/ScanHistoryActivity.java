@@ -102,7 +102,7 @@ public class ScanHistoryActivity extends AppCompatActivity implements View.OnCli
     }
 
     public void clearAll() {
-        AlertDialog alertDialog = new MaterialAlertDialogBuilder(this)
+        new MaterialAlertDialogBuilder(this)
                 .setTitle(R.string.app_name)
                 .setMessage(R.string.clear_history_confirmation)
                 .setNegativeButton(R.string.cancel, (dialog, which) -> {
@@ -115,10 +115,6 @@ public class ScanHistoryActivity extends AppCompatActivity implements View.OnCli
                     finish();
                 })
                 .show();
-        alertDialog.getButton(DialogInterface.BUTTON_NEGATIVE)
-                .setTextColor(getResources().getColor(R.color.colorAccent));
-        alertDialog.getButton(DialogInterface.BUTTON_POSITIVE)
-                .setTextColor(getResources().getColor(R.color.colorAccent));
     }
 
     private void showUndoSnackbar() {
