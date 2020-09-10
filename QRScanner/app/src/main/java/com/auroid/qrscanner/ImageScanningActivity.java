@@ -80,8 +80,12 @@ public class ImageScanningActivity extends AppCompatActivity
         mDecodingText = findViewById(R.id.text_decoding);
         mPromptChip = findViewById(R.id.bottom_prompt_chip);
 
-        findViewById(R.id.close_button).setOnClickListener(this);
-        findViewById(R.id.photo_library_button).setOnClickListener(this);
+        findViewById(R.id.top_action_title).setVisibility(View.GONE);
+        findViewById(R.id.back_button).setOnClickListener(this);
+
+        ImageView topActionButton = findViewById(R.id.top_action_button);
+        topActionButton.setOnClickListener(this);
+        topActionButton.setImageResource(R.drawable.ic_photo_library_vd_white_24);
 
         mPreviewCardCarousel = findViewById(R.id.card_recycler_view);
         mPreviewCardCarousel.setHasFixedSize(true);
@@ -109,9 +113,9 @@ public class ImageScanningActivity extends AppCompatActivity
     @Override
     public void onClick(View v) {
         int id = v.getId();
-        if (id == R.id.close_button) {
+        if (id == R.id.back_button) {
             onBackPressed();
-        } else if (id == R.id.photo_library_button) {
+        } else if (id == R.id.top_action_button) {
             Utils.openImagePicker(this);
         }
     }

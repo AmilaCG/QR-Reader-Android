@@ -35,7 +35,7 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_gravity="top|center_horizontal"
-    android:layout_marginTop="32dp"
+    android:layout_marginTop="@dimen/top_action_bar_height"
     android:checkable="false"
     android:clickable="false"
     android:fontFamily="sans-serif"

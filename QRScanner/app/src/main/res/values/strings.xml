@@ -21,6 +21,7 @@
     <string name="flasher_fail">Failed to turn on flasher</string>
     <string name="clearall">Clear All</string>
     <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
     <string name="cd_settings_button">Settings</string>
     <string name="cd_flash_button">Toggle camera flash</string>
     <string name="cd_history_button">Scan history</string>
@@ -67,4 +68,7 @@
     <string name="error_open_browser">Opening browser failed. Try changing the default browser.</string>
     <string name="error_open_maps">Unable to open maps. Make sure to have Google Maps installed.</string>
     <string name="error_open_calender">Unable to open calender. Make sure to have a calender app installed.</string>
+
+    <string name="activity_label_scan_history">Scan History</string>
+    <string name="activity_label_settings">Settings</string>
 </resources>

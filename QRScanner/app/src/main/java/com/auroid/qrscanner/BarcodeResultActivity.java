@@ -8,7 +8,6 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.auroid.qrscanner.serializable.BarcodeWrapper;
@@ -16,7 +15,7 @@ import com.auroid.qrscanner.serializable.BarcodeWrapper;
 import com.google.mlkit.vision.barcode.Barcode;
 import com.google.gson.Gson;
 
-public class BarcodeResultActivity extends AppCompatActivity {
+public class BarcodeResultActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final String TAG = "BarcodeResultActivity";
 
@@ -29,9 +28,8 @@ public class BarcodeResultActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_barcode_result);
 
-        ActionBar actionBar = getSupportActionBar();
-        assert actionBar != null;
-        actionBar.setDisplayHomeAsUpEnabled(true);
+        findViewById(R.id.back_button).setOnClickListener(this);
+        findViewById(R.id.top_action_button).setVisibility(View.GONE);
 
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
@@ -154,8 +152,10 @@ public class BarcodeResultActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onSupportNavigateUp() {
-        this.finish();
-        return true;
+    public void onClick(View v) {
+        int id = v.getId();
+        if (id == R.id.back_button) {
+            onBackPressed();
+        }
     }
 }

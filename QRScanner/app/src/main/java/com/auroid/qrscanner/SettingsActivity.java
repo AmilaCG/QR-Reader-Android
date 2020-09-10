@@ -1,13 +1,15 @@
 package com.auroid.qrscanner;
 
 import android.os.Bundle;
+import android.view.View;
+import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 
-public class SettingsActivity extends AppCompatActivity {
+public class SettingsActivity extends AppCompatActivity implements View.OnClickListener{
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -19,13 +21,17 @@ public class SettingsActivity extends AppCompatActivity {
                 .replace(R.id.settings, new SettingsFragmentCompat())
                 .commit();
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        ((TextView) findViewById(R.id.top_action_title)).setText(R.string.activity_label_settings);
+        findViewById(R.id.back_button).setOnClickListener(this);
+        findViewById(R.id.top_action_button).setVisibility(View.GONE);
     }
 
     @Override
-    public boolean onSupportNavigateUp() {
-        this.finish();
-        return true;
+    public void onClick(View v) {
+        int id = v.getId();
+        if (id == R.id.back_button) {
+            onBackPressed();
+        }
     }
 
     public static class SettingsFragmentCompat extends PreferenceFragmentCompat {
