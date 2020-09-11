@@ -74,4 +74,7 @@ dependencies {
 
     // Firebase Crashlytics
     implementation 'com.google.firebase:firebase-crashlytics:17.2.1'
+
+    // Subsampling Scale Image View library
+    implementation 'com.davemorrissey.labs:subsampling-scale-image-view-androidx:3.10.0'
 }

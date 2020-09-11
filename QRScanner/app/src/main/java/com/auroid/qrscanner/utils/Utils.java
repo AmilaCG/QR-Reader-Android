@@ -17,23 +17,14 @@
 package com.auroid.qrscanner.utils;
 
 import android.app.Activity;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
 import android.hardware.Camera;
-import android.net.Uri;
 import android.util.Log;
-
-import androidx.exifinterface.media.ExifInterface;
 
 import com.auroid.qrscanner.camera.CameraSizePair;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -102,100 +93,5 @@ public class Utils {
         Intent intent = new Intent(Intent.ACTION_PICK);
         intent.setType("image/*");
         activity.startActivityForResult(intent, RC_PHOTO_LIBRARY);
-    }
-
-    public static Bitmap loadImage(Context context, Uri imageUri, int maxImageDimension)
-            throws IOException {
-        InputStream inputStreamForSize = null;
-        InputStream inputStreamForImage = null;
-        try {
-            inputStreamForSize = context.getContentResolver().openInputStream(imageUri);
-            BitmapFactory.Options opts = new BitmapFactory.Options();
-            opts.inJustDecodeBounds = true;
-            BitmapFactory.decodeStream(inputStreamForSize, /* outPadding= */ null, opts);
-            int inSampleSize =
-                    Math.max(opts.outWidth / maxImageDimension, opts.outHeight / maxImageDimension);
-
-            opts = new BitmapFactory.Options();
-            opts.inSampleSize = inSampleSize;
-            inputStreamForImage = context.getContentResolver().openInputStream(imageUri);
-            Bitmap decodedBitmap =
-                    BitmapFactory.decodeStream(inputStreamForImage, /* outPadding= */ null, opts);
-            return maybeTransformBitmap(context.getContentResolver(), imageUri, decodedBitmap);
-
-        } finally {
-            if (inputStreamForSize != null) {
-                inputStreamForSize.close();
-            }
-            if (inputStreamForImage != null) {
-                inputStreamForImage.close();
-            }
-        }
-    }
-
-    private static Bitmap maybeTransformBitmap(ContentResolver resolver, Uri uri, Bitmap bitmap) {
-        int orientation = getExifOrientationTag(resolver, uri);
-        Matrix matrix = new Matrix();
-        switch (orientation) {
-            case ExifInterface.ORIENTATION_UNDEFINED:
-            case ExifInterface.ORIENTATION_NORMAL:
-                // Set the matrix to be null to skip the image transform.
-                matrix = null;
-                break;
-            case ExifInterface.ORIENTATION_FLIP_HORIZONTAL:
-                matrix = new Matrix();
-                matrix.postScale(-1.0f, 1.0f);
-                break;
-            case ExifInterface.ORIENTATION_ROTATE_90:
-                matrix.postRotate(90);
-                break;
-            case ExifInterface.ORIENTATION_TRANSPOSE:
-                matrix.postRotate(90.0f);
-                matrix.postScale(-1.0f, 1.0f);
-                break;
-            case ExifInterface.ORIENTATION_ROTATE_180:
-                matrix.postRotate(180.0f);
-                break;
-            case ExifInterface.ORIENTATION_FLIP_VERTICAL:
-                matrix.postScale(1.0f, -1.0f);
-                break;
-            case ExifInterface.ORIENTATION_ROTATE_270:
-                matrix.postRotate(-90.0f);
-                break;
-            case ExifInterface.ORIENTATION_TRANSVERSE:
-                matrix.postRotate(-90.0f);
-                matrix.postScale(-1.0f, 1.0f);
-                break;
-            default:
-                // Set the matrix to be null to skip the image transform.
-                matrix = null;
-                break;
-        }
-
-        if (matrix != null) {
-            return Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-        } else {
-            return bitmap;
-        }
-    }
-
-    private static int getExifOrientationTag(ContentResolver resolver, Uri imageUri) {
-        if (!ContentResolver.SCHEME_CONTENT.equals(imageUri.getScheme())
-                && !ContentResolver.SCHEME_FILE.equals(imageUri.getScheme())) {
-            return 0;
-        }
-
-        ExifInterface exif = null;
-        try (InputStream inputStream = resolver.openInputStream(imageUri)) {
-            if (inputStream != null) {
-                exif = new ExifInterface(inputStream);
-            }
-        } catch (IOException e) {
-            Log.e(TAG, "Failed to open file to read rotation meta data: " + imageUri, e);
-        }
-
-        return exif !=  null
-                ? exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
-                : ExifInterface.ORIENTATION_UNDEFINED;
     }
 }

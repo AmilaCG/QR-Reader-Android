@@ -38,7 +38,10 @@
     <string name="wait_for_decode">Scanning..</string>
 
     <string name="static_image_prompt_detected_no_results">No barcodes detected</string>
-    <string name="static_image_prompt_detected_results">Tap on a dot to inspect</string>
+    <string name="detected_result_count_singular">One barcode detected</string>
+    <string name="detected_result_count_plural">barcodes detected</string>
+    <string name="dot_tap_guide_singular">Tap on the dot to inspect</string>
+    <string name="dot_tap_guide_plural">Tap on a dot to inspect</string>
 
     <string name="rate_dialog_title">Rate QR Code Reader</string>
     <string name="rate_dialog_message">Your reviews keep our small team motivated to make this app even better. It won\'t take more than a minute.</string>

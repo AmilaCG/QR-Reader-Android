@@ -11,14 +11,12 @@
     android:layout_height="@dimen/top_action_bar_height"
     android:layout_gravity="top" />
 
-  <ImageView
-    android:id="@+id/image_preview"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_marginTop="@dimen/top_action_bar_height"
-    android:layout_marginBottom="@dimen/preview_card_carousel_height"
-    android:adjustViewBounds="true"
-    android:scaleType="centerInside" />
+  <com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
+      android:id="@+id/image_preview"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:layout_marginTop="@dimen/top_action_bar_height"
+      android:layout_marginBottom="@dimen/preview_card_carousel_height" />
 
   <FrameLayout
     android:id="@+id/dot_view_container"

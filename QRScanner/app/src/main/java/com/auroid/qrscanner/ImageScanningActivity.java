@@ -8,16 +8,20 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.animation.AnimatorInflater;
 import android.animation.AnimatorSet;
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -34,31 +38,35 @@ import com.auroid.qrscanner.serializable.BarcodeWrapper;
 import com.auroid.qrscanner.settings.PreferenceUtils;
 import com.auroid.qrscanner.utils.Utils;
 
+import com.davemorrissey.labs.subscaleview.ImageSource;
+import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
+
 import com.google.android.material.chip.Chip;
 import com.google.common.collect.ImmutableList;
 import com.google.firebase.analytics.FirebaseAnalytics;
-import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.google.mlkit.vision.barcode.Barcode;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicReference;
 
-public class ImageScanningActivity extends AppCompatActivity
-        implements View.OnClickListener, ImageScanner.DecodeListener, PreviewCardAdapter.CardItemListener {
+public class ImageScanningActivity extends AppCompatActivity implements
+        View.OnClickListener,
+        ImageScanner.DecodeListener,
+        PreviewCardAdapter.CardItemListener {
 
     private static final String TAG = "ImageScanningActivity";
 
-    private final int MAX_IMAGE_SIZE = 2048;
     private static final int RC_PHOTO_LIBRARY = 26;
 
     private Bitmap mInputImage;
-    private ImageView mImagePreview;
     private ProgressBar mProgressBar;
     private TextView mDecodingText;
     private Chip mPromptChip;
+    private SubsamplingScaleImageView mImagePreview;
+    private AnimatorSet mPromptChipAnimator;
 
     private final ExecutorService imageDecodeExecutor = Executors.newSingleThreadExecutor();
     private ImageScanner mImageScanner;
@@ -67,6 +75,8 @@ public class ImageScanningActivity extends AppCompatActivity
     private ViewGroup mDotViewContainer;
     private int mDotViewSize;
     private int mCurrentSelectedBarcodeIndex = 0;
+
+    private AtomicReference<Boolean> mIsDecodingDone;
 
     private FirebaseAnalytics mFirebaseAnalytics;
 
@@ -79,6 +89,9 @@ public class ImageScanningActivity extends AppCompatActivity
         mProgressBar = findViewById(R.id.progressBar);
         mDecodingText = findViewById(R.id.text_decoding);
         mPromptChip = findViewById(R.id.bottom_prompt_chip);
+        mPromptChipAnimator =
+                (AnimatorSet) AnimatorInflater.loadAnimator(this, R.animator.prompt_chip_enter);
+        mPromptChipAnimator.setTarget(mPromptChip);
 
         findViewById(R.id.top_action_title).setVisibility(View.GONE);
         findViewById(R.id.back_button).setOnClickListener(this);
@@ -96,18 +109,28 @@ public class ImageScanningActivity extends AppCompatActivity
         mDotViewContainer = findViewById(R.id.dot_view_container);
         mDotViewSize = getResources().getDimensionPixelOffset(R.dimen.static_image_dot_view_size);
 
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+
+        mIsDecodingDone = new AtomicReference<>(false);
+
         Uri pickedImageUri = getIntent().getData();
         if (pickedImageUri != null) {
-            decodeImage(pickedImageUri);
+            setupImagePreview(pickedImageUri);
+        } else {
+            Toast.makeText(this, R.string.error_unknown, Toast.LENGTH_SHORT).show();
+            onBackPressed();
         }
-
-        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mImageScanner.release();
+        if (mImageScanner != null) {
+            mImageScanner.release();
+        }
+        if (mImagePreview != null) {
+            mImagePreview.recycle();
+        }
     }
 
     @Override
@@ -124,40 +147,104 @@ public class ImageScanningActivity extends AppCompatActivity
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if (resultCode == RESULT_OK && requestCode == RC_PHOTO_LIBRARY && data != null) {
             mImageScanner.release();
+            mPreviewCardCarousel.setVisibility(View.GONE);
+            mPromptChip.setVisibility(View.GONE);
+            mDotViewContainer.removeAllViews();
             mProgressBar.setVisibility(View.VISIBLE);
             mDecodingText.setVisibility(View.VISIBLE);
-            ((BitmapDrawable) mImagePreview.getDrawable()).getBitmap().recycle();
-            mImagePreview.setVisibility(View.GONE);
 
-            decodeImage(data.getData());
+            mImagePreview.recycle();
+            setupImagePreview(data.getData());
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
     }
 
-    private void decodeImage(Uri imageUri) {
+    @SuppressLint("ClickableViewAccessibility")
+    private void setupImagePreview(Uri pickedImageUri) {
+        mImagePreview.setOrientation(SubsamplingScaleImageView.ORIENTATION_USE_EXIF);
+        mImagePreview.setImage(ImageSource.uri(pickedImageUri));
+
+        mImagePreview.setOnImageEventListener(new SubsamplingScaleImageView.OnImageEventListener() {
+            @Override
+            public void onReady() {
+                Log.d(TAG, "onReady: ");
+            }
+
+            @Override
+            public void onImageLoaded() {
+                Log.d(TAG, "onImageLoaded: ");
+                decodeImage(getBitmapFromView(mImagePreview));
+            }
+
+            @Override
+            public void onPreviewLoadError(Exception e) {
+
+            }
+
+            @Override
+            public void onImageLoadError(Exception e) {
+
+            }
+
+            @Override
+            public void onTileLoadError(Exception e) {
+
+            }
+
+            @Override
+            public void onPreviewReleased() {
+                Log.d(TAG, "onPreviewReleased: ");
+            }
+        });
+
+        mImagePreview.setOnTouchListener((View v, MotionEvent event) -> {
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    Log.d(TAG, "onTouch: ACTION_DOWN");
+                    mPromptChip.setVisibility(View.GONE);
+                    mDotViewContainer.removeAllViews();
+                    break;
+                case MotionEvent.ACTION_UP:
+                    Log.d(TAG, "onTouch: ACTION_UP");
+                    if (mIsDecodingDone.get()) {
+                        mIsDecodingDone.set(false);
+                        decodeImage(getBitmapFromView(mImagePreview));
+                        return true;
+                    }
+                    break;
+                case MotionEvent.ACTION_CANCEL:
+                    Log.d(TAG, "onTouch: ACTION_CANCEL");
+                    break;
+                case MotionEvent.ACTION_OUTSIDE:
+                    Log.d(TAG, "onTouch: ACTION_OUTSIDE");
+                    break;
+            }
+            return false;
+        });
+    }
+
+    private Bitmap getBitmapFromView(View v) {
+        Bitmap bitmap = Bitmap.createBitmap(v.getWidth(), v.getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        v.layout(v.getLeft(), v.getTop(), v.getRight(), v.getBottom());
+        v.draw(canvas);
+        return bitmap;
+    }
+
+    private void decodeImage(Bitmap bitmap) {
+        mInputImage = bitmap;
         mPreviewCardCarousel.setAdapter(new PreviewCardAdapter(ImmutableList.of(), this));
         mPreviewCardCarousel.clearOnScrollListeners();
+        mPreviewCardCarousel.setVisibility(View.VISIBLE);
         mPromptChip.setVisibility(View.GONE);
         mDotViewContainer.removeAllViews();
         mCurrentSelectedBarcodeIndex = 0;
 
         imageDecodeExecutor.execute(() -> {
-            try {
-                mInputImage = Utils.loadImage(this, imageUri, MAX_IMAGE_SIZE);
-            } catch (IOException e) {
-                FirebaseCrashlytics.getInstance().recordException(e);
-                Log.e(TAG, "Failed to load file: " + imageUri, e);
-                finish();
-            }
             runOnUiThread(() -> {
                 mProgressBar.setVisibility(View.GONE);
                 mDecodingText.setVisibility(View.GONE);
-                if (mImagePreview.getVisibility() == View.GONE) {
-                    mImagePreview.setVisibility(View.VISIBLE);
-                }
-                mImagePreview.setImageBitmap(mInputImage);
-                showPromptChip(getString(R.string.static_image_prompt_detected_results));
             });
 
             mImageScanner = new ImageScanner(this);
@@ -169,9 +256,18 @@ public class ImageScanningActivity extends AppCompatActivity
 
     @Override
     public void onSuccessfulDecode(List<Barcode> barcodes) {
-        if (barcodes.size() > 0) {
-            Toast.makeText(this, barcodes.size() + " barcode(s) detected",
-                    Toast.LENGTH_SHORT).show();
+        int barcodeCount = barcodes.size();
+        if (barcodeCount > 0) {
+            final Handler handler = new Handler(Looper.getMainLooper());
+            if (barcodeCount == 1) {
+                showPromptChip(getString(R.string.detected_result_count_singular));
+                handler.postDelayed(() ->
+                                showPromptChip(getString(R.string.dot_tap_guide_singular)), 1500);
+            } else {
+                showPromptChip(barcodeCount + " " + getString(R.string.detected_result_count_plural));
+                handler.postDelayed(() ->
+                                showPromptChip(getString(R.string.dot_tap_guide_plural)), 1500);
+            }
 
             List<DetectedBarcode> detectedBarcodeList = new ArrayList<>();
             for (int i = 0; i < barcodes.size(); i++) {
@@ -223,11 +319,13 @@ public class ImageScanningActivity extends AppCompatActivity
                 animatorSet.start();
             }
         }
+        mIsDecodingDone.set(true);
     }
 
     @Override
     public void onUnsuccessfulDecode() {
         showPromptChip(getString(R.string.static_image_prompt_detected_no_results));
+        mIsDecodingDone.set(true);
     }
 
     private TrackerDotView createDotView(DetectedBarcode detectedBarcode) {
@@ -313,6 +411,10 @@ public class ImageScanningActivity extends AppCompatActivity
     private void showPromptChip(String message) {
         mPromptChip.setVisibility(View.VISIBLE);
         mPromptChip.setText(message);
+
+        if (!mPromptChipAnimator.isRunning()) {
+            mPromptChipAnimator.start();
+        }
     }
 
     private static class CardItemDecoration extends RecyclerView.ItemDecoration {
