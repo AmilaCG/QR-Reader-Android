@@ -22,7 +22,6 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.view.View;
-import com.google.android.gms.common.images.Size;
 import com.auroid.qrscanner.utils.Utils;
 import java.util.ArrayList;
 import java.util.List;
@@ -86,18 +85,18 @@ public class GraphicOverlay extends View {
     }
 
     /**
-     * Sets the camera attributes for size and facing direction, which informs how to transform image
+     * Sets the image analyzer's output image size, which informs how to transform image
      * coordinates later.
      */
-    public void setCameraInfo(CameraSource cameraSource) {
-        Size previewSize = cameraSource.getPreviewSize();
+    @SuppressWarnings("SuspiciousNameCombination")
+    public void setAnalyzerInfo(int outputWidth, int outputHeight) {
         if (Utils.isPortraitMode(getContext())) {
             // Swap width and height when in portrait, since camera's natural orientation is landscape.
-            previewWidth = previewSize.getHeight();
-            previewHeight = previewSize.getWidth();
+            previewWidth = outputHeight;
+            previewHeight = outputWidth;
         } else {
-            previewWidth = previewSize.getWidth();
-            previewHeight = previewSize.getHeight();
+            previewWidth = outputWidth;
+            previewHeight = outputHeight;
         }
     }
 

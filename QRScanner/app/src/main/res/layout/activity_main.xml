@@ -9,17 +9,22 @@
   android:keepScreenOn="true"
   tools:context=".MainActivity">
 
-  <com.auroid.qrscanner.camera.CameraSourcePreview
-    android:id="@+id/camera_preview"
+  <FrameLayout
+    android:id="@+id/camera_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
+    <androidx.camera.view.PreviewView
+      android:id="@+id/view_finder"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent" />
 
     <com.auroid.qrscanner.camera.GraphicOverlay
       android:id="@+id/camera_preview_graphic_overlay"
       android:layout_width="match_parent"
       android:layout_height="match_parent" />
 
-  </com.auroid.qrscanner.camera.CameraSourcePreview>
+  </FrameLayout>
 
   <include
     layout="@layout/bottom_action_bar"

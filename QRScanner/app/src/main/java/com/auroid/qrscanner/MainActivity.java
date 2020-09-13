@@ -7,53 +7,49 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.hardware.Camera;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.camera.lifecycle.ProcessCameraProvider;
+import androidx.camera.view.PreviewView;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.auroid.qrscanner.utils.Utils;
-import com.google.android.gms.common.internal.Objects;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.common.base.Objects;
+import com.google.common.util.concurrent.ListenableFuture;
 import com.google.firebase.analytics.FirebaseAnalytics;
-import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.google.mlkit.vision.barcode.Barcode;
 
+import com.auroid.qrscanner.camera.CameraHandler;
+import com.auroid.qrscanner.utils.Utils;
 import com.auroid.qrscanner.serializable.BarcodeWrapper;
 import com.auroid.qrscanner.settings.PreferenceUtils;
 import com.auroid.qrscanner.camera.GraphicOverlay;
 import com.auroid.qrscanner.camera.WorkflowModel;
 import com.auroid.qrscanner.camera.WorkflowModel.WorkflowState;
-import com.auroid.qrscanner.camera.CameraSource;
-import com.auroid.qrscanner.camera.CameraSourcePreview;
-import com.auroid.qrscanner.barcodedetection.BarcodeProcessor;
-
-import java.io.IOException;
 
 import hotchemi.android.rate.AppRate;
 
 public class MainActivity extends AppCompatActivity implements OnClickListener {
 
-    private static final String TAG = "LiveBarcodeActivity";
+    private static final String TAG = "MainActivity";
 
     private static final int RC_HANDLE_CAMERA_PERM = 24;
     private static final int READ_EXT_STORAGE_PERM = 25;
     private static final int RC_PHOTO_LIBRARY = 26;
 
-    private CameraSource mCameraSource;
+    private CameraHandler mCameraHandler;
 
-    private CameraSourcePreview mPreview;
     private GraphicOverlay mGraphicOverlay;
     private View mSettingsButton;
     private View mHistoryButton;
@@ -74,10 +70,8 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mPreview = findViewById(R.id.camera_preview);
         mGraphicOverlay = findViewById(R.id.camera_preview_graphic_overlay);
         mGraphicOverlay.setOnClickListener(this);
-        mCameraSource = new CameraSource(mGraphicOverlay);
 
         mGuideChip = findViewById(R.id.guide_chip);
         mPromptChipAnimator =
@@ -100,6 +94,13 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
 
         setUpWorkflowModel();
 
+        int rc = ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
+        if (rc == PackageManager.PERMISSION_GRANTED) {
+            setupCamera();
+        } else {
+            requestCameraPermission();
+        }
+
         // Rate me dialog
         AppRate.with(this)
                 .setInstallDays(3)
@@ -112,12 +113,12 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
     @Override
     protected void onResume() {
         super.onResume();
-        mWorkflowModel.markCameraFrozen();
+        mGraphicOverlay.clear();
         mSettingsButton.setEnabled(true);
         mHistoryButton.setEnabled(true);
         mGalleryButton.setEnabled(true);
+        mFlashButton.setSelected(false);
         mCurrentWorkflowState = WorkflowState.NOT_STARTED;
-        mCameraSource.setFrameProcessor(new BarcodeProcessor(mGraphicOverlay, mWorkflowModel));
         mWorkflowModel.setWorkflowState(WorkflowState.DETECTING);
     }
 
@@ -125,15 +126,13 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
     protected void onPause() {
         super.onPause();
         mCurrentWorkflowState = WorkflowState.NOT_STARTED;
-        stopCameraPreview();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (mCameraSource != null) {
-            mCameraSource.release();
-            mCameraSource = null;
+        if (mCameraHandler != null) {
+            mCameraHandler.release();
         }
         if (mAudioHandler != null) {
             mAudioHandler.release();
@@ -160,16 +159,10 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
             case R.id.flash_button:
                 if (mFlashButton.isSelected()) {
                     mFlashButton.setSelected(false);
-                    mCameraSource.updateFlashMode(Camera.Parameters.FLASH_MODE_OFF);
+                    mCameraHandler.enableTorch(false);
                 } else {
                     mFlashButton.setSelected(true);
-                    try {
-                        mCameraSource.updateFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
-                    } catch (RuntimeException e) {
-                        mFlashButton.setSelected(false);
-                        Toast.makeText(this, R.string.flasher_fail, Toast.LENGTH_SHORT).show();
-                        Log.e(TAG, "Failed to turn on flash", e);
-                    }
+                    mCameraHandler.enableTorch(true);
                 }
                 break;
 
@@ -190,35 +183,17 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
         }
     }
 
-    private void startCameraPreview() {
-        int rc = ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
-        if (rc == PackageManager.PERMISSION_GRANTED) {
-            startPreview();
-        } else {
-            requestCameraPermission();
-        }
-    }
-
-    private void startPreview() {
-        if (!mWorkflowModel.isCameraLive() && mCameraSource != null) {
-            try {
-                mWorkflowModel.markCameraLive();
-                mPreview.start(mCameraSource);
-            } catch (IOException e) {
-                FirebaseCrashlytics.getInstance().recordException(e);
-                Log.e(TAG, "Failed to start camera preview!", e);
-                mCameraSource.release();
-                mCameraSource = null;
-            }
-        }
-    }
-
-    private void stopCameraPreview() {
-        if (mWorkflowModel.isCameraLive()) {
-            mWorkflowModel.markCameraFrozen();
-            mFlashButton.setSelected(false);
-            mPreview.stop();
-        }
+    private void setupCamera() {
+        ListenableFuture<ProcessCameraProvider> cameraProviderFuture =
+                ProcessCameraProvider.getInstance(this);
+        PreviewView previewView = findViewById(R.id.view_finder);
+        mCameraHandler = new CameraHandler(
+                cameraProviderFuture,
+                previewView,
+                this,
+                mGraphicOverlay,
+                mWorkflowModel);
+        cameraProviderFuture.addListener(mCameraHandler, ContextCompat.getMainExecutor(this));
     }
 
     private void setUpWorkflowModel() {
@@ -242,12 +217,12 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                         case DETECTING:
                             mGuideChip.setVisibility(View.VISIBLE);
                             mGuideChip.setText(R.string.prompt_point_at_a_barcode);
-                            startCameraPreview();
+                            mWorkflowModel.markCameraLive();
                             break;
                         case DETECTED:
                             mGuideChip.setVisibility(View.GONE);
                             mAudioHandler.playAudioBeep();
-                            stopCameraPreview();
+                            mWorkflowModel.markCameraFrozen();
                             break;
                         default:
                             mGuideChip.setVisibility(View.GONE);
@@ -310,7 +285,7 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
             case RC_HANDLE_CAMERA_PERM: {
                 if (grantResults.length != 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Log.d(TAG, "Camera permission granted");
-                    startPreview();
+                    setupCamera();
                 } else {
                     DialogInterface.OnClickListener listener = (dialog, id) -> finish();
 
