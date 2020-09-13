@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.auroid.qrscanner.settings;
+package com.auroid.qrscanner.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;

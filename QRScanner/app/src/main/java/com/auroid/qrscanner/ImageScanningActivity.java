@@ -35,7 +35,7 @@ import com.auroid.qrscanner.imagescanner.ImageScanner;
 import com.auroid.qrscanner.imagescanner.PreviewCardAdapter;
 import com.auroid.qrscanner.imagescanner.TrackerDotView;
 import com.auroid.qrscanner.serializable.BarcodeWrapper;
-import com.auroid.qrscanner.settings.PreferenceUtils;
+import com.auroid.qrscanner.utils.PreferenceUtils;
 import com.auroid.qrscanner.utils.Utils;
 
 import com.davemorrissey.labs.subscaleview.ImageSource;

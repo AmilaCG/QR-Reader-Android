@@ -79,9 +79,6 @@ dependencies {
     // Google analytics components
     implementation 'com.google.firebase:firebase-analytics:17.5.0'
 
-    // Rating library
-    implementation 'com.github.hotchemi:android-rate:1.0.1'
-
     api 'com.google.guava:guava:28.2-jre'
 
     // Firebase Crashlytics
@@ -89,4 +86,7 @@ dependencies {
 
     // Subsampling Scale Image View library
     implementation 'com.davemorrissey.labs:subsampling-scale-image-view-androidx:3.10.0'
+
+    // Google play core library for in-app review API
+    implementation 'com.google.android.play:core:1.8.0'
 }

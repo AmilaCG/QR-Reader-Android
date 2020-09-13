@@ -31,14 +31,13 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.mlkit.vision.barcode.Barcode;
 
 import com.auroid.qrscanner.camera.CameraHandler;
-import com.auroid.qrscanner.utils.Utils;
-import com.auroid.qrscanner.serializable.BarcodeWrapper;
-import com.auroid.qrscanner.settings.PreferenceUtils;
 import com.auroid.qrscanner.camera.GraphicOverlay;
 import com.auroid.qrscanner.camera.WorkflowModel;
 import com.auroid.qrscanner.camera.WorkflowModel.WorkflowState;
-
-import hotchemi.android.rate.AppRate;
+import com.auroid.qrscanner.serializable.BarcodeWrapper;
+import com.auroid.qrscanner.utils.Utils;
+import com.auroid.qrscanner.utils.PreferenceUtils;
+import com.auroid.qrscanner.utils.AppRater;
 
 public class MainActivity extends AppCompatActivity implements OnClickListener {
 
@@ -101,13 +100,10 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
             requestCameraPermission();
         }
 
-        // Rate me dialog
-        AppRate.with(this)
-                .setInstallDays(3)
-                .setLaunchTimes(3)
-                .setRemindInterval(5)
-                .monitor();
-        AppRate.showRateDialogIfMeetsConditions(this);
+        // Only run at the first time activity launches
+        if (savedInstanceState == null) {
+            AppRater.app_launched(this);
+        }
     }
 
     @Override
