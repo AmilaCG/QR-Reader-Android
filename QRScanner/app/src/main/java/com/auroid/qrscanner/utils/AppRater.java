@@ -12,9 +12,7 @@ import com.google.android.play.core.tasks.Task;
 public class AppRater {
 
     private static final int DAYS_UNTIL_PROMPT = 3; //Min number of days
-    private static final int LAUNCHES_UNTIL_PROMPT = 3; //Min number of launches
-
-    private static ReviewInfo mReviewInfo;
+    private static final int LAUNCHES_UNTIL_PROMPT = 5; //Min number of launches
 
     public static void app_launched(Activity activity) {
         SharedPreferences prefs = activity.getApplicationContext()
@@ -49,17 +47,18 @@ public class AppRater {
         Task<ReviewInfo> request = manager.requestReviewFlow();
         request.addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
-                mReviewInfo = task.getResult();
-            }
-        });
+                ReviewInfo reviewInfo = task.getResult();
 
-        Task<Void> flow = manager.launchReviewFlow(activity, mReviewInfo);
-        flow.addOnCompleteListener(task -> {
-            // The flow has finished. The API does not indicate whether the user
-            // reviewed or not, or even whether the review dialog was shown. Thus, no
-            // matter the result, we continue our app flow.
-            if (editor != null) {
-                editor.clear().apply();
+                Task<Void> flow = manager.launchReviewFlow(activity, reviewInfo);
+                flow.addOnCompleteListener(launchTask -> {
+                    // The flow has finished. The API does not indicate whether the user
+                    // reviewed or not, or even whether the review dialog was shown. Thus, no
+                    // matter the result, we continue our app flow.
+                    // Reset saved preferences
+                    if (editor != null) {
+                        editor.clear().apply();
+                    }
+                });
             }
         });
     }
