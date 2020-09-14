@@ -35,7 +35,7 @@ import com.auroid.qrscanner.imagescanner.ImageScanner;
 import com.auroid.qrscanner.imagescanner.PreviewCardAdapter;
 import com.auroid.qrscanner.imagescanner.TrackerDotView;
 import com.auroid.qrscanner.serializable.BarcodeWrapper;
-import com.auroid.qrscanner.settings.PreferenceUtils;
+import com.auroid.qrscanner.utils.PreferenceUtils;
 import com.auroid.qrscanner.utils.Utils;
 
 import com.davemorrissey.labs.subscaleview.ImageSource;
@@ -90,7 +90,7 @@ public class ImageScanningActivity extends AppCompatActivity implements
         mDecodingText = findViewById(R.id.text_decoding);
         mPromptChip = findViewById(R.id.bottom_prompt_chip);
         mPromptChipAnimator =
-                (AnimatorSet) AnimatorInflater.loadAnimator(this, R.animator.prompt_chip_enter);
+                (AnimatorSet) AnimatorInflater.loadAnimator(this, R.animator.guide_chip_enter);
         mPromptChipAnimator.setTarget(mPromptChip);
 
         findViewById(R.id.top_action_title).setVisibility(View.GONE);
@@ -247,7 +247,7 @@ public class ImageScanningActivity extends AppCompatActivity implements
                 mDecodingText.setVisibility(View.GONE);
             });
 
-            mImageScanner = new ImageScanner(this);
+            mImageScanner = new ImageScanner();
 
             mImageScanner.setImage(mInputImage);
             mImageScanner.decode(this);

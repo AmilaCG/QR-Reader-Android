@@ -11,8 +11,8 @@ android {
         applicationId "com.auroid.qrscanner"
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 28
-        versionName "3.00.02"
+        versionCode 29
+        versionName "3.01.00b"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -49,13 +49,25 @@ dependencies {
     implementation 'com.google.android.material:material:1.2.1'
 
     // Room components
-    implementation "androidx.room:room-runtime:$rootProject.roomVersion"
-    annotationProcessor "androidx.room:room-compiler:$rootProject.roomVersion"
-    androidTestImplementation "androidx.room:room-testing:$rootProject.roomVersion"
+    def roomVersion = '2.2.5'
+    implementation "androidx.room:room-runtime:$roomVersion"
+    annotationProcessor "androidx.room:room-compiler:$roomVersion"
+    androidTestImplementation "androidx.room:room-testing:$roomVersion"
 
     // Lifecycle components
-    implementation "androidx.lifecycle:lifecycle-extensions:$rootProject.archLifecycleVersion"
-    annotationProcessor "androidx.lifecycle:lifecycle-compiler:$rootProject.archLifecycleVersion"
+    def archLifecycleVersion = '2.2.0'
+    implementation "androidx.lifecycle:lifecycle-extensions:$archLifecycleVersion"
+    annotationProcessor "androidx.lifecycle:lifecycle-compiler:$archLifecycleVersion"
+
+    // CameraX core library
+    def camerax_version = '1.0.0-beta08'
+    implementation "androidx.camera:camera-core:$camerax_version"
+    // CameraX Camera2 extensions
+    implementation "androidx.camera:camera-camera2:$camerax_version"
+    // CameraX Lifecycle library
+    implementation "androidx.camera:camera-lifecycle:$camerax_version"
+    // CameraX View class
+    implementation 'androidx.camera:camera-view:1.0.0-alpha15'
 
     implementation 'com.google.android.gms:play-services-oss-licenses:17.0.0'
 
@@ -67,9 +79,6 @@ dependencies {
     // Google analytics components
     implementation 'com.google.firebase:firebase-analytics:17.5.0'
 
-    // Rating library
-    implementation 'com.github.hotchemi:android-rate:1.0.1'
-
     api 'com.google.guava:guava:28.2-jre'
 
     // Firebase Crashlytics
@@ -77,4 +86,7 @@ dependencies {
 
     // Subsampling Scale Image View library
     implementation 'com.davemorrissey.labs:subsampling-scale-image-view-androidx:3.10.0'
+
+    // Google play core library for in-app review API
+    implementation 'com.google.android.play:core:1.8.0'
 }

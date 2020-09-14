@@ -28,7 +28,7 @@ import androidx.core.content.ContextCompat;
 import com.auroid.qrscanner.camera.GraphicOverlay;
 import com.auroid.qrscanner.camera.GraphicOverlay.Graphic;
 import com.auroid.qrscanner.R;
-import com.auroid.qrscanner.settings.PreferenceUtils;
+import com.auroid.qrscanner.utils.PreferenceUtils;
 
 abstract class BarcodeGraphicBase extends Graphic {
 

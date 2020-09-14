@@ -4,7 +4,7 @@ import android.content.Context;
 import android.media.AudioAttributes;
 import android.media.SoundPool;
 
-import com.auroid.qrscanner.settings.PreferenceUtils;
+import com.auroid.qrscanner.utils.PreferenceUtils;
 
 class AudioHandler {
 

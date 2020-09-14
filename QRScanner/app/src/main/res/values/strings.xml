@@ -18,7 +18,6 @@
     <string name="action_contact">Add to contacts</string>
     <string name="action_wifi">Connect</string>
     <string name="view_more">More details</string>
-    <string name="flasher_fail">Failed to turn on flasher</string>
     <string name="clearall">Clear All</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
@@ -28,8 +27,6 @@
     <string name="cd_gallery_button">Open gallery</string>
     <string name="cd_close_button">Back</string>
     <string name="prompt_point_at_a_barcode">Point your camera at a barcode</string>
-    <string name="pref_key_rear_camera_preview_size" translatable="false">rcpvs</string>
-    <string name="pref_key_rear_camera_picture_size" translatable="false">rcpts</string>
     <string name="pref_key_barcode_reticle_width" translatable="false">barcode_brw</string>
     <string name="pref_key_barcode_reticle_height" translatable="false">barcode_brh</string>
     <string name="pref_key_open_browser">open_browser</string>

@@ -1,6 +1,5 @@
 package com.auroid.qrscanner.imagescanner;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -8,9 +7,9 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Point;
 
+import com.auroid.qrscanner.consts.CommonDefines;
 import com.google.mlkit.vision.barcode.Barcode;
 import com.google.mlkit.vision.barcode.BarcodeScanner;
-import com.google.mlkit.vision.barcode.BarcodeScannerOptions;
 import com.google.mlkit.vision.barcode.BarcodeScanning;
 import com.google.mlkit.vision.common.InputImage;
 
@@ -23,13 +22,8 @@ public class ImageScanner {
         void onUnsuccessfulDecode();
     }
 
-    private Context mContext;
     private Bitmap mBitmap;
     private BarcodeScanner mScanner;
-
-    public ImageScanner(Context context) {
-        mContext = context;
-    }
 
     public void setImage(Bitmap bitmap) {
         mBitmap = bitmap;
@@ -38,18 +32,7 @@ public class ImageScanner {
     public void decode(DecodeListener listener) {
         InputImage image = InputImage.fromBitmap(mBitmap, 0);
 
-        final BarcodeScannerOptions options = new BarcodeScannerOptions.Builder()
-                .setBarcodeFormats(
-                        Barcode.FORMAT_QR_CODE,
-                        Barcode.FORMAT_EAN_13,
-                        Barcode.FORMAT_EAN_8,
-                        Barcode.FORMAT_UPC_A,
-                        Barcode.FORMAT_UPC_E,
-                        Barcode.FORMAT_DATA_MATRIX,
-                        Barcode.FORMAT_CODE_128)
-                .build();
-
-        mScanner = BarcodeScanning.getClient(options);
+        mScanner = BarcodeScanning.getClient(CommonDefines.barcodeScannerOptions);
         mScanner.process(image).addOnSuccessListener(barcodes -> {
             if (barcodes.size() > 0) {
                 listener.onSuccessfulDecode(barcodes);

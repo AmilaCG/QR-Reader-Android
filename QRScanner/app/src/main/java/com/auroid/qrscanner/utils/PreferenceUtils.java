@@ -14,29 +14,18 @@
  * limitations under the License.
  */
 
-package com.auroid.qrscanner.settings;
+package com.auroid.qrscanner.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.RectF;
 import android.preference.PreferenceManager;
-import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
-import com.google.android.gms.common.images.Size;
 import com.auroid.qrscanner.R;
-import com.auroid.qrscanner.camera.CameraSizePair;
 import com.auroid.qrscanner.camera.GraphicOverlay;
 
 /** Utility class to retrieve shared preferences. */
 public class PreferenceUtils {
-
-    public static void saveStringPreference(
-            Context context, @StringRes int prefKeyId, @Nullable String value) {
-        PreferenceManager.getDefaultSharedPreferences(context)
-                .edit()
-                .putString(context.getString(prefKeyId), value)
-                .apply();
-    }
 
     public static RectF getBarcodeReticleBox(GraphicOverlay overlay) {
         Context context = overlay.getContext();
@@ -65,20 +54,6 @@ public class PreferenceUtils {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         String prefKey = context.getString(prefKeyId);
         return sharedPreferences.getInt(prefKey, defaultValue);
-    }
-
-    @Nullable
-    public static CameraSizePair getUserSpecifiedPreviewSize(Context context) {
-        try {
-            String previewSizePrefKey = context.getString(R.string.pref_key_rear_camera_preview_size);
-            String pictureSizePrefKey = context.getString(R.string.pref_key_rear_camera_picture_size);
-            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-            return new CameraSizePair(
-                    Size.parseSize(sharedPreferences.getString(previewSizePrefKey, null)),
-                    Size.parseSize(sharedPreferences.getString(pictureSizePrefKey, null)));
-        } catch (Exception e) {
-            return null;
-        }
     }
 
     private static boolean getBooleanPref(
