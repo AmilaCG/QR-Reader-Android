@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout
   xmlns:android="http://schemas.android.com/apk/res/android"
   xmlns:app="http://schemas.android.com/apk/res-auto"
+  android:id="@+id/top_action_bar_layout"
   android:layout_width="match_parent"
   android:layout_height="@dimen/top_action_bar_height"
   android:background="@color/dark"

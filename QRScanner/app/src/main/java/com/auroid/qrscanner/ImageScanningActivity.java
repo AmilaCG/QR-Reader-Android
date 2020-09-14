@@ -3,6 +3,7 @@ package com.auroid.qrscanner;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -95,6 +96,10 @@ public class ImageScanningActivity extends AppCompatActivity implements
 
         findViewById(R.id.top_action_title).setVisibility(View.GONE);
         findViewById(R.id.back_button).setOnClickListener(this);
+
+        ConstraintLayout tabLayout = findViewById(R.id.top_action_bar_layout);
+        tabLayout.setBackgroundColor(getResources().getColor(R.color.dark_bg));
+        tabLayout.setElevation(0);
 
         ImageView topActionButton = findViewById(R.id.top_action_button);
         topActionButton.setOnClickListener(this);

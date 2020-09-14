@@ -12,12 +12,14 @@
 
     <style name="OtherActivities" parent="Theme.MaterialComponents.NoActionBar.Bridge">
         <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="android:windowBackground">@color/dark_bg</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:colorEdgeEffect">@color/colorAccent</item>
     </style>
 
     <style name="LicenceActivity" parent="Theme.MaterialComponents.Bridge">
         <item name="colorPrimary">@color/dark</item>
+        <item name="android:windowBackground">@color/dark_bg</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:colorEdgeEffect">@color/colorAccent</item>
     </style>
