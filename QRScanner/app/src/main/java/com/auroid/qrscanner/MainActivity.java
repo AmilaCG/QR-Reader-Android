@@ -1,8 +1,6 @@
 package com.auroid.qrscanner;
 
 import android.Manifest;
-import android.animation.AnimatorInflater;
-import android.animation.AnimatorSet;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -55,7 +53,6 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
     private View mFlashButton;
     private View mGalleryButton;
     private Chip mGuideChip;
-    private AnimatorSet mPromptChipAnimator;
 
     private WorkflowModel mWorkflowModel;
     private WorkflowState mCurrentWorkflowState;
@@ -73,9 +70,6 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
         mGraphicOverlay.setOnClickListener(this);
 
         mGuideChip = findViewById(R.id.guide_chip);
-        mPromptChipAnimator =
-                (AnimatorSet) AnimatorInflater.loadAnimator(this, R.animator.guide_chip_enter);
-        mPromptChipAnimator.setTarget(mGuideChip);
 
         mFlashButton = findViewById(R.id.flash_button);
         mFlashButton.setOnClickListener(this);
@@ -207,8 +201,6 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                     mCurrentWorkflowState = workflowState;
                     Log.d(TAG, "Current workflow state: " + mCurrentWorkflowState.name());
 
-                    boolean wasPromptChipGone = (mGuideChip.getVisibility() == View.GONE);
-
                     switch (workflowState) {
                         case DETECTING:
                             mGuideChip.setVisibility(View.VISIBLE);
@@ -223,12 +215,6 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                         default:
                             mGuideChip.setVisibility(View.GONE);
                             break;
-                    }
-
-                    boolean shouldPlayPromptChipEnteringAnimation =
-                            wasPromptChipGone && (mGuideChip.getVisibility() == View.VISIBLE);
-                    if (shouldPlayPromptChipEnteringAnimation && !mPromptChipAnimator.isRunning()) {
-                        mPromptChipAnimator.start();
                     }
                 });
 
