@@ -23,17 +23,14 @@ public class CameraHandler implements Runnable {
     private static final int CAMERA_PREVIEW_WIDTH = 720;
     private static final int CAMERA_PREVIEW_HEIGHT = 1280;
 
-    private final ListenableFuture<ProcessCameraProvider> mCameraProviderFuture;
+    private ListenableFuture<ProcessCameraProvider> mCameraProviderFuture;
     private ProcessCameraProvider mCameraProvider;
-    private final PreviewView mPreviewView;
+    private PreviewView mPreviewView;
     private Camera mCamera;
-    private CameraSelector mCameraSelector;
-    private Preview mPreview;
-    private ImageAnalysis mImageAnalyzer;
     private ExecutorService mCameraExecutor;
-    private final LifecycleOwner mLifecycleOwner;
-    private final GraphicOverlay mGraphicOverlay;
-    private final WorkflowModel mWorkflowModel;
+    private LifecycleOwner mLifecycleOwner;
+    private GraphicOverlay mGraphicOverlay;
+    private WorkflowModel mWorkflowModel;
 
     public CameraHandler(ListenableFuture<ProcessCameraProvider> cpf,
                          PreviewView previewView,
@@ -51,10 +48,6 @@ public class CameraHandler implements Runnable {
     public void run() {
         try {
             mCameraProvider = mCameraProviderFuture.get();
-            mCameraSelector = new CameraSelector.Builder()
-                    .requireLensFacing(CameraSelector.LENS_FACING_BACK)
-                    .build();
-            initUseCases();
             bindPreview();
         } catch (ExecutionException | InterruptedException e) {
             // No errors need to be handled for this Future.
@@ -62,38 +55,28 @@ public class CameraHandler implements Runnable {
         }
     }
 
-    private synchronized void initUseCases() {
-        mPreview = new Preview.Builder()
+    private void bindPreview() {
+        Preview preview = new Preview.Builder()
                 .build();
-        mPreview.setSurfaceProvider(mPreviewView.createSurfaceProvider());
 
-        mImageAnalyzer = new ImageAnalysis.Builder()
+        CameraSelector cameraSelector = new CameraSelector.Builder()
+                .requireLensFacing(CameraSelector.LENS_FACING_BACK)
+                .build();
+
+        preview.setSurfaceProvider(mPreviewView.createSurfaceProvider());
+
+        ImageAnalysis imageAnalyzer = new ImageAnalysis.Builder()
                 .setTargetResolution(new Size(CAMERA_PREVIEW_WIDTH, CAMERA_PREVIEW_HEIGHT))
                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                 .build();
 
         mCameraExecutor = Executors.newSingleThreadExecutor();
-        mImageAnalyzer.setAnalyzer(
+        imageAnalyzer.setAnalyzer(
                 mCameraExecutor,
                 new FrameAnalyzer(mGraphicOverlay, mWorkflowModel));
-    }
 
-    public synchronized void bindPreview() {
-        if (mCameraProvider == null || mCameraProvider.isBound(mPreview)) {
-            return;
-        }
-        initUseCases();
-        mCamera = mCameraProvider
-                .bindToLifecycle(mLifecycleOwner, mCameraSelector, mPreview, mImageAnalyzer);
-    }
-
-    public void unbindPreview() {
-        mCameraProvider.unbind(mPreview, mImageAnalyzer);
-        mPreview = null;
-        mImageAnalyzer.clearAnalyzer();
-        if (!mCameraExecutor.isShutdown()) {
-            mCameraExecutor.shutdown();
-        }
+        mCamera = mCameraProvider.bindToLifecycle(
+                mLifecycleOwner, cameraSelector, preview, imageAnalyzer);
     }
 
     public void enableTorch(boolean state) {
@@ -101,15 +84,6 @@ public class CameraHandler implements Runnable {
     }
 
     public void release() {
-        if (mPreview != null) {
-            mPreview = null;
-        }
-        if (mImageAnalyzer != null) {
-            mImageAnalyzer.clearAnalyzer();
-            mImageAnalyzer = null;
-        }
-        if (mCameraExecutor != null && !mCameraExecutor.isShutdown()) {
-            mCameraExecutor.shutdown();
-        }
+        mCameraExecutor.shutdown();
     }
 }

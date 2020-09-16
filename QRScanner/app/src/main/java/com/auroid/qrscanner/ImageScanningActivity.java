@@ -167,7 +167,6 @@ public class ImageScanningActivity extends AppCompatActivity implements
 
     @SuppressLint("ClickableViewAccessibility")
     private void setupImagePreview(Uri pickedImageUri) {
-        // Refer: https://github.com/davemorrissey/subsampling-scale-image-view/wiki
         mImagePreview.setOrientation(SubsamplingScaleImageView.ORIENTATION_USE_EXIF);
         mImagePreview.setImage(ImageSource.uri(pickedImageUri));
 
@@ -204,7 +203,6 @@ public class ImageScanningActivity extends AppCompatActivity implements
             }
         });
 
-        //TODO: Try to make this compatible with double tap zoom
         mImagePreview.setOnTouchListener((View v, MotionEvent event) -> {
             switch (event.getAction()) {
                 case MotionEvent.ACTION_DOWN:

@@ -206,16 +206,12 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                             mGuideChip.setVisibility(View.VISIBLE);
                             mGuideChip.setText(R.string.prompt_point_at_a_barcode);
                             mWorkflowModel.markCameraLive();
-                            mCameraHandler.bindPreview();
                             break;
-
                         case DETECTED:
                             mGuideChip.setVisibility(View.GONE);
-                            mCameraHandler.unbindPreview();
                             mAudioHandler.playAudioBeep();
                             mWorkflowModel.markCameraFrozen();
                             break;
-
                         default:
                             mGuideChip.setVisibility(View.GONE);
                             break;
