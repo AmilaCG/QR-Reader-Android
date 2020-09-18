@@ -23,14 +23,14 @@ public class CameraHandler implements Runnable {
     private static final int CAMERA_PREVIEW_WIDTH = 720;
     private static final int CAMERA_PREVIEW_HEIGHT = 1280;
 
-    private ListenableFuture<ProcessCameraProvider> mCameraProviderFuture;
+    private final ListenableFuture<ProcessCameraProvider> mCameraProviderFuture;
     private ProcessCameraProvider mCameraProvider;
-    private PreviewView mPreviewView;
+    private final PreviewView mPreviewView;
     private Camera mCamera;
     private ExecutorService mCameraExecutor;
-    private LifecycleOwner mLifecycleOwner;
-    private GraphicOverlay mGraphicOverlay;
-    private WorkflowModel mWorkflowModel;
+    private final LifecycleOwner mLifecycleOwner;
+    private final GraphicOverlay mGraphicOverlay;
+    private final WorkflowModel mWorkflowModel;
 
     public CameraHandler(ListenableFuture<ProcessCameraProvider> cpf,
                          PreviewView previewView,
@@ -63,7 +63,7 @@ public class CameraHandler implements Runnable {
                 .requireLensFacing(CameraSelector.LENS_FACING_BACK)
                 .build();
 
-        preview.setSurfaceProvider(mPreviewView.createSurfaceProvider());
+        preview.setSurfaceProvider(mPreviewView.getSurfaceProvider());
 
         ImageAnalysis imageAnalyzer = new ImageAnalysis.Builder()
                 .setTargetResolution(new Size(CAMERA_PREVIEW_WIDTH, CAMERA_PREVIEW_HEIGHT))

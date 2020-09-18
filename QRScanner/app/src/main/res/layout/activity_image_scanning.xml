@@ -24,7 +24,7 @@
     android:layout_height="match_parent"
     android:layout_marginTop="@dimen/top_action_bar_height"
     android:layout_marginBottom="@dimen/preview_card_carousel_height"
-    android:background="@color/transparent" />
+    android:background="@android:color/transparent" />
 
   <com.google.android.material.chip.Chip
     android:id="@+id/bottom_prompt_chip"

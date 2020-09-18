@@ -2,6 +2,7 @@ package com.auroid.qrscanner.barcodedetection;
 
 import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
+import android.graphics.Rect;
 import android.graphics.RectF;
 import android.media.Image;
 import android.os.SystemClock;
@@ -17,6 +18,7 @@ import com.auroid.qrscanner.camera.WorkflowModel;
 import com.auroid.qrscanner.consts.CommonDefines;
 import com.auroid.qrscanner.utils.BitmapUtils;
 
+import com.auroid.qrscanner.utils.PreferenceUtils;
 import com.google.mlkit.vision.barcode.Barcode;
 import com.google.mlkit.vision.barcode.BarcodeScanner;
 import com.google.mlkit.vision.barcode.BarcodeScanning;
@@ -35,32 +37,35 @@ public class FrameAnalyzer implements ImageAnalysis.Analyzer {
     private final CameraReticleAnimator mCameraReticleAnimator;
     private final WorkflowModel mWorkflowModel;
     private InputImage mInputImage;
+    private final int mCropPercentage;
 
     public FrameAnalyzer(GraphicOverlay graphicOverlay, WorkflowModel workflowModel) {
         mGraphicOverlay = graphicOverlay;
         mCameraReticleAnimator = new CameraReticleAnimator(graphicOverlay);
         mWorkflowModel = workflowModel;
+        mCropPercentage =
+                PreferenceUtils.getCropPrecentages(graphicOverlay.getContext()).getWidth() + 10;
     }
 
+    @SuppressLint("UnsafeExperimentalUsageError")
     @Override
     public void analyze(@NonNull ImageProxy imageProxy) {
         int rotationDegrees = imageProxy.getImageInfo().getRotationDegrees();
-        /*TODO: Using fromMediaImage to process is the recommended way but it is temporary commented
-         * since it is not working
-         */
-//        @SuppressLint("UnsafeExperimentalUsageError") Image mediaImage = imageProxy.getImage();
-//        if (mediaImage == null) {
-//            return;
-//        }
-//        mInputImage = InputImage.fromMediaImage(mediaImage, rotationDegrees);
-
-//        long startMs = SystemClock.elapsedRealtime();
-        @SuppressLint("UnsafeExperimentalUsageError")
-        Bitmap input = BitmapUtils.getBitmap(imageProxy);
-        if (input == null) {
+        //TODO: Find a method to crop and feed only the reticle box area for processing, without
+        // converting to a bitmap
+        Image mediaImage = imageProxy.getImage();
+        if (mediaImage == null) {
             return;
         }
-        mInputImage = InputImage.fromBitmap(input, rotationDegrees);
+        mediaImage.getPlanes();
+        mInputImage = InputImage.fromMediaImage(mediaImage, rotationDegrees);
+
+//        long startMs = SystemClock.elapsedRealtime();
+//        Bitmap input = cropImage(imageProxy);
+//        if (input == null) {
+//            return;
+//        }
+//        mInputImage = InputImage.fromBitmap(input, rotationDegrees);
 //        long endMs = SystemClock.elapsedRealtime();
 //        Log.d(TAG, "Latency is: " + (endMs - startMs));
 
@@ -106,5 +111,55 @@ public class FrameAnalyzer implements ImageAnalysis.Analyzer {
             mWorkflowModel.detectedBarcode.setValue(barcodeInCenter);
         }
         mGraphicOverlay.invalidate();
+    }
+
+    @SuppressLint("UnsafeExperimentalUsageError")
+    private Bitmap cropImage(ImageProxy imageProxy) {
+        Bitmap bitmap = BitmapUtils.getBitmap(imageProxy);
+        if (bitmap == null) {
+            Log.e(TAG, "cropImage: Bitmap conversion failed");
+            return null;
+        }
+        int imageWidth = bitmap.getWidth();
+        int imageHeight = bitmap.getHeight();
+
+        int boxSideLength;
+        if (imageWidth <= imageHeight) {
+            boxSideLength = (int) imageWidth * mCropPercentage / 100;
+        } else {
+            boxSideLength = (int) imageHeight * mCropPercentage / 100;
+        }
+
+        int cx = imageWidth / 2;
+        int cy = imageHeight / 2;
+
+        int left = cx - boxSideLength / 2;
+        int top = cy - boxSideLength / 2;
+        int right = cx + boxSideLength / 2;
+        int bottom = cy + boxSideLength / 2;
+
+        return Bitmap.createBitmap(bitmap, left, top, boxSideLength, boxSideLength);
+    }
+
+    private Rect getCropRect(Image mediaImage) {
+        int imageWidth = mediaImage.getWidth();
+        int imageHeight = mediaImage.getHeight();
+
+        int boxSideLength;
+        if (imageWidth <= imageHeight) {
+            boxSideLength = (int) imageWidth * mCropPercentage / 100;
+        } else {
+            boxSideLength = (int) imageHeight * mCropPercentage / 100;
+        }
+
+        int cx = imageWidth / 2;
+        int cy = imageHeight / 2;
+
+        int left = cx - boxSideLength / 2;
+        int top = cy - boxSideLength / 2;
+        int right = cx + boxSideLength / 2;
+        int bottom = cy + boxSideLength / 2;
+
+        return new Rect(left, top, right, bottom);
     }
 }

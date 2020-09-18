@@ -20,6 +20,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.RectF;
 import android.preference.PreferenceManager;
+import android.util.Size;
+
 import androidx.annotation.StringRes;
 import com.auroid.qrscanner.R;
 import com.auroid.qrscanner.camera.GraphicOverlay;
@@ -48,6 +50,12 @@ public class PreferenceUtils {
 
     public static boolean shouldPlayAudioBeep(Context context) {
         return getBooleanPref(context, R.string.pref_key_play_audio_beep, true);
+    }
+
+    public static Size getCropPrecentages(Context context) {
+        int cropWidth = getIntPref(context, R.string.pref_key_barcode_reticle_width, 70);
+        int cropHeight = getIntPref(context, R.string.pref_key_barcode_reticle_height, 50);
+        return new Size(cropWidth, cropHeight);
     }
 
     private static int getIntPref(Context context, @StringRes int prefKeyId, int defaultValue) {
