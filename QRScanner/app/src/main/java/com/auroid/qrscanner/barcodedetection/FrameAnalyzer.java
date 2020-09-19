@@ -2,6 +2,7 @@ package com.auroid.qrscanner.barcodedetection;
 
 import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.media.Image;
@@ -12,7 +13,6 @@ import androidx.annotation.NonNull;
 import androidx.camera.core.ImageAnalysis;
 import androidx.camera.core.ImageProxy;
 
-import com.auroid.qrscanner.camera.CameraReticleAnimator;
 import com.auroid.qrscanner.camera.GraphicOverlay;
 import com.auroid.qrscanner.camera.WorkflowModel;
 import com.auroid.qrscanner.consts.CommonDefines;
@@ -34,14 +34,12 @@ public class FrameAnalyzer implements ImageAnalysis.Analyzer {
     private final BarcodeScanner scanner =
             BarcodeScanning.getClient(CommonDefines.barcodeScannerOptions);
     private final GraphicOverlay mGraphicOverlay;
-    private final CameraReticleAnimator mCameraReticleAnimator;
     private final WorkflowModel mWorkflowModel;
     private InputImage mInputImage;
     private final int mCropPercentage;
 
     public FrameAnalyzer(GraphicOverlay graphicOverlay, WorkflowModel workflowModel) {
         mGraphicOverlay = graphicOverlay;
-        mCameraReticleAnimator = new CameraReticleAnimator(graphicOverlay);
         mWorkflowModel = workflowModel;
         mCropPercentage =
                 PreferenceUtils.getCropPrecentages(graphicOverlay.getContext()).getWidth() + 10;
@@ -101,11 +99,14 @@ public class FrameAnalyzer implements ImageAnalysis.Analyzer {
 
         mGraphicOverlay.clear();
         if (barcodeInCenter == null) {
-            mCameraReticleAnimator.start();
-            mGraphicOverlay.add(new BarcodeReticleGraphic(mGraphicOverlay, mCameraReticleAnimator));
+            mGraphicOverlay.add(new BarcodeGraphicBase(mGraphicOverlay) {
+                @Override
+                protected void draw(Canvas canvas) {
+                    super.draw(canvas);
+                }
+            });
             mWorkflowModel.setWorkflowState(WorkflowModel.WorkflowState.DETECTING);
         } else {
-            mCameraReticleAnimator.cancel();
             mGraphicOverlay.add(new BarcodeTrackerGraphic(mGraphicOverlay, barcodeInCenter));
             mWorkflowModel.setWorkflowState(WorkflowModel.WorkflowState.DETECTED);
             mWorkflowModel.detectedBarcode.setValue(barcodeInCenter);

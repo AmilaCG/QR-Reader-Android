@@ -33,15 +33,17 @@ public class PreferenceUtils {
         Context context = overlay.getContext();
         float overlayWidth = overlay.getWidth();
         float overlayHeight = overlay.getHeight();
-        float boxWidth =
-                overlayWidth * getIntPref(context, R.string.pref_key_barcode_reticle_width, 70) / 100;
-        float boxHeight =
-                overlayHeight * getIntPref(context, R.string.pref_key_barcode_reticle_height, 50) / 100;
+        float boxWidth = overlayWidth * getCropPrecentages(context).getWidth() / 100;
+        float boxHeight = overlayHeight * getCropPrecentages(context).getHeight() / 100;
         float cx = overlayWidth / 2;
         float cy = overlayHeight / 2;
         //return new RectF(cx - boxWidth / 2, cy - boxHeight / 2, cx + boxWidth / 2, cy + boxHeight / 2);
         // Square reticle box
-        return new RectF(cx - boxWidth / 2, cy - boxWidth / 2, cx + boxWidth / 2, cy + boxWidth / 2);
+        return new RectF(
+                cx - boxWidth / 2,
+                cy - boxWidth / 2,
+                cx + boxWidth / 2,
+                cy + boxWidth / 2);
     }
 
     public static boolean shouldOpenDirectlyInBrowser(Context context) {
