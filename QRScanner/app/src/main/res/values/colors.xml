@@ -6,9 +6,9 @@
     <color name="colorText">#F4F4F4</color>
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
-    <color name="dark">#212121</color>
+    <color name="primary_dark">#212121</color>
     <color name="dark_bg">#121212</color>
-    <color name="reticle_ripple">#9AFFFFFF</color>
+    <color name="chip_bg">#9A000000</color>
     <color name="barcode_reticle_background">#99000000</color>
     <color name="barcode_reticle_stroke">#40000000</color>
     <color name="colorTracker">#03DAC5</color>

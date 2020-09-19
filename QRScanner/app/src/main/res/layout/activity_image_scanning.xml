@@ -40,7 +40,7 @@
     android:textSize="@dimen/bottom_prompt_chip_text_size"
     android:visibility="gone"
     app:chipCornerRadius="@dimen/bottom_prompt_chip_corner_radius"
-    app:chipSurfaceColor="@color/dark"
+    app:chipSurfaceColor="@color/chip_bg"
     app:closeIconVisible="false" />
 
   <ProgressBar

@@ -5,7 +5,7 @@
   android:id="@+id/top_action_bar_layout"
   android:layout_width="match_parent"
   android:layout_height="@dimen/top_action_bar_height"
-  android:background="@color/dark"
+  android:background="@color/primary_dark"
   android:elevation="4dp"
   android:paddingStart="@dimen/top_action_bar_padding_horizontal"
   android:paddingEnd="@dimen/top_action_bar_padding_horizontal">
