@@ -26,7 +26,7 @@
     <string name="cd_history_button">Scan history</string>
     <string name="cd_gallery_button">Open gallery</string>
     <string name="cd_close_button">Back</string>
-    <string name="prompt_point_at_a_barcode">Point your camera at a barcode</string>
+    <string name="prompt_point_at_a_barcode">Align a barcode to the center</string>
     <string name="pref_key_barcode_reticle_width" translatable="false">barcode_brw</string>
     <string name="pref_key_barcode_reticle_height" translatable="false">barcode_brh</string>
     <string name="pref_key_open_browser">open_browser</string>
@@ -58,7 +58,7 @@
     <string name="pref_title_open_browser">Open browser directly</string>
     <string name="pref_title_audio_beep">Beep sound on decode</string>
     <string name="pref_title_hw_accl">Hardware acceleration</string>
-    <string name="pref_summary_hw_accl">Keep this enabled unless the camera preview is not working properly</string>
+    <string name="pref_summary_hw_accl">Disable this only if the camera preview is not working properly</string>
     <string name="pref_title_version">Version</string>
     <string name="pref_title_developer">Developer</string>
     <string name="pref_summary_developer">Auroid Labs</string>

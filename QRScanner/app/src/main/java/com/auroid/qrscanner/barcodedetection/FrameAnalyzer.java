@@ -6,6 +6,8 @@ import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.media.Image;
+import android.os.Handler;
+import android.os.Looper;
 import android.os.SystemClock;
 import android.util.Log;
 
@@ -89,8 +91,9 @@ public class FrameAnalyzer implements ImageAnalysis.Analyzer {
 
         // Picks the barcode, if exists, that covers the center of graphic overlay.
         Barcode barcodeInCenter = null;
+        RectF box = null;
         for (Barcode barcode : results) {
-            RectF box = mGraphicOverlay.translateRect(Objects.requireNonNull(barcode.getBoundingBox()));
+            box = mGraphicOverlay.translateRect(Objects.requireNonNull(barcode.getBoundingBox()));
             if (box.contains(mGraphicOverlay.getWidth() / 2f, mGraphicOverlay.getHeight() / 2f)) {
                 barcodeInCenter = barcode;
                 break;
@@ -107,9 +110,17 @@ public class FrameAnalyzer implements ImageAnalysis.Analyzer {
             });
             mWorkflowModel.setWorkflowState(WorkflowModel.WorkflowState.DETECTING);
         } else {
-            mGraphicOverlay.add(new BarcodeTrackerGraphic(mGraphicOverlay, barcodeInCenter));
+            BarcodeTrackerDot trackerDot = new BarcodeTrackerDot(mGraphicOverlay, box);
+            mGraphicOverlay.add(trackerDot);
+            trackerDot.fadeOutDot();
+
             mWorkflowModel.setWorkflowState(WorkflowModel.WorkflowState.DETECTED);
-            mWorkflowModel.detectedBarcode.setValue(barcodeInCenter);
+            final Handler handler = new Handler(Looper.getMainLooper());
+            final Barcode finalBarcodeInCenter = barcodeInCenter;
+            handler.postDelayed(() ->
+                    mWorkflowModel.detectedBarcode.setValue(finalBarcodeInCenter),
+                    // Deducting 50ms to run barcode post processing stuff while animation running
+                    trackerDot.getFadeoutDuration() - 50);
         }
         mGraphicOverlay.invalidate();
     }
