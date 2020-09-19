@@ -31,6 +31,7 @@
     <string name="pref_key_barcode_reticle_height" translatable="false">barcode_brh</string>
     <string name="pref_key_open_browser">open_browser</string>
     <string name="pref_key_play_audio_beep">audio_beep</string>
+    <string name="pref_key_enable_hw_accl">enable_hw_acceleration</string>
     <string name="unsupported_encryption">WiFi encryption is not supported</string>
     <string name="wait_for_decode">Scanning..</string>
 
@@ -52,9 +53,12 @@
     <string name="preview_card_title_code128">Code 128</string>
 
     <string name="pref_cat_title_scanning">Scanning</string>
+    <string name="pref_cat_title_advanced">Advanced</string>
     <string name="pref_cat_title_about">About</string>
     <string name="pref_title_open_browser">Open browser directly</string>
     <string name="pref_title_audio_beep">Beep sound on decode</string>
+    <string name="pref_title_hw_accl">Hardware acceleration</string>
+    <string name="pref_summary_hw_accl">Keep this enabled unless the camera preview is not working properly</string>
     <string name="pref_title_version">Version</string>
     <string name="pref_title_developer">Developer</string>
     <string name="pref_summary_developer">Auroid Labs</string>

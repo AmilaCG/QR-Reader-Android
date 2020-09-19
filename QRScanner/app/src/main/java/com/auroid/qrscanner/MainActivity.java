@@ -103,6 +103,9 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
     @Override
     protected void onResume() {
         super.onResume();
+        if (!PreferenceUtils.shouldEnableHwAcceleration(this)) {
+            mGraphicOverlay.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+        }
         mGraphicOverlay.clear();
         mSettingsButton.setEnabled(true);
         mHistoryButton.setEnabled(true);
