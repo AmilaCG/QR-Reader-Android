@@ -1,24 +1,7 @@
-/*
- * Copyright 2019 Google LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.auroid.qrscanner.barcodedetection;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.CornerPathEffect;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.graphics.PorterDuff;
@@ -32,37 +15,30 @@ import com.auroid.qrscanner.utils.PreferenceUtils;
 
 abstract class BarcodeGraphicBase extends Graphic {
 
-    private final Paint boxPaint;
     private final Paint scrimPaint;
     private final Paint eraserPaint;
-
-    final int boxCornerRadius;
-    final Paint pathPaint;
-    final RectF boxRect;
+    private final Paint pathPaint;
+    private final int boxCornerRadius;
+    private final RectF boxRect;
 
     BarcodeGraphicBase(GraphicOverlay overlay) {
         super(overlay);
 
-        boxPaint = new Paint();
-        boxPaint.setColor(ContextCompat.getColor(context, R.color.barcode_reticle_stroke));
-        boxPaint.setStyle(Paint.Style.STROKE);
-        boxPaint.setStrokeWidth(
-                context.getResources().getDimensionPixelOffset(R.dimen.barcode_reticle_stroke_width));
+        boxCornerRadius =
+                context.getResources().getDimensionPixelOffset(R.dimen.barcode_reticle_corner_radius);
 
         scrimPaint = new Paint();
         scrimPaint.setColor(ContextCompat.getColor(context, R.color.barcode_reticle_background));
-        eraserPaint = new Paint();
-        eraserPaint.setStrokeWidth(boxPaint.getStrokeWidth());
-        eraserPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
 
-        boxCornerRadius =
-                context.getResources().getDimensionPixelOffset(R.dimen.barcode_reticle_corner_radius);
+        eraserPaint = new Paint();
+        eraserPaint.setStrokeWidth(
+                context.getResources().getDimensionPixelOffset(R.dimen.barcode_reticle_stroke_width));
+        eraserPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
 
         pathPaint = new Paint();
         pathPaint.setColor(Color.WHITE);
         pathPaint.setStyle(Paint.Style.STROKE);
-        pathPaint.setStrokeWidth(boxPaint.getStrokeWidth());
-        pathPaint.setPathEffect(new CornerPathEffect(boxCornerRadius));
+        pathPaint.setStrokeWidth(eraserPaint.getStrokeWidth());
 
         boxRect = PreferenceUtils.getBarcodeReticleBox(overlay);
     }
@@ -76,9 +52,27 @@ abstract class BarcodeGraphicBase extends Graphic {
         eraserPaint.setStyle(Style.FILL);
         canvas.drawRoundRect(boxRect, boxCornerRadius, boxCornerRadius, eraserPaint);
         eraserPaint.setStyle(Style.STROKE);
-        canvas.drawRoundRect(boxRect, boxCornerRadius, boxCornerRadius, eraserPaint);
+        canvas.drawRoundRect(boxRect, boxCornerRadius, boxCornerRadius, pathPaint);
 
-        // Draws the box.
-        canvas.drawRoundRect(boxRect, boxCornerRadius, boxCornerRadius, boxPaint);
+        eraserPaint.setStyle(Style.FILL);
+        int strokeWidth =
+                context.getResources().getDimensionPixelOffset(R.dimen.barcode_reticle_stroke_width);
+        double boxEdgeLengthFactor = 0.75;
+        int verticalEraserWidth = (int) ((boxRect.right - boxRect.left) * boxEdgeLengthFactor);
+        int horizontalEraserHeight = (int) ((boxRect.bottom - boxRect.top) * boxEdgeLengthFactor);
+        // Erase top and bottom strokes
+        canvas.drawRect(
+                boxRect.left + verticalEraserWidth,
+                boxRect.top - strokeWidth,
+                boxRect.right - verticalEraserWidth,
+                boxRect.bottom + strokeWidth,
+                eraserPaint);
+        // Erase left and right strokes
+        canvas.drawRect(
+                boxRect.left - strokeWidth,
+                boxRect.top + horizontalEraserHeight,
+                boxRect.right + strokeWidth,
+                boxRect.bottom - horizontalEraserHeight,
+                eraserPaint);
     }
 }
