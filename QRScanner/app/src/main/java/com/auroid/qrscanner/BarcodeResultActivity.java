@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.auroid.qrscanner.serializable.BarcodeWrapper;
 
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.google.mlkit.vision.barcode.Barcode;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
@@ -41,6 +42,7 @@ public class BarcodeResultActivity extends AppCompatActivity implements View.OnC
             } catch (JsonSyntaxException e) {
                 Toast.makeText(this, R.string.error_unknown, Toast.LENGTH_SHORT).show();
                 Log.e(TAG, "onCreate: json is not a valid representation for BarcodeWrapper", e);
+                FirebaseCrashlytics.getInstance().recordException(e);
                 finish();
             }
             if (mBarcodeWrapper == null) {
