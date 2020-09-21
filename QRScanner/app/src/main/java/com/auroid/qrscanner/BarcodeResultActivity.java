@@ -14,6 +14,7 @@ import com.auroid.qrscanner.serializable.BarcodeWrapper;
 
 import com.google.mlkit.vision.barcode.Barcode;
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 
 public class BarcodeResultActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -35,7 +36,18 @@ public class BarcodeResultActivity extends AppCompatActivity implements View.OnC
         if (bundle != null) {
             String barcodeJson = bundle.getString("RESULT");
             Gson gson = new Gson();
-            mBarcodeWrapper = gson.fromJson(barcodeJson, BarcodeWrapper.class);
+            try {
+                mBarcodeWrapper = gson.fromJson(barcodeJson, BarcodeWrapper.class);
+            } catch (JsonSyntaxException e) {
+                Toast.makeText(this, R.string.error_unknown, Toast.LENGTH_SHORT).show();
+                Log.e(TAG, "onCreate: json is not a valid representation for BarcodeWrapper", e);
+                finish();
+            }
+            if (mBarcodeWrapper == null) {
+                Toast.makeText(this, R.string.error_unknown, Toast.LENGTH_SHORT).show();
+                Log.e(TAG, "onCreate: mBarcodeWrapper is null");
+                finish();
+            }
         } else {
             Toast.makeText(this, R.string.error_unknown, Toast.LENGTH_SHORT).show();
             Log.e(TAG, "onCreate: Intent bundle is null");
