@@ -52,10 +52,10 @@
             android:theme="@style/LicenceActivity" />
         <meta-data
           android:name="firebase_analytics_collection_deactivated"
-          android:value="${analytics_deactivated}" />
+          android:value="@bool/FIREBASE_ANALYTICS_DEACTIVATED" />
         <meta-data
           android:name="firebase_crashlytics_collection_enabled"
-          android:value="${crashlytics_enabled}" />
+          android:value="@bool/FIREBASE_CRASHLYTICS_ENABLED" />
     </application>
 
 </manifest>

@@ -24,14 +24,14 @@ android {
             proguardFiles getDefaultProguardFile(
                     'proguard-android-optimize.txt'),
                     'proguard-rules.pro'
-            // Flags for enabling Firebase Analytics & Crashlytics
-            manifestPlaceholders = [analytics_deactivated: "false"]
-            manifestPlaceholders = [crashlytics_enabled: "true"]
+            // Enable Firebase Analytics & Crashlytics
+            resValue("bool", "FIREBASE_ANALYTICS_DEACTIVATED", "false")
+            resValue("bool", "FIREBASE_CRASHLYTICS_ENABLED", "true")
         }
         debug {
-            // Flags for disabling Firebase Analytics & Crashlytics
-            manifestPlaceholders = [analytics_deactivated: "true"]
-            manifestPlaceholders = [crashlytics_enabled: "false"]
+            // Disable Firebase Analytics & Crashlytics
+            resValue("bool", "FIREBASE_ANALYTICS_DEACTIVATED", "true")
+            resValue("bool", "FIREBASE_CRASHLYTICS_ENABLED", "false")
         }
     }
 
