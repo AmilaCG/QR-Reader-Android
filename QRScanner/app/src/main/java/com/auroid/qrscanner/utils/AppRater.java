@@ -14,35 +14,41 @@ public class AppRater {
     private static final int DAYS_UNTIL_PROMPT = 3; //Min number of days
     private static final int LAUNCHES_UNTIL_PROMPT = 5; //Min number of launches
 
+    private static boolean shouldLaunchReviewFlow = false;
+    private static SharedPreferences.Editor mEditor;
+
     public static void app_launched(Activity activity) {
         SharedPreferences prefs = activity.getApplicationContext()
                 .getSharedPreferences("apprater", Context.MODE_PRIVATE);
 
-        SharedPreferences.Editor editor = prefs.edit();
+        mEditor = prefs.edit();
 
         // Increment launch counter
         long launchCount = prefs.getLong("launch_count", 0) + 1;
-        editor.putLong("launch_count", launchCount);
+        mEditor.putLong("launch_count", launchCount);
 
         // Get date of first launch
         long firstLaunchDate = prefs.getLong("date_firstlaunch", 0);
         if (firstLaunchDate == 0) {
             firstLaunchDate = System.currentTimeMillis();
-            editor.putLong("date_firstlaunch", firstLaunchDate);
+            mEditor.putLong("date_firstlaunch", firstLaunchDate);
         }
 
         // Wait at least n days before opening
         if (launchCount >= LAUNCHES_UNTIL_PROMPT) {
             if (System.currentTimeMillis() >= firstLaunchDate +
                     (DAYS_UNTIL_PROMPT * 24 * 60 * 60 * 1000)) {
-                showRateDialog(activity, editor);
+                shouldLaunchReviewFlow = true;
             }
         }
 
-        editor.apply();
+        mEditor.apply();
     }
 
-    private static void showRateDialog(Activity activity, SharedPreferences.Editor editor) {
+    public static void showRateDialog(Activity activity) {
+        if (!shouldLaunchReviewFlow) {
+            return;
+        }
         ReviewManager manager = ReviewManagerFactory.create(activity.getApplicationContext());
         Task<ReviewInfo> request = manager.requestReviewFlow();
         request.addOnCompleteListener(task -> {
@@ -55,9 +61,10 @@ public class AppRater {
                     // reviewed or not, or even whether the review dialog was shown. Thus, no
                     // matter the result, we continue our app flow.
                     // Reset saved preferences
-                    if (editor != null) {
-                        editor.clear().apply();
+                    if (mEditor != null) {
+                        mEditor.clear().apply();
                     }
+                    shouldLaunchReviewFlow = false;
                 });
             }
         });

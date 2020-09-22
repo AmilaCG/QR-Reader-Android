@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.auroid.qrscanner.serializable.BarcodeWrapper;
 
+import com.auroid.qrscanner.utils.AppRater;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.google.mlkit.vision.barcode.Barcode;
 import com.google.gson.Gson;
@@ -55,6 +56,8 @@ public class BarcodeResultActivity extends AppCompatActivity implements View.OnC
             Log.e(TAG, "onCreate: Intent bundle is null");
             finish();
         }
+
+        AppRater.showRateDialog(this);
 
         String result = mBarcodeWrapper.displayValue;
         String rawValue = mBarcodeWrapper.rawValue;
