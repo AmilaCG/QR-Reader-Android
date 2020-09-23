@@ -16,8 +16,8 @@ public class AppRater {
     private static final int SCANS_UNTIL_PROMPT = 5; //Min number of scans
 
     private static final String SHARED_PREF_NAME = "apprater";
-    private static final String LAUNCH_COUNT_KEY = "launch_count";
-    private static final String SCAN_COUNT_KEY = "scan_count";
+    private static final String LAUNCH_COUNT_KEY = "launch_counter";
+    private static final String SCAN_COUNT_KEY = "scan_counter";
     private static final String FIRST_LAUNCH_DATE_KEY = "first_launch_date";
 
     private static boolean shouldLaunchReviewFlow = false;
