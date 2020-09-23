@@ -13,29 +13,36 @@ public class AppRater {
 
     private static final int DAYS_UNTIL_PROMPT = 3; //Min number of days
     private static final int LAUNCHES_UNTIL_PROMPT = 5; //Min number of launches
+    private static final int SCANS_UNTIL_PROMPT = 5; //Min number of scans
+
+    private static final String SHARED_PREF_NAME = "apprater";
+    private static final String LAUNCH_COUNT_KEY = "launch_count";
+    private static final String SCAN_COUNT_KEY = "scan_count";
+    private static final String FIRST_LAUNCH_DATE_KEY = "first_launch_date";
 
     private static boolean shouldLaunchReviewFlow = false;
     private static SharedPreferences.Editor mEditor;
+    private static int mScanCount;
 
     public static void app_launched(Activity activity) {
-        SharedPreferences prefs = activity.getApplicationContext()
-                .getSharedPreferences("apprater", Context.MODE_PRIVATE);
-
+        SharedPreferences prefs = activity.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
         mEditor = prefs.edit();
 
         // Increment launch counter
-        long launchCount = prefs.getLong("launch_count", 0) + 1;
-        mEditor.putLong("launch_count", launchCount);
+        int launchCount = prefs.getInt(LAUNCH_COUNT_KEY, 0) + 1;
+        mEditor.putInt(LAUNCH_COUNT_KEY, launchCount);
 
         // Get date of first launch
-        long firstLaunchDate = prefs.getLong("date_firstlaunch", 0);
+        long firstLaunchDate = prefs.getLong(FIRST_LAUNCH_DATE_KEY, 0);
         if (firstLaunchDate == 0) {
             firstLaunchDate = System.currentTimeMillis();
-            mEditor.putLong("date_firstlaunch", firstLaunchDate);
+            mEditor.putLong(FIRST_LAUNCH_DATE_KEY, firstLaunchDate);
         }
 
+        mScanCount = prefs.getInt(SCAN_COUNT_KEY, 0);
+
         // Wait at least n days before opening
-        if (launchCount >= LAUNCHES_UNTIL_PROMPT) {
+        if (launchCount >= LAUNCHES_UNTIL_PROMPT && mScanCount >= SCANS_UNTIL_PROMPT) {
             if (System.currentTimeMillis() >= firstLaunchDate +
                     (DAYS_UNTIL_PROMPT * 24 * 60 * 60 * 1000)) {
                 shouldLaunchReviewFlow = true;
@@ -47,6 +54,9 @@ public class AppRater {
 
     public static void showRateDialog(Activity activity) {
         if (!shouldLaunchReviewFlow) {
+            // Increment scan counter
+            mScanCount ++;
+            mEditor.putInt(SCAN_COUNT_KEY, mScanCount).apply();
             return;
         }
         ReviewManager manager = ReviewManagerFactory.create(activity.getApplicationContext());

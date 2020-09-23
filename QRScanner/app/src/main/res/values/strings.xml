@@ -29,9 +29,9 @@
     <string name="prompt_point_at_a_barcode">Align a barcode to the center</string>
     <string name="pref_key_barcode_reticle_width" translatable="false">barcode_brw</string>
     <string name="pref_key_barcode_reticle_height" translatable="false">barcode_brh</string>
-    <string name="pref_key_open_browser">open_browser</string>
-    <string name="pref_key_play_audio_beep">audio_beep</string>
-    <string name="pref_key_enable_hw_accl">enable_hw_acceleration</string>
+    <string name="pref_key_open_browser" translatable="false">open_browser</string>
+    <string name="pref_key_play_audio_beep" translatable="false">audio_beep</string>
+    <string name="pref_key_enable_hw_accl" translatable="false">enable_hw_acceleration</string>
     <string name="unsupported_encryption">WiFi encryption is not supported</string>
     <string name="wait_for_decode">Scanning..</string>
 
