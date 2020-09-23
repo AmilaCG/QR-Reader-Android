@@ -70,13 +70,7 @@ public class FrameAnalyzer implements ImageAnalysis.Analyzer {
 //        Log.d(TAG, "Latency is: " + (endMs - startMs));
 
         scanner.process(mInputImage)
-                .addOnSuccessListener(
-                        barcodes -> {
-                            if (barcodes.size() > 0) {
-                                Log.d(TAG, "analyze: barcode detected");
-                            }
-                            processBarcode(barcodes);
-                        })
+                .addOnSuccessListener(this::processBarcode)
                 .addOnFailureListener(
                         e -> Log.e(TAG, "Barcode scanning failed", e)
                 )

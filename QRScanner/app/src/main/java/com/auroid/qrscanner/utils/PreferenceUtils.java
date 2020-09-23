@@ -59,7 +59,7 @@ public class PreferenceUtils {
     }
 
     public static Size getCropPrecentages(Context context) {
-        int cropWidth = getIntPref(context, R.string.pref_key_barcode_reticle_width, 70);
+        int cropWidth = getIntPref(context, R.string.pref_key_barcode_reticle_width, 65);
         int cropHeight = getIntPref(context, R.string.pref_key_barcode_reticle_height, 50);
         return new Size(cropWidth, cropHeight);
     }
