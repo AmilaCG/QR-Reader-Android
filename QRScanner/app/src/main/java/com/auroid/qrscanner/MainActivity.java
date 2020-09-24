@@ -67,6 +67,9 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
         setContentView(R.layout.activity_main);
 
         mGraphicOverlay = findViewById(R.id.camera_preview_graphic_overlay);
+        // TODO: Temporary disabled HW acceleration since graphic overlay is not rendered properly
+        //  on some devices due to an issue of CameraX PreviewView.
+        mGraphicOverlay.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
         mGraphicOverlay.setOnClickListener(this);
 
         mGuideChip = findViewById(R.id.guide_chip);
@@ -103,9 +106,6 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
     @Override
     protected void onResume() {
         super.onResume();
-        if (!PreferenceUtils.shouldEnableHwAcceleration(this)) {
-            mGraphicOverlay.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
-        }
         mGraphicOverlay.clear();
         mSettingsButton.setEnabled(true);
         mHistoryButton.setEnabled(true);

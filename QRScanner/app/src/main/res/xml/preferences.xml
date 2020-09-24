@@ -18,15 +18,6 @@
     </PreferenceCategory>
 
     <PreferenceCategory
-      app:title="@string/pref_cat_title_advanced">
-        <SwitchPreference
-          app:defaultValue="true"
-          app:key="@string/pref_key_enable_hw_accl"
-          app:title="@string/pref_title_hw_accl"
-          app:summary="@string/pref_summary_hw_accl" />
-    </PreferenceCategory>
-
-    <PreferenceCategory
         app:title="@string/pref_cat_title_about">
         <Preference
             app:title="Version"

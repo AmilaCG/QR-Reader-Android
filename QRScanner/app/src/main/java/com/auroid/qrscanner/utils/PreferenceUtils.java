@@ -54,10 +54,6 @@ public class PreferenceUtils {
         return getBooleanPref(context, R.string.pref_key_play_audio_beep, true);
     }
 
-    public static boolean shouldEnableHwAcceleration(Context context) {
-        return getBooleanPref(context, R.string.pref_key_enable_hw_accl, true);
-    }
-
     public static Size getCropPrecentages(Context context) {
         int cropWidth = getIntPref(context, R.string.pref_key_barcode_reticle_width, 65);
         int cropHeight = getIntPref(context, R.string.pref_key_barcode_reticle_height, 50);
