@@ -85,7 +85,6 @@ abstract class BarcodeGraphicBase extends Graphic {
         drawCorners(canvas);
     }
 
-    // TODO: In Android 6, ending line is shorter Due to the PathEffect on pathPaint. Fix it.
     private void drawCorners(Canvas canvas) {
         Path path = new Path();
 
@@ -168,6 +167,26 @@ abstract class BarcodeGraphicBase extends Graphic {
         //
         // |__     __|
         path.lineTo(boxRect.left + segX, boxRect.top);
+
+        // Redraw starting edge due to having a shorter end line in Android 6. This occurs when
+        // setting a PathEffect on pathPaint.
+        path.moveTo(boxRect.right - segX, boxRect.top);
+
+        //         __
+        //
+        //
+        //
+        //
+        path.lineTo(boxRect.right , boxRect.top);
+
+        segY = (boxRect.bottom - boxRect.top) / cornerSizeFactor;
+
+        //         __
+        //           |
+        //
+        //
+        //
+        path.lineTo(boxRect.right, boxRect.top + segY);
 
         canvas.drawPath(path, pathPaint);
     }
