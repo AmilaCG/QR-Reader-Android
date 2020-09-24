@@ -21,6 +21,7 @@ import android.graphics.Color;
 import android.graphics.CornerPathEffect;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
+import android.graphics.Path;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.RectF;
@@ -63,6 +64,7 @@ abstract class BarcodeGraphicBase extends Graphic {
         pathPaint.setStyle(Paint.Style.STROKE);
         pathPaint.setStrokeWidth(boxPaint.getStrokeWidth());
         pathPaint.setPathEffect(new CornerPathEffect(boxCornerRadius));
+        pathPaint.setAntiAlias(true);
 
         boxRect = PreferenceUtils.getBarcodeReticleBox(overlay);
     }
@@ -80,5 +82,93 @@ abstract class BarcodeGraphicBase extends Graphic {
 
         // Draws the box.
         canvas.drawRoundRect(boxRect, boxCornerRadius, boxCornerRadius, boxPaint);
+        drawCorners(canvas);
+    }
+
+    // TODO: In Android 6, ending line is shorter Due to the PathEffect on pathPaint. Fix it.
+    private void drawCorners(Canvas canvas) {
+        Path path = new Path();
+
+        // Higher the value, smaller the corner size (1 = min value = full rectangle)
+        float cornerSizeFactor = 5f;
+        float segX;
+        float segY;
+
+        path.reset();
+
+        segX = (boxRect.right - boxRect.left) / cornerSizeFactor;
+        path.moveTo(boxRect.right - segX, boxRect.top);
+
+        //         __
+        //
+        //
+        //
+        //
+        path.lineTo(boxRect.right , boxRect.top);
+
+        segY = (boxRect.bottom - boxRect.top) / cornerSizeFactor;
+
+        //         __
+        //           |
+        //
+        //
+        //
+        path.lineTo(boxRect.right, boxRect.top + segY);
+
+        path.moveTo(boxRect.right, boxRect.bottom - segY);
+
+        //         __
+        //           |
+        //
+        //
+        //           |
+        path.lineTo(boxRect.right , boxRect.bottom);
+
+        segX = (boxRect.left - boxRect.right) / cornerSizeFactor;
+
+        //         __
+        //           |
+        //
+        //
+        //         __|
+        path.lineTo(boxRect.right + segX, boxRect.bottom);
+
+        path.moveTo(boxRect.left - segX, boxRect.bottom);
+
+        //         __
+        //           |
+        //
+        //
+        //  __     __|
+        path.lineTo(boxRect.left , boxRect.bottom);
+
+        segY = (boxRect.top - boxRect.bottom) / cornerSizeFactor;
+
+        //         __
+        //           |
+        //
+        //
+        // |__     __|
+        path.lineTo(boxRect.left, boxRect.bottom + segY);
+
+        path.moveTo(boxRect.left, boxRect.top - segY);
+
+        //         __
+        // |         |
+        //
+        //
+        // |__     __|
+        path.lineTo(boxRect.left , boxRect.top);
+
+        segX = (boxRect.right - boxRect.left) / cornerSizeFactor;
+
+        //  __     __
+        // |         |
+        //
+        //
+        // |__     __|
+        path.lineTo(boxRect.left + segX, boxRect.top);
+
+        canvas.drawPath(path, pathPaint);
     }
 }
