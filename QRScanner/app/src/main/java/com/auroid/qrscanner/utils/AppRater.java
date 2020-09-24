@@ -56,7 +56,9 @@ public class AppRater {
         if (!shouldLaunchReviewFlow) {
             // Increment scan counter
             mScanCount ++;
-            mEditor.putInt(SCAN_COUNT_KEY, mScanCount).apply();
+            if (mEditor != null) {
+                mEditor.putInt(SCAN_COUNT_KEY, mScanCount).apply();
+            }
             return;
         }
         ReviewManager manager = ReviewManagerFactory.create(activity.getApplicationContext());
