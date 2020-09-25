@@ -36,6 +36,7 @@ abstract class BarcodeGraphicBase extends Graphic {
     private final Paint boxPaint;
     private final Paint scrimPaint;
     private final Paint eraserPaint;
+    private final Path path;
 
     final int boxCornerRadius;
     final Paint pathPaint;
@@ -52,6 +53,7 @@ abstract class BarcodeGraphicBase extends Graphic {
 
         scrimPaint = new Paint();
         scrimPaint.setColor(ContextCompat.getColor(context, R.color.barcode_reticle_background));
+
         eraserPaint = new Paint();
         eraserPaint.setStrokeWidth(boxPaint.getStrokeWidth());
         eraserPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
@@ -65,6 +67,8 @@ abstract class BarcodeGraphicBase extends Graphic {
         pathPaint.setStrokeWidth(boxPaint.getStrokeWidth());
         pathPaint.setPathEffect(new CornerPathEffect(boxCornerRadius));
         pathPaint.setAntiAlias(true);
+
+        path = new Path();
 
         boxRect = PreferenceUtils.getBarcodeReticleBox(overlay);
     }
@@ -86,8 +90,6 @@ abstract class BarcodeGraphicBase extends Graphic {
     }
 
     private void drawCorners(Canvas canvas) {
-        Path path = new Path();
-
         // Higher the value, smaller the corner size (1 = min value = full rectangle)
         float cornerSizeFactor = 5f;
         float segX;

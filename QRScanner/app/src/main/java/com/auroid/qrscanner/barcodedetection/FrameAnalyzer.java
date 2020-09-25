@@ -43,8 +43,7 @@ public class FrameAnalyzer implements ImageAnalysis.Analyzer {
     public FrameAnalyzer(GraphicOverlay graphicOverlay, WorkflowModel workflowModel) {
         mGraphicOverlay = graphicOverlay;
         mWorkflowModel = workflowModel;
-        mCropPercentage =
-                PreferenceUtils.getCropPrecentages(graphicOverlay.getContext()).getWidth() + 10;
+        mCropPercentage = PreferenceUtils.getCropPercentage(graphicOverlay.getContext()) + 10;
     }
 
     @SuppressLint("UnsafeExperimentalUsageError")
@@ -82,6 +81,9 @@ public class FrameAnalyzer implements ImageAnalysis.Analyzer {
             return;
         }
         mGraphicOverlay.setAnalyzerInfo(mInputImage.getWidth(), mInputImage.getHeight());
+        //TODO: Display the detected barcode amount (results.size()) in Chip.
+        // If it is more than 1, ask the user to align the barcode to the center,
+        // Otherwise decode it. Maybe show a guide (reticle) to center.
 
         // Picks the barcode, if exists, that covers the center of graphic overlay.
         Barcode barcodeInCenter = null;

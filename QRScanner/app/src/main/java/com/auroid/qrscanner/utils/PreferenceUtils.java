@@ -19,10 +19,10 @@ package com.auroid.qrscanner.utils;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.RectF;
-import android.preference.PreferenceManager;
-import android.util.Size;
 
+import androidx.preference.PreferenceManager;
 import androidx.annotation.StringRes;
+
 import com.auroid.qrscanner.R;
 import com.auroid.qrscanner.camera.GraphicOverlay;
 
@@ -33,17 +33,23 @@ public class PreferenceUtils {
         Context context = overlay.getContext();
         float overlayWidth = overlay.getWidth();
         float overlayHeight = overlay.getHeight();
-        float boxWidth = overlayWidth * getCropPrecentages(context).getWidth() / 100;
-        float boxHeight = overlayHeight * getCropPrecentages(context).getHeight() / 100;
+
+        float boxEdgeLen;
+        if (overlayWidth <= overlayHeight) {
+            boxEdgeLen = overlayWidth * getCropPercentage(context) / 100;
+        } else {
+            boxEdgeLen = overlayHeight * getCropPercentage(context) / 100;
+        }
+
         float cx = overlayWidth / 2;
         float cy = overlayHeight / 2;
-        //return new RectF(cx - boxWidth / 2, cy - boxHeight / 2, cx + boxWidth / 2, cy + boxHeight / 2);
         // Square reticle box
+        float halfEdgeLen = boxEdgeLen / 2;
         return new RectF(
-                cx - boxWidth / 2,
-                cy - boxWidth / 2,
-                cx + boxWidth / 2,
-                cy + boxWidth / 2);
+                cx - halfEdgeLen,
+                cy - halfEdgeLen,
+                cx + halfEdgeLen,
+                cy + halfEdgeLen);
     }
 
     public static boolean shouldOpenDirectlyInBrowser(Context context) {
@@ -54,10 +60,8 @@ public class PreferenceUtils {
         return getBooleanPref(context, R.string.pref_key_play_audio_beep, true);
     }
 
-    public static Size getCropPrecentages(Context context) {
-        int cropWidth = getIntPref(context, R.string.pref_key_barcode_reticle_width, 65);
-        int cropHeight = getIntPref(context, R.string.pref_key_barcode_reticle_height, 50);
-        return new Size(cropWidth, cropHeight);
+    public static int getCropPercentage(Context context) {
+        return getIntPref(context, R.string.pref_key_crop_percentage, 65);
     }
 
     private static int getIntPref(Context context, @StringRes int prefKeyId, int defaultValue) {
