@@ -36,11 +36,12 @@ abstract class BarcodeGraphicBase extends Graphic {
     private final Paint boxPaint;
     private final Paint scrimPaint;
     private final Paint eraserPaint;
+    private final Paint circlePaint;
+    private final Paint pathPaint;
     private final Path path;
 
-    final int boxCornerRadius;
-    final Paint pathPaint;
-    final RectF boxRect;
+    private final int boxCornerRadius;
+    private final RectF boxRect;
 
     BarcodeGraphicBase(GraphicOverlay overlay) {
         super(overlay);
@@ -68,6 +69,12 @@ abstract class BarcodeGraphicBase extends Graphic {
         pathPaint.setPathEffect(new CornerPathEffect(boxCornerRadius));
         pathPaint.setAntiAlias(true);
 
+        circlePaint = new Paint();
+        circlePaint.setColor(ContextCompat.getColor(context, R.color.barcode_reticle_center));
+        circlePaint.setStyle(Paint.Style.STROKE);
+        circlePaint.setStrokeWidth(boxPaint.getStrokeWidth());
+        circlePaint.setAntiAlias(true);
+
         path = new Path();
 
         boxRect = PreferenceUtils.getBarcodeReticleBox(overlay);
@@ -91,8 +98,7 @@ abstract class BarcodeGraphicBase extends Graphic {
         // Reticle center
         int centerRadius =
                 context.getResources().getDimensionPixelOffset(R.dimen.barcode_reticle_center_radius);
-        pathPaint.setColor(ContextCompat.getColor(context, R.color.barcode_reticle_center));
-        canvas.drawCircle(boxRect.centerX(), boxRect.centerY(), centerRadius, pathPaint);
+        canvas.drawCircle(boxRect.centerX(), boxRect.centerY(), centerRadius, circlePaint);
     }
 
     private void drawCorners(Canvas canvas) {
