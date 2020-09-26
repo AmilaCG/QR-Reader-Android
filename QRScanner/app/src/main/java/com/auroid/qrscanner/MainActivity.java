@@ -99,7 +99,7 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
 
         // Only run at the first time activity launches
         if (savedInstanceState == null) {
-            AppRater.app_launched(this);
+            AppRater.appLaunched(this);
         }
     }
 
@@ -210,11 +210,13 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                             mGuideChip.setText(R.string.prompt_point_at_a_barcode);
                             mWorkflowModel.markCameraLive();
                             break;
+
                         case DETECTED:
                             mGuideChip.setVisibility(View.GONE);
                             mAudioHandler.playAudioBeep();
                             mWorkflowModel.markCameraFrozen();
                             break;
+
                         default:
                             mGuideChip.setVisibility(View.GONE);
                             break;

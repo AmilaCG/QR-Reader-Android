@@ -81,16 +81,15 @@ public class FrameAnalyzer implements ImageAnalysis.Analyzer {
             return;
         }
         mGraphicOverlay.setAnalyzerInfo(mInputImage.getWidth(), mInputImage.getHeight());
-        //TODO: Display the detected barcode amount (results.size()) in Chip.
-        // If it is more than 1, ask the user to align the barcode to the center,
-        // Otherwise decode it. Maybe show a guide (reticle) to center.
 
         // Picks the barcode, if exists, that covers the center of graphic overlay.
         Barcode barcodeInCenter = null;
-        RectF box = null;
+        RectF boundingBox = null;
         for (Barcode barcode : results) {
-            box = mGraphicOverlay.translateRect(Objects.requireNonNull(barcode.getBoundingBox()));
-            if (box.contains(mGraphicOverlay.getWidth() / 2f, mGraphicOverlay.getHeight() / 2f)) {
+            boundingBox =
+                    mGraphicOverlay.translateRect(Objects.requireNonNull(barcode.getBoundingBox()));
+            if (boundingBox.contains(
+                    mGraphicOverlay.getWidth() / 2f, mGraphicOverlay.getHeight() / 2f)) {
                 barcodeInCenter = barcode;
                 break;
             }
@@ -106,7 +105,7 @@ public class FrameAnalyzer implements ImageAnalysis.Analyzer {
             });
             mWorkflowModel.setWorkflowState(WorkflowModel.WorkflowState.DETECTING);
         } else {
-            BarcodeTrackerDot trackerDot = new BarcodeTrackerDot(mGraphicOverlay, box);
+            BarcodeTrackerDot trackerDot = new BarcodeTrackerDot(mGraphicOverlay, boundingBox);
             mGraphicOverlay.add(trackerDot);
             trackerDot.fadeOutDot();
 

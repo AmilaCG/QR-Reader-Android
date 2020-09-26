@@ -24,7 +24,7 @@ public class AppRater {
     private static SharedPreferences.Editor mEditor;
     private static int mScanCount;
 
-    public static void app_launched(Activity activity) {
+    public static void appLaunched(Activity activity) {
         SharedPreferences prefs = activity.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
         mEditor = prefs.edit();
 
