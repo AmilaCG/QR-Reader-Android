@@ -7,6 +7,7 @@
     <dimen name="bottom_prompt_chip_corner_radius">8dp</dimen>
     <dimen name="barcode_reticle_stroke_width">4dp</dimen>
     <dimen name="barcode_reticle_corner_radius">8dp</dimen>
+    <dimen name="barcode_reticle_center_radius">10dp</dimen>
     <dimen name="barcode_tracker_corner_radius">20dp</dimen>
     <dimen name="preview_card_width">240dp</dimen>
     <dimen name="preview_card_height">80dp</dimen>

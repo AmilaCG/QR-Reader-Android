@@ -11,6 +11,7 @@
     <color name="chip_bg">#9A000000</color>
     <color name="barcode_reticle_background">#99000000</color>
     <color name="barcode_reticle_stroke">#40000000</color>
+    <color name="barcode_reticle_center">#32FFFFFF</color>
     <color name="colorTracker">#03DAC5</color>
     <color name="colorTinyIcon">#00bfa5</color>
     <color name="lighter_grey">#DDDDDD</color>

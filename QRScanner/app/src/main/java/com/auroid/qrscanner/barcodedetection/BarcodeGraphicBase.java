@@ -87,6 +87,12 @@ abstract class BarcodeGraphicBase extends Graphic {
         // Draws the box.
         canvas.drawRoundRect(boxRect, boxCornerRadius, boxCornerRadius, boxPaint);
         drawCorners(canvas);
+
+        // Reticle center
+        int centerRadius =
+                context.getResources().getDimensionPixelOffset(R.dimen.barcode_reticle_center_radius);
+        pathPaint.setColor(ContextCompat.getColor(context, R.color.barcode_reticle_center));
+        canvas.drawCircle(boxRect.centerX(), boxRect.centerY(), centerRadius, pathPaint);
     }
 
     private void drawCorners(Canvas canvas) {
