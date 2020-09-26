@@ -33,7 +33,6 @@ import com.auroid.qrscanner.utils.PreferenceUtils;
 
 abstract class BarcodeGraphicBase extends Graphic {
 
-    private final Paint boxPaint;
     private final Paint scrimPaint;
     private final Paint eraserPaint;
     private final Paint circlePaint;
@@ -46,17 +45,11 @@ abstract class BarcodeGraphicBase extends Graphic {
     BarcodeGraphicBase(GraphicOverlay overlay) {
         super(overlay);
 
-        boxPaint = new Paint();
-        boxPaint.setColor(ContextCompat.getColor(context, R.color.barcode_reticle_stroke));
-        boxPaint.setStyle(Paint.Style.STROKE);
-        boxPaint.setStrokeWidth(
-                context.getResources().getDimensionPixelOffset(R.dimen.barcode_reticle_stroke_width));
-
         scrimPaint = new Paint();
         scrimPaint.setColor(ContextCompat.getColor(context, R.color.barcode_reticle_background));
 
         eraserPaint = new Paint();
-        eraserPaint.setStrokeWidth(boxPaint.getStrokeWidth());
+        eraserPaint.setStyle(Style.FILL);
         eraserPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
 
         boxCornerRadius =
@@ -65,14 +58,15 @@ abstract class BarcodeGraphicBase extends Graphic {
         pathPaint = new Paint();
         pathPaint.setColor(Color.WHITE);
         pathPaint.setStyle(Paint.Style.STROKE);
-        pathPaint.setStrokeWidth(boxPaint.getStrokeWidth());
+        pathPaint.setStrokeWidth(
+                context.getResources().getDimensionPixelOffset(R.dimen.barcode_reticle_stroke_width));
         pathPaint.setPathEffect(new CornerPathEffect(boxCornerRadius));
         pathPaint.setAntiAlias(true);
 
         circlePaint = new Paint();
         circlePaint.setColor(ContextCompat.getColor(context, R.color.barcode_reticle_center));
         circlePaint.setStyle(Paint.Style.STROKE);
-        circlePaint.setStrokeWidth(boxPaint.getStrokeWidth());
+        circlePaint.setStrokeWidth(pathPaint.getStrokeWidth());
         circlePaint.setAntiAlias(true);
 
         path = new Path();
@@ -82,20 +76,16 @@ abstract class BarcodeGraphicBase extends Graphic {
 
     @Override
     protected void draw(Canvas canvas) {
-        // Draws the dark background scrim and leaves the box area clear.
+        // Draws the dark background scrim and leaves the box area clear
         canvas.drawRect(0, 0, canvas.getWidth(), canvas.getHeight(), scrimPaint);
-        // As the stroke is always centered, so erase twice with FILL and STROKE respectively to clear
-        // all area that the box rect would occupy.
-        eraserPaint.setStyle(Style.FILL);
-        canvas.drawRoundRect(boxRect, boxCornerRadius, boxCornerRadius, eraserPaint);
-        eraserPaint.setStyle(Style.STROKE);
+
+        // Erase all the area that the box rect would occupy
         canvas.drawRoundRect(boxRect, boxCornerRadius, boxCornerRadius, eraserPaint);
 
-        // Draws the box.
-        canvas.drawRoundRect(boxRect, boxCornerRadius, boxCornerRadius, boxPaint);
+        // Draw corners of the box
         drawCorners(canvas);
 
-        // Reticle center
+        // Draws the center circle
         int centerRadius =
                 context.getResources().getDimensionPixelOffset(R.dimen.barcode_reticle_center_radius);
         canvas.drawCircle(boxRect.centerX(), boxRect.centerY(), centerRadius, circlePaint);
