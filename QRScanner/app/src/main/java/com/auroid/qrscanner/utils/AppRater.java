@@ -24,6 +24,9 @@ public class AppRater {
     private static SharedPreferences.Editor mEditor;
     private static int mScanCount;
 
+    private static ReviewManager mReviewManager;
+    private static ReviewInfo mReviewInfo;
+
     public static void appLaunched(Activity activity) {
         SharedPreferences prefs = activity.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
         mEditor = prefs.edit();
@@ -42,10 +45,17 @@ public class AppRater {
         mScanCount = prefs.getInt(SCAN_COUNT_KEY, 0);
 
         // Wait at least n days before opening
+        long waitTime = DAYS_UNTIL_PROMPT * 24 * 60 * 60 * 1000;
         if (launchCount >= LAUNCHES_UNTIL_PROMPT && mScanCount >= SCANS_UNTIL_PROMPT) {
-            if (System.currentTimeMillis() >= firstLaunchDate +
-                    (DAYS_UNTIL_PROMPT * 24 * 60 * 60 * 1000)) {
+            if (System.currentTimeMillis() >= firstLaunchDate + waitTime) {
                 shouldLaunchReviewFlow = true;
+                mReviewManager = ReviewManagerFactory.create(activity.getApplicationContext());
+                Task<ReviewInfo> request = mReviewManager.requestReviewFlow();
+                request.addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        mReviewInfo = task.getResult();
+                    }
+                });
             }
         }
 
@@ -60,25 +70,19 @@ public class AppRater {
                 mEditor.putInt(SCAN_COUNT_KEY, mScanCount).apply();
             }
             return;
+        } else if (mReviewManager == null || mReviewInfo == null) {
+            return;
         }
-        ReviewManager manager = ReviewManagerFactory.create(activity.getApplicationContext());
-        Task<ReviewInfo> request = manager.requestReviewFlow();
-        request.addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                ReviewInfo reviewInfo = task.getResult();
-
-                Task<Void> flow = manager.launchReviewFlow(activity, reviewInfo);
-                flow.addOnCompleteListener(launchTask -> {
-                    // The flow has finished. The API does not indicate whether the user
-                    // reviewed or not, or even whether the review dialog was shown. Thus, no
-                    // matter the result, we continue our app flow.
-                    // Reset saved preferences
-                    if (mEditor != null) {
-                        mEditor.clear().apply();
-                    }
-                    shouldLaunchReviewFlow = false;
-                });
+        Task<Void> flow = mReviewManager.launchReviewFlow(activity, mReviewInfo);
+        flow.addOnCompleteListener(task -> {
+            // The flow has finished. The API does not indicate whether the user
+            // reviewed or not, or even whether the review dialog was shown. Thus, no
+            // matter the result, we continue our app flow.
+            // Reset saved preferences
+            if (mEditor != null) {
+                mEditor.clear().apply();
             }
+            shouldLaunchReviewFlow = false;
         });
     }
 }
