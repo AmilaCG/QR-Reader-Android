@@ -56,6 +56,9 @@
         <meta-data
           android:name="firebase_crashlytics_collection_enabled"
           android:value="@bool/FIREBASE_CRASHLYTICS_ENABLED" />
+        <meta-data
+          android:name="com.google.android.gms.ads.APPLICATION_ID"
+          android:value="ca-app-pub-5081530253339354~2861911026" />
     </application>
 
 </manifest>
