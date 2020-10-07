@@ -23,7 +23,8 @@
     app:layout_constraintEnd_toEndOf="parent"
     app:layout_constraintStart_toStartOf="parent"
     app:adSize="BANNER"
-    app:adUnitId="ca-app-pub-5081530253339354/4806559849" />
+    app:adUnitId="ca-app-pub-3940256099942544/6300978111" />
+<!--    app:adUnitId="ca-app-pub-5081530253339354/4806559849" />-->
 
   <TextView
     android:id="@+id/barcode_result"
