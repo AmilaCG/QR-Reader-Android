@@ -13,7 +13,7 @@
     <string name="action_phone">Open in dialer</string>
     <string name="action_geo">Open in maps</string>
     <string name="action_calender">Add to calender</string>
-    <string name="action_copy">Copy to clipboard</string>
+    <string name="action_copy">Copy</string>
     <string name="action_web_search">Web search</string>
     <string name="action_contact">Add to contacts</string>
     <string name="action_wifi">Connect</string>

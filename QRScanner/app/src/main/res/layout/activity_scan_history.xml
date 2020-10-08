@@ -31,13 +31,24 @@
     android:id="@+id/text_guide"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingBottom="8dp"
+    android:paddingBottom="4dp"
     android:text="@string/delete_guide"
     android:textAlignment="center"
     android:textAppearance="@android:style/TextAppearance.Material.Small"
-    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintBottom_toTopOf="@id/history_ad_view"
     app:layout_constraintEnd_toEndOf="parent"
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintTop_toBottomOf="@id/recyclerview" />
+
+  <com.google.android.gms.ads.AdView
+    android:id="@+id/history_ad_view"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    app:layout_constraintTop_toBottomOf="@id/text_guide"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:adSize="BANNER"
+    app:adUnitId="ca-app-pub-5081530253339354/9924947161" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
