@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+  <domain-config cleartextTrafficPermitted="true">
+    <!-- Added to allow caching media files for Facebook Audience Network-->
+    <domain includeSubdomains="true">127.0.0.1</domain>
+  </domain-config>
+</network-security-config>
