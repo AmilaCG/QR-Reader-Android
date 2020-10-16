@@ -4,15 +4,15 @@ apply plugin: 'com.google.android.gms.oss-licenses-plugin'
 apply plugin: 'com.google.firebase.crashlytics'
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 30
     buildToolsVersion "29.0.3"
 
     defaultConfig {
         applicationId "com.auroid.qrscanner"
         minSdkVersion 21
-        targetSdkVersion 29
-        versionCode 43
-        versionName "3.03.00"
+        targetSdkVersion 30
+        versionCode 44
+        versionName "3.03.01"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
