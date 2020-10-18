@@ -4,14 +4,13 @@ import android.app.Application;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
-
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
 
 public class App extends Application {
 
-    AdView adView;
+    private AdView adView;
 
     @Override
     public void onCreate() {
