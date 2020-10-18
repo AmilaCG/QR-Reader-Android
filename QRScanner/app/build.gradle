@@ -11,8 +11,8 @@ android {
         applicationId "com.auroid.qrscanner"
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 45
-        versionName "3.03.02"
+        versionCode 46
+        versionName "3.03.03"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         resConfigs "en"
@@ -102,5 +102,5 @@ dependencies {
     // Google Mobile Ads SDK
     implementation 'com.google.android.gms:play-services-ads:19.4.0'
     // Facebook Ads mediation for Google Ads
-    implementation 'com.google.ads.mediation:facebook:6.0.0.0'
+    implementation 'com.google.ads.mediation:facebook:6.1.0.0'
 }
