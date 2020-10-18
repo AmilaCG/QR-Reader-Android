@@ -10,14 +10,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.auroid.qrscanner.resultdb.Result;
 import com.auroid.qrscanner.resultdb.ResultListAdapter;
 import com.auroid.qrscanner.resultdb.ResultViewModel;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -44,9 +43,9 @@ public class ScanHistoryActivity extends AppCompatActivity implements View.OnCli
         topActionButton.setOnClickListener(this);
         topActionButton.setImageResource(R.drawable.ic_baseline_delete_24);
 
-        AdView adView = findViewById(R.id.history_ad_view);
-        AdRequest adRequest = new AdRequest.Builder().build();
-        adView.loadAd(adRequest);
+        LinearLayout adView = findViewById(R.id.ad_view);
+        App app = (App) getApplication();
+        app.loadAd(adView);
 
         RecyclerView recyclerView = findViewById(R.id.recyclerview);
 

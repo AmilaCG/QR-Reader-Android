@@ -5,6 +5,7 @@ import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -13,8 +14,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.auroid.qrscanner.serializable.BarcodeWrapper;
 import com.auroid.qrscanner.utils.AppRater;
 
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.google.mlkit.vision.barcode.Barcode;
 import com.google.gson.Gson;
@@ -61,9 +60,9 @@ public class BarcodeResultActivity extends AppCompatActivity implements View.OnC
 
         AppRater.showRateDialog(this);
 
-        AdView adView = findViewById(R.id.result_ad_view);
-        AdRequest adRequest = new AdRequest.Builder().build();
-        adView.loadAd(adRequest);
+        LinearLayout adView = findViewById(R.id.ad_view);
+        App app = (App) getApplication();
+        app.loadAd(adView);
 
         showResult();
     }
