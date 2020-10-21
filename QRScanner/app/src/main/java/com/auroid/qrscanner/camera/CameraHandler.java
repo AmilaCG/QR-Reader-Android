@@ -84,6 +84,6 @@ public class CameraHandler implements Runnable {
     }
 
     public void release() {
-        mCameraExecutor.shutdown();
+        if (mCameraExecutor != null) mCameraExecutor.shutdown();
     }
 }
