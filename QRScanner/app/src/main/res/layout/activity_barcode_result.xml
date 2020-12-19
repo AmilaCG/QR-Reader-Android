@@ -15,6 +15,15 @@
     android:layout_height="@dimen/top_action_bar_height"
     app:layout_constraintTop_toTopOf="parent" />
 
+  <include
+    android:id="@+id/ad_view"
+    layout="@layout/ad_container"
+    android:layout_width="320dp"
+    android:layout_height="50dp"
+    app:layout_constraintTop_toBottomOf="@id/top_action_bar"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent" />
+
   <TextView
     android:id="@+id/barcode_result"
     android:layout_width="0dp"
@@ -32,7 +41,7 @@
     app:layout_constraintBottom_toTopOf="@id/ib_copy"
     app:layout_constraintEnd_toEndOf="parent"
     app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toBottomOf="@id/top_action_bar" />
+    app:layout_constraintTop_toBottomOf="@id/ad_view" />
 
   <ImageButton
     android:id="@+id/ib_copy"

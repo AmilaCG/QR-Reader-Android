@@ -5,6 +5,7 @@ import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -58,6 +59,10 @@ public class BarcodeResultActivity extends AppCompatActivity implements View.OnC
         }
 
         AppRater.showRateDialog(this);
+
+        LinearLayout adView = findViewById(R.id.ad_view);
+        App app = (App) getApplication();
+        app.loadAd(adView);
 
         showResult();
     }

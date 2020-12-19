@@ -69,9 +69,6 @@ public class ImageScanner {
 
     public void release() {
         if (mBitmap != null) mBitmap = null;
-        if (mScanner != null) {
-            mScanner.close();
-            mScanner = null;
-        }
+        mScanner.close();
     }
 }
