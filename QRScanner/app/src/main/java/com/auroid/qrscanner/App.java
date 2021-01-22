@@ -4,9 +4,8 @@ import android.app.Application;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdSize;
-import com.google.android.gms.ads.AdView;
+import com.facebook.ads.AdSize;
+import com.facebook.ads.AdView;
 
 public class App extends Application {
 
@@ -16,23 +15,18 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
 
-        adView = new AdView(this);
-        adView.setAdSize(AdSize.BANNER);
-        adView.setAdUnitId("ca-app-pub-5081530253339354/7233530176");
-//        Test ad unit
-//        adView.setAdUnitId("ca-app-pub-3940256099942544/6300978111");
-
-        AdRequest adRequest = new AdRequest.Builder().build();
-        adView.loadAd(adRequest);
+        // Use this IMG_16_9_APP_INSTALL# in front of the placement id to test ads
+        adView = new AdView(this, "3384360194976084_3408475895897847", AdSize.BANNER_HEIGHT_50);
+        adView.loadAd();
     }
 
-    public void loadAd(LinearLayout layAd) {
+    public void loadAd(LinearLayout adContainer) {
         // Locate the Banner Ad in activity xml
         if (adView.getParent() != null) {
             ViewGroup tempVg = (ViewGroup) adView.getParent();
             tempVg.removeView(adView);
         }
 
-        layAd.addView(adView);
+        adContainer.addView(adView);
     }
 }

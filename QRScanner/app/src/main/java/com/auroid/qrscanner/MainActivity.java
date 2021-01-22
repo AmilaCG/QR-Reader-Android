@@ -21,7 +21,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.google.android.gms.ads.MobileAds;
+import com.facebook.ads.AudienceNetworkAds;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.common.base.Objects;
@@ -89,7 +89,7 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
 
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
-        MobileAds.initialize(this);
+        AudienceNetworkAds.initialize(this);
 
         setUpWorkflowModel();
 
