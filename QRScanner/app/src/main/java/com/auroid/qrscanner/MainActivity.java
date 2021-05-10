@@ -245,6 +245,7 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                         } else {
                             Intent intent = new Intent(this, BarcodeResultActivity.class);
                             intent.putExtra("RESULT", resultHandler.getResultJson());
+                            intent.putExtra("FORMAT", barcode.getFormat());
                             startActivity(intent);
                         }
                         mFirebaseAnalytics.logEvent("scan_barcode", null);

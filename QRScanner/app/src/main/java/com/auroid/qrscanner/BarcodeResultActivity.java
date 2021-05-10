@@ -25,6 +25,7 @@ public class BarcodeResultActivity extends AppCompatActivity implements View.OnC
     private int mResultType;
 
     private BarcodeWrapper mBarcodeWrapper;
+    private int mBarcodeFormat = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +38,7 @@ public class BarcodeResultActivity extends AppCompatActivity implements View.OnC
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
             String barcodeJson = bundle.getString("RESULT");
+            mBarcodeFormat = bundle.getInt("FORMAT");
             Gson gson = new Gson();
             try {
                 mBarcodeWrapper = gson.fromJson(barcodeJson, BarcodeWrapper.class);
@@ -59,7 +61,43 @@ public class BarcodeResultActivity extends AppCompatActivity implements View.OnC
 
         AppRater.showRateDialog(this);
 
+        TextView tvBarcodeFormat = findViewById(R.id.barcode_format);
+        tvBarcodeFormat.setText(getFormat(mBarcodeFormat));
         showResult();
+    }
+
+    private String getFormat(int format) {
+        switch (format) {
+            case Barcode.FORMAT_AZTEC:
+                return "Aztec Code";
+            case Barcode.FORMAT_CODABAR:
+                return "Codabar";
+            case Barcode.FORMAT_CODE_39:
+                return "Code 39";
+            case Barcode.FORMAT_CODE_93:
+                return "Code 93";
+            case Barcode.FORMAT_CODE_128:
+                return "Code 128";
+            case Barcode.FORMAT_DATA_MATRIX:
+                return "Data Matrix";
+            case Barcode.FORMAT_EAN_8:
+                return "EAN-8";
+            case Barcode.FORMAT_EAN_13:
+                return "EAN-13";
+            case Barcode.FORMAT_ITF:
+                return "ITF";
+            case Barcode.FORMAT_PDF417:
+                return "PDF417";
+            case Barcode.FORMAT_QR_CODE:
+                return "QR Code";
+            case Barcode.FORMAT_UPC_A:
+                return "UPC-A";
+            case Barcode.FORMAT_UPC_E:
+                return "UPC-E";
+            case Barcode.FORMAT_UNKNOWN:
+                return "Unknown Format";
+        }
+        return "Unknown Format";
     }
 
     private void showResult() {
@@ -67,6 +105,7 @@ public class BarcodeResultActivity extends AppCompatActivity implements View.OnC
         String rawValue = mBarcodeWrapper.rawValue;
         mResultType = mBarcodeWrapper.valueFormat;
 
+        TextView tvResultType = findViewById(R.id.result_type);
         TextView tvBarcodeResult = findViewById(R.id.barcode_result);
         tvBarcodeResult.setText(result);
 
@@ -76,6 +115,7 @@ public class BarcodeResultActivity extends AppCompatActivity implements View.OnC
         switch (mResultType) {
             case Barcode.TYPE_URL:
                 Log.d(TAG, "URL");
+                tvResultType.setText(R.string.type_web);
                 tvBarcodeResult.setText(rawValue);
                 tvAction.setText(R.string.action_web);
                 ibAction.setImageResource(R.drawable.ic_public_black_44dp);
@@ -83,18 +123,21 @@ public class BarcodeResultActivity extends AppCompatActivity implements View.OnC
 
             case Barcode.TYPE_PHONE:
                 Log.d(TAG, "PHONE");
+                tvResultType.setText(R.string.type_phone);
                 tvAction.setText(R.string.action_phone);
                 ibAction.setImageResource(R.drawable.ic_phone_black_38dp);
                 break;
 
             case Barcode.TYPE_GEO:
                 Log.d(TAG, "GEO");
+                tvResultType.setText(R.string.type_geo);
                 tvAction.setText(R.string.action_geo);
                 ibAction.setImageResource(R.drawable.ic_location_on_black_38dp);
                 break;
 
             case Barcode.TYPE_CALENDAR_EVENT:
                 Log.d(TAG, "CALENDAR_EVENT");
+                tvResultType.setText(R.string.type_calender);
                 ActionHandler actionEvent = new ActionHandler(this, mBarcodeWrapper);
                 tvBarcodeResult.setText(actionEvent.getFormattedEventDetails());
                 tvBarcodeResult.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
@@ -105,6 +148,7 @@ public class BarcodeResultActivity extends AppCompatActivity implements View.OnC
 
             case Barcode.TYPE_CONTACT_INFO:
                 Log.d(TAG, "CONTACT_INFO");
+                tvResultType.setText(R.string.type_contact);
                 ActionHandler actionContact = new ActionHandler(this, mBarcodeWrapper);
                 tvBarcodeResult.setText(actionContact.getFormattedContactDetails());
                 tvBarcodeResult.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
@@ -117,6 +161,7 @@ public class BarcodeResultActivity extends AppCompatActivity implements View.OnC
 
             case Barcode.TYPE_WIFI:
                 Log.d(TAG, "WIFI");
+                tvResultType.setText(R.string.type_wifi);
                 ActionHandler actionWifi = new ActionHandler(this, mBarcodeWrapper);
                 tvBarcodeResult.setText(actionWifi.getFormattedWiFiDetails());
 
@@ -124,8 +169,19 @@ public class BarcodeResultActivity extends AppCompatActivity implements View.OnC
                 ibAction.setImageResource(R.drawable.ic_wifi_black_38);
                 break;
 
+            case Barcode.TYPE_PRODUCT:
+                Log.d(TAG, "Product");
+                tvResultType.setText(R.string.type_product);
+                break;
+
+            case Barcode.TYPE_ISBN:
+                Log.d(TAG, "ISBN");
+                tvResultType.setText(R.string.type_isbn);
+                break;
+
             default:
                 Log.d(TAG, "default");
+                tvResultType.setText(R.string.type_text);
                 tvAction.setVisibility(View.GONE);
                 ibAction.setVisibility(View.GONE);
                 break;

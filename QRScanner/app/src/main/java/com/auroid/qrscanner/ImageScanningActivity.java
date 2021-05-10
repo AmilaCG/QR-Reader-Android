@@ -407,6 +407,7 @@ public class ImageScanningActivity extends AppCompatActivity implements
         } else {
             Intent intent = new Intent(this, BarcodeResultActivity.class);
             intent.putExtra("RESULT", resultHandler.getResultJson());
+            intent.putExtra("FORMAT", barcode.getFormat());
             startActivity(intent);
         }
         mFirebaseAnalytics.logEvent("scan_barcode_static_image", null);

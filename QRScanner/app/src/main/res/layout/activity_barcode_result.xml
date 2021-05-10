@@ -20,7 +20,7 @@
     android:layout_width="0dp"
     android:layout_height="0dp"
     android:layout_marginStart="24dp"
-    android:layout_marginTop="16dp"
+    android:layout_marginTop="8dp"
     android:layout_marginEnd="24dp"
     android:layout_marginBottom="16dp"
     android:gravity="center"
@@ -32,7 +32,36 @@
     app:layout_constraintBottom_toTopOf="@id/ib_copy"
     app:layout_constraintEnd_toEndOf="parent"
     app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toBottomOf="@id/top_action_bar" />
+    app:layout_constraintTop_toBottomOf="@id/barcode_format" />
+
+  <TextView
+    android:id="@+id/result_type"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="24dp"
+    android:layout_marginTop="4dp"
+    android:layout_marginEnd="24dp"
+    android:text="Type"
+    android:textAppearance="@style/TextAppearance.AppCompat.Large"
+    android:textColor="@color/colorAccent"
+    app:layout_constraintTop_toBottomOf="@id/top_action_bar"
+    app:layout_constraintBottom_toTopOf="@id/barcode_format"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintEnd_toEndOf="parent" />
+
+  <TextView
+    android:id="@+id/barcode_format"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="24dp"
+    android:layout_marginEnd="24dp"
+    android:text="Format"
+    android:textAppearance="@style/TextAppearance.AppCompat.Small"
+    android:textColor="@color/lighter_grey"
+    app:layout_constraintTop_toBottomOf="@id/result_type"
+    app:layout_constraintBottom_toTopOf="@id/barcode_result"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintEnd_toEndOf="parent" />
 
   <ImageButton
     android:id="@+id/ib_copy"

@@ -477,8 +477,7 @@ public class ActionHandler {
                 encryption = "Unknown";
         }
 
-        return "Wi-Fi Network\n" +
-                "\nName: " + wifiParams.ssid +
+        return "\nName (SSID): " + wifiParams.ssid +
                 "\nPassword: " + wifiParams.password +
                 "\nEncryption: " + encryption;
     }

@@ -9,6 +9,15 @@
     <string name="confirm_clear_scan_history">Scan history has been cleared</string>
     <string name="confirm_result_delete">Item deleted</string>
     <string name="delete_guide">Swipe to delete items</string>
+    <string name="type_web">Website/URL</string>
+    <string name="type_phone">Telephone Number</string>
+    <string name="type_geo">Location</string>
+    <string name="type_calender">Calender Event</string>
+    <string name="type_contact">Contact</string>
+    <string name="type_text">Text</string>
+    <string name="type_wifi">Wi-Fi Network</string>
+    <string name="type_product">Product</string>
+    <string name="type_isbn">ISBN</string>
     <string name="action_web">Open in browser</string>
     <string name="action_phone">Open in dialer</string>
     <string name="action_geo">Open in maps</string>
