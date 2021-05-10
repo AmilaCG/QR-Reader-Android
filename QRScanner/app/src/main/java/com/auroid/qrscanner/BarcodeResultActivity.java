@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.auroid.qrscanner.serializable.BarcodeWrapper;
 import com.auroid.qrscanner.utils.AppRater;
+import com.auroid.qrscanner.utils.TypeSelector;
 
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.google.mlkit.vision.barcode.Barcode;
@@ -62,42 +63,9 @@ public class BarcodeResultActivity extends AppCompatActivity implements View.OnC
         AppRater.showRateDialog(this);
 
         TextView tvBarcodeFormat = findViewById(R.id.barcode_format);
-        tvBarcodeFormat.setText(getFormat(mBarcodeFormat));
+        String format = TypeSelector.barcodeFormatAsString(mBarcodeFormat);
+        tvBarcodeFormat.setText(format);
         showResult();
-    }
-
-    private String getFormat(int format) {
-        switch (format) {
-            case Barcode.FORMAT_AZTEC:
-                return "Aztec Code";
-            case Barcode.FORMAT_CODABAR:
-                return "Codabar";
-            case Barcode.FORMAT_CODE_39:
-                return "Code 39";
-            case Barcode.FORMAT_CODE_93:
-                return "Code 93";
-            case Barcode.FORMAT_CODE_128:
-                return "Code 128";
-            case Barcode.FORMAT_DATA_MATRIX:
-                return "Data Matrix";
-            case Barcode.FORMAT_EAN_8:
-                return "EAN-8";
-            case Barcode.FORMAT_EAN_13:
-                return "EAN-13";
-            case Barcode.FORMAT_ITF:
-                return "ITF";
-            case Barcode.FORMAT_PDF417:
-                return "PDF417";
-            case Barcode.FORMAT_QR_CODE:
-                return "QR Code";
-            case Barcode.FORMAT_UPC_A:
-                return "UPC-A";
-            case Barcode.FORMAT_UPC_E:
-                return "UPC-E";
-            case Barcode.FORMAT_UNKNOWN:
-                return "Unknown Format";
-        }
-        return "Unknown Format";
     }
 
     private void showResult() {

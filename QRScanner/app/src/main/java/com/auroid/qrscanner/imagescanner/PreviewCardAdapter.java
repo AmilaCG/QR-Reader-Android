@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.auroid.qrscanner.R;
+import com.auroid.qrscanner.utils.TypeSelector;
 import com.google.mlkit.vision.barcode.Barcode;
 
 import java.util.List;
@@ -68,40 +69,9 @@ public class PreviewCardAdapter extends RecyclerView.Adapter<PreviewCardAdapter.
             imageView.setImageDrawable(null);
 
             setIcon(detectedBarcode.getBarcode().getValueType(), imageView);
-            setTitle(detectedBarcode.getBarcode().getFormat(), titleView);
+            String format = TypeSelector.barcodeFormatAsString(detectedBarcode.getBarcode().getFormat());
+            titleView.setText(format);
             subtitleView.setText(detectedBarcode.getBarcode().getDisplayValue());
-        }
-
-        private void setTitle(int resultFormat, TextView titleView) {
-            switch(resultFormat) {
-                case Barcode.FORMAT_QR_CODE:
-                    titleView.setText(R.string.preview_card_title_qr);
-                    break;
-
-                case Barcode.FORMAT_EAN_13:
-                    titleView.setText(R.string.preview_card_title_ean13);
-                    break;
-
-                case Barcode.FORMAT_EAN_8:
-                    titleView.setText(R.string.preview_card_title_ean8);
-                    break;
-
-                case Barcode.FORMAT_UPC_A:
-                    titleView.setText(R.string.preview_card_title_upca);
-                    break;
-
-                case Barcode.FORMAT_UPC_E:
-                    titleView.setText(R.string.preview_card_title_upce);
-                    break;
-
-                case Barcode.FORMAT_DATA_MATRIX:
-                    titleView.setText(R.string.preview_card_title_datamatrix);
-                    break;
-
-                case Barcode.FORMAT_CODE_128:
-                    titleView.setText(R.string.preview_card_title_code128);
-                    break;
-            }
         }
 
         private void setIcon(int resultType, ImageView imageView) {
