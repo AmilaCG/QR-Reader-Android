@@ -140,11 +140,15 @@ public class BarcodeResultActivity extends AppCompatActivity implements View.OnC
             case Barcode.TYPE_PRODUCT:
                 Log.d(TAG, "Product");
                 tvResultType.setText(R.string.type_product);
+                tvAction.setVisibility(View.GONE);
+                ibAction.setVisibility(View.GONE);
                 break;
 
             case Barcode.TYPE_ISBN:
                 Log.d(TAG, "ISBN");
                 tvResultType.setText(R.string.type_isbn);
+                tvAction.setVisibility(View.GONE);
+                ibAction.setVisibility(View.GONE);
                 break;
 
             default:
