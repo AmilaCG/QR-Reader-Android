@@ -6,10 +6,6 @@ A robust, hassle-free Barcode reader for Android powered by [Google ML Kit's Bar
 
 
 
-## Demo
-
-![demo gif](demo.gif)
-
 ## Functions
 
 - Go to a website, copy to clipboard or search scanned content on the web
