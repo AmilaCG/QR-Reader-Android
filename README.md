@@ -16,7 +16,8 @@ A robust, hassle-free Barcode reader for Android powered by [Google ML Kit's Bar
 - Add an event to the calender by scanning a QR code
 - Save scan history and do above actions even from the history
 - Ability to use torch/flasher to scan in dark places
-- Display corners of the decoded QR code in real-time
+- Track and display a dot in the center of the decoded QR code/barcode in real-time
+- Scan a QR code or a barcode saved in the device gallery
 
 ## Prerequisites
 
@@ -28,10 +29,10 @@ Android API 21 (Android 5.0 - Lollipop) or greater
 
 * [Create a Firebase project in the Firebase console, if you don't already have one](https://firebase.google.com/docs/android/setup) (Using Firebase only for Analytics)
 * Add a new Android app into your Firebase project with package name **com.auroid.qrscanner**
-* Download the config file (google-services.json) from the new added app and move it into the module folder (i.e. [app/](./QRScanner/app/))
+* Download the config file (google-services.json) from the newly added app and move it into the module folder (i.e. [app/](./QRScanner/app/))
 * Build and run
 
 ## Implementation using Mobile Vision Barcode API (Depricated)
 
-Implementation using the [older Google Mobile Vision Barcode API](https://developers.google.com/vision) can be found on **OldMobileVisionAPI** branch. Since Google will wind down Mobile Vision Barcode API, migrated to Google ML Kit. Both API's are almost same. 
+Implementation using the [older Google Mobile Vision Barcode API](https://developers.google.com/vision) can be found on **OldMobileVisionAPI** branch. Since Google will wind down Mobile Vision Barcode API, migrated to Google ML Kit. Both API's are almost the same. 
 
