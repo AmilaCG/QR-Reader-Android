@@ -18,7 +18,7 @@ import com.auroid.qrscanner.serializable.PhoneWrapper;
 import com.auroid.qrscanner.serializable.WiFiWrapper;
 
 import com.google.gson.Gson;
-import com.google.mlkit.vision.barcode.Barcode;
+import com.google.mlkit.vision.barcode.common.Barcode;
 
 import java.util.Date;
 import java.util.Objects;

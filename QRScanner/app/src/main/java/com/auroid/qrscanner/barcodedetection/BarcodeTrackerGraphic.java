@@ -10,7 +10,7 @@ import androidx.core.content.ContextCompat;
 
 import com.auroid.qrscanner.R;
 import com.auroid.qrscanner.camera.GraphicOverlay;
-import com.google.mlkit.vision.barcode.Barcode;
+import com.google.mlkit.vision.barcode.common.Barcode;
 
 class BarcodeTrackerGraphic extends BarcodeGraphicBase {
 

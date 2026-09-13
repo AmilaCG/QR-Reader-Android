@@ -1,6 +1,5 @@
 package com.auroid.qrscanner.barcodedetection;
 
-import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Rect;
@@ -12,6 +11,8 @@ import android.os.SystemClock;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.OptIn;
+import androidx.camera.core.ExperimentalGetImage;
 import androidx.camera.core.ImageAnalysis;
 import androidx.camera.core.ImageProxy;
 
@@ -21,7 +22,7 @@ import com.auroid.qrscanner.consts.CommonDefines;
 import com.auroid.qrscanner.utils.BitmapUtils;
 
 import com.auroid.qrscanner.utils.PreferenceUtils;
-import com.google.mlkit.vision.barcode.Barcode;
+import com.google.mlkit.vision.barcode.common.Barcode;
 import com.google.mlkit.vision.barcode.BarcodeScanner;
 import com.google.mlkit.vision.barcode.BarcodeScanning;
 import com.google.mlkit.vision.common.InputImage;
@@ -29,6 +30,7 @@ import com.google.mlkit.vision.common.InputImage;
 import java.util.List;
 import java.util.Objects;
 
+@OptIn(markerClass = ExperimentalGetImage.class)
 public class FrameAnalyzer implements ImageAnalysis.Analyzer {
 
     private static final String TAG = "FrameAnalyzer";
@@ -46,7 +48,6 @@ public class FrameAnalyzer implements ImageAnalysis.Analyzer {
         mCropPercentage = PreferenceUtils.getCropPercentage(graphicOverlay.getContext()) + 10;
     }
 
-    @SuppressLint("UnsafeExperimentalUsageError")
     @Override
     public void analyze(@NonNull ImageProxy imageProxy) {
         int rotationDegrees = imageProxy.getImageInfo().getRotationDegrees();
@@ -54,6 +55,7 @@ public class FrameAnalyzer implements ImageAnalysis.Analyzer {
         // converting to a bitmap
         Image mediaImage = imageProxy.getImage();
         if (mediaImage == null) {
+            imageProxy.close();
             return;
         }
         mediaImage.getPlanes();
@@ -120,7 +122,6 @@ public class FrameAnalyzer implements ImageAnalysis.Analyzer {
         mGraphicOverlay.invalidate();
     }
 
-    @SuppressLint("UnsafeExperimentalUsageError")
     private Bitmap cropImage(ImageProxy imageProxy) {
         Bitmap bitmap = BitmapUtils.getBitmap(imageProxy);
         if (bitmap == null) {

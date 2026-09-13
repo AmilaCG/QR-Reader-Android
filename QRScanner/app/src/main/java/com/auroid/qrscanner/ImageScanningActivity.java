@@ -45,7 +45,7 @@ import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 import com.google.android.material.chip.Chip;
 import com.google.common.collect.ImmutableList;
 import com.google.firebase.analytics.FirebaseAnalytics;
-import com.google.mlkit.vision.barcode.Barcode;
+import com.google.mlkit.vision.barcode.common.Barcode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -85,6 +85,7 @@ public class ImageScanningActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_image_scanning);
+        com.auroid.qrscanner.utils.Utils.applySystemBarInsets(this);
 
         mImagePreview = findViewById(R.id.image_preview);
         mProgressBar = findViewById(R.id.progressBar);

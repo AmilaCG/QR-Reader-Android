@@ -80,7 +80,9 @@ public class CameraHandler implements Runnable {
     }
 
     public void enableTorch(boolean state) {
-        mCamera.getCameraControl().enableTorch(state);
+        if (mCamera != null && mCamera.getCameraInfo().hasFlashUnit()) {
+            mCamera.getCameraControl().enableTorch(state);
+        }
     }
 
     public void release() {

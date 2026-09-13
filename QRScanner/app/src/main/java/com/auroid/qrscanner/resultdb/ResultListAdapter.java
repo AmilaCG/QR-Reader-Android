@@ -20,7 +20,7 @@ import com.auroid.qrscanner.R;
 import com.auroid.qrscanner.serializable.BarcodeWrapper;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.google.mlkit.vision.barcode.Barcode;
+import com.google.mlkit.vision.barcode.common.Barcode;
 import com.google.gson.Gson;
 
 import java.text.SimpleDateFormat;
@@ -79,24 +79,24 @@ public class ResultListAdapter extends ListAdapter<Result, ResultListAdapter.Res
             ActionHandler actionHandler = new ActionHandler(mContext, barcodeWrapper);
 
             popupMenu.setOnMenuItemClickListener(item -> {
-                switch (item.getItemId()) {
-                    case R.id.menu_item_more:
+                int id = item.getItemId();
+                if (id == R.id.menu_item_more) {
                         displayInfo(valueFormat, actionHandler, barcodeWrapper);
                         return true;
 
-                    case R.id.menu_item_action:
+                } else if (id == R.id.menu_item_action) {
                         runAction(valueFormat, actionHandler);
                         return true;
 
-                    case R.id.menu_item_search:
+                } else if (id == R.id.menu_item_search) {
                         actionHandler.webSearch();
                         return true;
 
-                    case R.id.menu_item_copy:
+                } else if (id == R.id.menu_item_copy) {
                         actionHandler.copyToClipboard();
                         return true;
 
-                    default:
+                } else {
                         return false;
                 }
             });
