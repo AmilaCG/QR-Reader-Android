@@ -15,6 +15,7 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
+        com.auroid.qrscanner.utils.Utils.applySystemBarInsets(this);
 
         getSupportFragmentManager()
                 .beginTransaction()

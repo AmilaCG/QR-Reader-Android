@@ -7,7 +7,7 @@ import android.content.SharedPreferences;
 import com.google.android.play.core.review.ReviewInfo;
 import com.google.android.play.core.review.ReviewManager;
 import com.google.android.play.core.review.ReviewManagerFactory;
-import com.google.android.play.core.tasks.Task;
+import com.google.android.gms.tasks.Task;
 
 public class AppRater {
 

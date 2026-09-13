@@ -1,7 +1,7 @@
 package com.auroid.qrscanner.imagescanner;
 
 import android.graphics.Rect;
-import com.google.mlkit.vision.barcode.Barcode;
+import com.google.mlkit.vision.barcode.common.Barcode;
 
 public class DetectedBarcode {
 

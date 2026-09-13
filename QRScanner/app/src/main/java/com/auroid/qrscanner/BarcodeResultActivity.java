@@ -15,7 +15,7 @@ import com.auroid.qrscanner.utils.AppRater;
 import com.auroid.qrscanner.utils.TypeSelector;
 
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
-import com.google.mlkit.vision.barcode.Barcode;
+import com.google.mlkit.vision.barcode.common.Barcode;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
@@ -32,6 +32,7 @@ public class BarcodeResultActivity extends AppCompatActivity implements View.OnC
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_barcode_result);
+        com.auroid.qrscanner.utils.Utils.applySystemBarInsets(this);
 
         findViewById(R.id.back_button).setOnClickListener(this);
         findViewById(R.id.top_action_button).setVisibility(View.GONE);

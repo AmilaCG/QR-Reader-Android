@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -26,7 +25,7 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.common.base.Objects;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.firebase.analytics.FirebaseAnalytics;
-import com.google.mlkit.vision.barcode.Barcode;
+import com.google.mlkit.vision.barcode.common.Barcode;
 
 import com.auroid.qrscanner.camera.CameraHandler;
 import com.auroid.qrscanner.camera.GraphicOverlay;
@@ -42,7 +41,6 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
     private static final String TAG = "MainActivity";
 
     private static final int RC_HANDLE_CAMERA_PERM = 24;
-    private static final int READ_EXT_STORAGE_PERM = 25;
     private static final int RC_PHOTO_LIBRARY = 26;
 
     private CameraHandler mCameraHandler;
@@ -65,6 +63,7 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        com.auroid.qrscanner.utils.Utils.applySystemBarInsets(this);
 
         mGraphicOverlay = findViewById(R.id.camera_preview_graphic_overlay);
         // TODO: Temporary disabled HW acceleration since graphic overlay is not rendered properly
@@ -135,44 +134,23 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
 
     @Override
     public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.settings_button:
-                // Sets as disabled to prevent the user from clicking on it too fast.
-                mSettingsButton.setEnabled(false);
-                startActivity(new Intent(this, SettingsActivity.class));
-                break;
-
-            case R.id.history_button:
-                // Sets as disabled to prevent the user from clicking on it too fast.
-                mHistoryButton.setEnabled(false);
-                startActivity(new Intent(this, ScanHistoryActivity.class));
-                mFirebaseAnalytics.logEvent("open_history", null);
-                break;
-
-            case R.id.flash_button:
-                if (mFlashButton.isSelected()) {
-                    mFlashButton.setSelected(false);
-                    mCameraHandler.enableTorch(false);
-                } else {
-                    mFlashButton.setSelected(true);
-                    mCameraHandler.enableTorch(true);
-                }
-                break;
-
-            case R.id.gallery_button:
-                mGalleryButton.setEnabled(false);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
-                            == PackageManager.PERMISSION_DENIED) {
-                        String[] permissions = {Manifest.permission.READ_EXTERNAL_STORAGE};
-                        requestPermissions(permissions, READ_EXT_STORAGE_PERM);
-                    } else {
-                        Utils.openImagePicker(this);
-                    }
-                } else {
-                    Utils.openImagePicker(this);
-                }
-                break;
+        int id = view.getId();
+        if (id == R.id.settings_button) {
+            mSettingsButton.setEnabled(false);
+            startActivity(new Intent(this, SettingsActivity.class));
+        } else if (id == R.id.history_button) {
+            mHistoryButton.setEnabled(false);
+            startActivity(new Intent(this, ScanHistoryActivity.class));
+            mFirebaseAnalytics.logEvent("open_history", null);
+        } else if (id == R.id.flash_button) {
+            if (mCameraHandler != null) {
+                boolean enabled = !mFlashButton.isSelected();
+                mFlashButton.setSelected(enabled);
+                mCameraHandler.enableTorch(enabled);
+            }
+        } else if (id == R.id.gallery_button) {
+            mGalleryButton.setEnabled(false);
+            Utils.openImagePicker(this);
         }
     }
 
@@ -269,6 +247,7 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
     public void onRequestPermissionsResult(int requestCode,
                                            @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode) {
             case RC_HANDLE_CAMERA_PERM: {
                 if (grantResults.length != 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -282,21 +261,6 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                             .setMessage(R.string.no_camera_permission)
                             .setPositiveButton(R.string.ok, listener)
                             .setCancelable(false)
-                            .show();
-
-                    Log.e(TAG, "Permission not granted: results len = " + grantResults.length +
-                            " Result code = " + (grantResults.length > 0 ? grantResults[0] : "(empty)"));
-                }
-                break;
-            }
-            case READ_EXT_STORAGE_PERM: {
-                if (grantResults.length != 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Log.d(TAG, "Gallery permission granted");
-                    Utils.openImagePicker(this);
-                } else {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                    builder.setTitle("Image Scanning")
-                            .setMessage(R.string.no_gallery_permission)
                             .show();
 
                     Log.e(TAG, "Permission not granted: results len = " + grantResults.length +

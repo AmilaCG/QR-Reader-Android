@@ -2,7 +2,7 @@ package com.auroid.qrscanner.utils;
 
 import android.provider.ContactsContract;
 
-import com.google.mlkit.vision.barcode.Barcode;
+import com.google.mlkit.vision.barcode.common.Barcode;
 
 // This class converts "TYPE" constants of Barcode class to ContactsContract.CommonDataKinds class's
 // "TYPE" constants.

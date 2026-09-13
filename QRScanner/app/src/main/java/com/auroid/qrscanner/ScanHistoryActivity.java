@@ -32,6 +32,7 @@ public class ScanHistoryActivity extends AppCompatActivity implements View.OnCli
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scan_history);
+        com.auroid.qrscanner.utils.Utils.applySystemBarInsets(this);
 
         TextView tvGuide = findViewById(R.id.text_guide);
 

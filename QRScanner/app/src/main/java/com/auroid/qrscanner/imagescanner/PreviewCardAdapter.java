@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.auroid.qrscanner.R;
 import com.auroid.qrscanner.utils.TypeSelector;
-import com.google.mlkit.vision.barcode.Barcode;
+import com.google.mlkit.vision.barcode.common.Barcode;
 
 import java.util.List;
 

@@ -31,7 +31,7 @@ import com.auroid.qrscanner.utils.TypeSelector;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
-import com.google.mlkit.vision.barcode.Barcode;
+import com.google.mlkit.vision.barcode.common.Barcode;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
