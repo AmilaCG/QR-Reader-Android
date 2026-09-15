@@ -30,6 +30,7 @@ public class WorkflowModel extends AndroidViewModel {
      */
     public enum WorkflowState {
         NOT_STARTED,
+        CAMERA_UNAVAILABLE,
         DETECTING,
         DETECTED
     }

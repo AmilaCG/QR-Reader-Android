@@ -2,10 +2,11 @@ package com.auroid.qrscanner;
 
 import android.Manifest;
 import android.app.Activity;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -88,11 +89,11 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
         setUpWorkflowModel();
+        mWorkflowModel.setWorkflowState(WorkflowState.CAMERA_UNAVAILABLE);
 
         int rc = ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
-        if (rc == PackageManager.PERMISSION_GRANTED) {
-            setupCamera();
-        } else {
+        if (getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)
+                && rc != PackageManager.PERMISSION_GRANTED) {
             requestCameraPermission();
         }
 
@@ -111,7 +112,16 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
         mGalleryButton.setEnabled(true);
         mFlashButton.setSelected(false);
         mCurrentWorkflowState = WorkflowState.NOT_STARTED;
-        mWorkflowModel.setWorkflowState(WorkflowState.DETECTING);
+        if (mCameraHandler == null
+                && getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)
+                && ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                == PackageManager.PERMISSION_GRANTED) {
+            setupCamera();
+        } else if (mCameraHandler != null && mCameraHandler.isReady()) {
+            mWorkflowModel.setWorkflowState(WorkflowState.DETECTING);
+        } else if (mWorkflowModel.workflowState.getValue() == WorkflowState.CAMERA_UNAVAILABLE) {
+            mWorkflowModel.setWorkflowState(WorkflowState.CAMERA_UNAVAILABLE);
+        }
     }
 
     @Override
@@ -155,16 +165,24 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
     }
 
     private void setupCamera() {
-        ListenableFuture<ProcessCameraProvider> cameraProviderFuture =
-                ProcessCameraProvider.getInstance(this);
-        PreviewView previewView = findViewById(R.id.view_finder);
-        mCameraHandler = new CameraHandler(
-                cameraProviderFuture,
-                previewView,
-                this,
-                mGraphicOverlay,
-                mWorkflowModel);
-        cameraProviderFuture.addListener(mCameraHandler, ContextCompat.getMainExecutor(this));
+        if (mCameraHandler != null) return;
+
+        mWorkflowModel.setWorkflowState(WorkflowState.NOT_STARTED);
+        try {
+            ListenableFuture<ProcessCameraProvider> cameraProviderFuture =
+                    ProcessCameraProvider.getInstance(this);
+            PreviewView previewView = findViewById(R.id.view_finder);
+            mCameraHandler = new CameraHandler(
+                    cameraProviderFuture,
+                    previewView,
+                    this,
+                    mGraphicOverlay,
+                    mWorkflowModel);
+            cameraProviderFuture.addListener(mCameraHandler, ContextCompat.getMainExecutor(this));
+        } catch (IllegalStateException | SecurityException e) {
+            Log.w(TAG, "Unable to initialize camera", e);
+            mWorkflowModel.setWorkflowState(WorkflowState.CAMERA_UNAVAILABLE);
+        }
     }
 
     private void setUpWorkflowModel() {
@@ -182,7 +200,19 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                     mCurrentWorkflowState = workflowState;
                     Log.d(TAG, "Current workflow state: " + mCurrentWorkflowState.name());
 
+                    boolean cameraReady = mCameraHandler != null && mCameraHandler.isReady();
+                    mGraphicOverlay.setVisibility(cameraReady ? View.VISIBLE : View.GONE);
+                    mFlashButton.setVisibility(cameraReady && mCameraHandler.hasFlash()
+                            ? View.VISIBLE : View.GONE);
+
                     switch (workflowState) {
+                        case CAMERA_UNAVAILABLE:
+                            mGraphicOverlay.clear();
+                            mGuideChip.setVisibility(View.VISIBLE);
+                            mGuideChip.setText(R.string.camera_unavailable);
+                            mWorkflowModel.markCameraFrozen();
+                            break;
+
                         case DETECTING:
                             mGuideChip.setVisibility(View.VISIBLE);
                             mGuideChip.setText(R.string.prompt_point_at_a_barcode);
@@ -197,6 +227,7 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
 
                         default:
                             mGuideChip.setVisibility(View.GONE);
+                            mWorkflowModel.markCameraFrozen();
                             break;
                     }
                 });
@@ -254,13 +285,14 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                     Log.d(TAG, "Camera permission granted");
                     setupCamera();
                 } else {
-                    DialogInterface.OnClickListener listener = (dialog, id) -> finish();
-
-                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                    builder.setTitle(R.string.app_name)
+                    mWorkflowModel.setWorkflowState(WorkflowState.CAMERA_UNAVAILABLE);
+                    new AlertDialog.Builder(this)
+                            .setTitle(R.string.app_name)
                             .setMessage(R.string.no_camera_permission)
-                            .setPositiveButton(R.string.ok, listener)
-                            .setCancelable(false)
+                            .setPositiveButton(R.string.ok, null)
+                            .setNeutralButton(R.string.activity_label_settings, (dialog, id) ->
+                                    startActivity(new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                                            Uri.parse("package:" + getPackageName()))))
                             .show();
 
                     Log.e(TAG, "Permission not granted: results len = " + grantResults.length +
@@ -288,7 +320,6 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
         View.OnClickListener listener = view ->
                 ActivityCompat.requestPermissions(thisActivity, permissions, RC_HANDLE_CAMERA_PERM);
 
-        findViewById(R.id.main_layout).setOnClickListener(listener);
         Snackbar.make(findViewById(R.id.main_layout), R.string.request_camera_permission,
                 Snackbar.LENGTH_INDEFINITE)
                 .setAction(R.string.ok, listener)
