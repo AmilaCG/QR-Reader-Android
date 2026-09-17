@@ -67,9 +67,8 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
         com.auroid.qrscanner.utils.Utils.applySystemBarInsets(this);
 
         mGraphicOverlay = findViewById(R.id.camera_preview_graphic_overlay);
-        // TODO: Temporary disabled HW acceleration since graphic overlay is not rendered properly
-        //  on some devices due to an issue of CameraX PreviewView.
-        mGraphicOverlay.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+        // Isolate CLEAR blending so the cutout only erases the overlay
+        mGraphicOverlay.setLayerType(View.LAYER_TYPE_HARDWARE, null);
         mGraphicOverlay.setOnClickListener(this);
 
         mGuideChip = findViewById(R.id.guide_chip);
