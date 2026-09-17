@@ -278,31 +278,26 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                                            @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch (requestCode) {
-            case RC_HANDLE_CAMERA_PERM: {
-                if (grantResults.length != 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Log.d(TAG, "Camera permission granted");
-                    setupCamera();
-                } else {
-                    mWorkflowModel.setWorkflowState(WorkflowState.CAMERA_UNAVAILABLE);
-                    new AlertDialog.Builder(this)
-                            .setTitle(R.string.app_name)
-                            .setMessage(R.string.no_camera_permission)
-                            .setPositiveButton(R.string.ok, null)
-                            .setNeutralButton(R.string.activity_label_settings, (dialog, id) ->
-                                    startActivity(new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-                                            Uri.parse("package:" + getPackageName()))))
-                            .show();
+        if (requestCode == RC_HANDLE_CAMERA_PERM) {
+            if (grantResults.length != 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Log.d(TAG, "Camera permission granted");
+                setupCamera();
+            } else {
+                mWorkflowModel.setWorkflowState(WorkflowState.CAMERA_UNAVAILABLE);
+                new AlertDialog.Builder(this)
+                        .setTitle(R.string.app_name)
+                        .setMessage(R.string.no_camera_permission)
+                        .setPositiveButton(R.string.ok, null)
+                        .setNeutralButton(R.string.activity_label_settings, (dialog, id) ->
+                                startActivity(new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                                        Uri.parse("package:" + getPackageName()))))
+                        .show();
 
-                    Log.e(TAG, "Permission not granted: results len = " + grantResults.length +
-                            " Result code = " + (grantResults.length > 0 ? grantResults[0] : "(empty)"));
-                }
-                break;
+                Log.e(TAG, "Permission not granted: results len = " + grantResults.length +
+                        " Result code = " + (grantResults.length > 0 ? grantResults[0] : "(empty)"));
             }
-            default: {
-                Log.e(TAG, "Got unexpected permission result: " + requestCode);
-                break;
-            }
+        } else {
+            Log.e(TAG, "Got unexpected permission result: " + requestCode);
         }
     }
 
