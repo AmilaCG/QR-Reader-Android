@@ -2,7 +2,6 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout
   xmlns:android="http://schemas.android.com/apk/res/android"
   xmlns:tools="http://schemas.android.com/tools"
-  xmlns:app="http://schemas.android.com/apk/res-auto"
   android:id="@+id/main_layout"
   android:layout_width="match_parent"
   android:layout_height="match_parent"
@@ -25,21 +24,27 @@
     android:layout_height="wrap_content"
     android:layout_gravity="bottom" />
 
-  <com.google.android.material.chip.Chip
-    android:id="@+id/guide_chip"
-    style="@style/Widget.MaterialComponents.Chip.Entry"
+  <androidx.appcompat.widget.AppCompatTextView
+    android:id="@+id/guide_text"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_marginTop="48dp"
     android:layout_gravity="top|center_horizontal"
-    android:checkable="false"
+    android:layout_marginStart="16dp"
+    android:layout_marginTop="48dp"
+    android:layout_marginEnd="16dp"
+    android:background="@drawable/guide_message_background"
     android:clickable="false"
     android:fontFamily="sans-serif"
+    android:gravity="center"
+    android:minHeight="32dp"
+    android:paddingStart="12dp"
+    android:paddingTop="8dp"
+    android:paddingEnd="12dp"
+    android:paddingBottom="8dp"
+    android:singleLine="false"
     android:textColor="@color/white"
     android:textSize="@dimen/bottom_prompt_chip_text_size"
-    android:visibility="gone"
-    app:chipCornerRadius="@dimen/bottom_prompt_chip_corner_radius"
-    app:chipSurfaceColor="@color/chip_bg"
-    app:closeIconVisible="false" />
+    android:visibility="visible"
+    tools:text="@string/camera_unavailable" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
