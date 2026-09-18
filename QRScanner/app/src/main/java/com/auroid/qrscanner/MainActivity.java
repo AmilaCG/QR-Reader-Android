@@ -10,6 +10,7 @@ import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -21,7 +22,6 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.google.android.material.chip.Chip;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.common.base.Objects;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
     private View mHistoryButton;
     private View mFlashButton;
     private View mGalleryButton;
-    private Chip mGuideChip;
+    private TextView mGuideText;
 
     private WorkflowModel mWorkflowModel;
     private WorkflowState mCurrentWorkflowState;
@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
         mGraphicOverlay.setLayerType(View.LAYER_TYPE_HARDWARE, null);
         mGraphicOverlay.setOnClickListener(this);
 
-        mGuideChip = findViewById(R.id.guide_chip);
+        mGuideText = findViewById(R.id.guide_text);
 
         mFlashButton = findViewById(R.id.flash_button);
         mFlashButton.setOnClickListener(this);
@@ -207,25 +207,25 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                     switch (workflowState) {
                         case CAMERA_UNAVAILABLE:
                             mGraphicOverlay.clear();
-                            mGuideChip.setVisibility(View.VISIBLE);
-                            mGuideChip.setText(R.string.camera_unavailable);
+                            mGuideText.setVisibility(View.VISIBLE);
+                            mGuideText.setText(R.string.camera_unavailable);
                             mWorkflowModel.markCameraFrozen();
                             break;
 
                         case DETECTING:
-                            mGuideChip.setVisibility(View.VISIBLE);
-                            mGuideChip.setText(R.string.prompt_point_at_a_barcode);
+                            mGuideText.setVisibility(View.VISIBLE);
+                            mGuideText.setText(R.string.prompt_point_at_a_barcode);
                             mWorkflowModel.markCameraLive();
                             break;
 
                         case DETECTED:
-                            mGuideChip.setVisibility(View.GONE);
+                            mGuideText.setVisibility(View.GONE);
                             mAudioHandler.playAudioBeep();
                             mWorkflowModel.markCameraFrozen();
                             break;
 
                         default:
-                            mGuideChip.setVisibility(View.GONE);
+                            mGuideText.setVisibility(View.GONE);
                             mWorkflowModel.markCameraFrozen();
                             break;
                     }
