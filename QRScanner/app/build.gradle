@@ -11,8 +11,8 @@ android {
         applicationId "com.auroid.qrscanner"
         minSdk 24
         targetSdk 37
-        versionCode 58
-        versionName "3.08.01"
+        versionCode 59
+        versionName "3.08.02"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         resValue 'string', 'versionName', versionName
