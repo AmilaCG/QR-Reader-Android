@@ -13,13 +13,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.auroid.qrscanner.serializable.BarcodeWrapper;
 import com.auroid.qrscanner.utils.AppRater;
 import com.auroid.qrscanner.utils.TypeSelector;
+import com.auroid.qrscanner.wifi.WifiConnectionHelper;
 
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.google.mlkit.vision.barcode.common.Barcode;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
-public class BarcodeResultActivity extends AppCompatActivity implements View.OnClickListener {
+public class BarcodeResultActivity extends AppCompatActivity implements View.OnClickListener,
+        WifiConnectionHelper.Host {
 
     private static final String TAG = "BarcodeResultActivity";
 
@@ -27,10 +29,17 @@ public class BarcodeResultActivity extends AppCompatActivity implements View.OnC
 
     private BarcodeWrapper mBarcodeWrapper;
     private int mBarcodeFormat = -1;
+    private WifiConnectionHelper mWifiConnectionHelper;
+
+    @Override
+    public WifiConnectionHelper getWifiConnectionHelper() {
+        return mWifiConnectionHelper;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mWifiConnectionHelper = new WifiConnectionHelper(this);
         setContentView(R.layout.activity_barcode_result);
         com.auroid.qrscanner.utils.Utils.applySystemBarInsets(this);
 
@@ -49,16 +58,19 @@ public class BarcodeResultActivity extends AppCompatActivity implements View.OnC
                 Log.e(TAG, "onCreate: json is not a valid representation for BarcodeWrapper", e);
                 FirebaseCrashlytics.getInstance().recordException(e);
                 finish();
+                return;
             }
             if (mBarcodeWrapper == null) {
                 Toast.makeText(this, R.string.error_unknown, Toast.LENGTH_SHORT).show();
                 Log.e(TAG, "onCreate: mBarcodeWrapper is null");
                 finish();
+                return;
             }
         } else {
             Toast.makeText(this, R.string.error_unknown, Toast.LENGTH_SHORT).show();
             Log.e(TAG, "onCreate: Intent bundle is null");
             finish();
+            return;
         }
 
         AppRater.showRateDialog(this);

@@ -16,10 +16,12 @@ import android.widget.Toast;
 import com.auroid.qrscanner.resultdb.Result;
 import com.auroid.qrscanner.resultdb.ResultListAdapter;
 import com.auroid.qrscanner.resultdb.ResultViewModel;
+import com.auroid.qrscanner.wifi.WifiConnectionHelper;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.snackbar.Snackbar;
 
-public class ScanHistoryActivity extends AppCompatActivity implements View.OnClickListener {
+public class ScanHistoryActivity extends AppCompatActivity implements View.OnClickListener,
+        WifiConnectionHelper.Host {
 
     private static final String TAG = "ScanHistoryActivity";
 
@@ -27,10 +29,17 @@ public class ScanHistoryActivity extends AppCompatActivity implements View.OnCli
     private Result mRecentlyDeletedItem;
 
     private boolean mIsHistoryEmpty;
+    private WifiConnectionHelper mWifiConnectionHelper;
+
+    @Override
+    public WifiConnectionHelper getWifiConnectionHelper() {
+        return mWifiConnectionHelper;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mWifiConnectionHelper = new WifiConnectionHelper(this);
         setContentView(R.layout.activity_scan_history);
         com.auroid.qrscanner.utils.Utils.applySystemBarInsets(this);
 
