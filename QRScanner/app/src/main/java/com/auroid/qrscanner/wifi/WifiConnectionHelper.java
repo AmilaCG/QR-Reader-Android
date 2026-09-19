@@ -269,7 +269,7 @@ public final class WifiConnectionHelper implements DefaultLifecycleObserver {
                 .setTitle(R.string.type_wifi)
                 .setMessage(message)
                 .setPositiveButton(R.string.wifi_open_settings, (d, which) -> openSettings())
-                .setNegativeButton(R.string.cancel, null);
+                .setNegativeButton(R.string.close, null);
         final String password = mCurrentWifi == null ? null : mCurrentWifi.password;
         if (password != null && !password.isEmpty()) {
             builder.setNeutralButton(R.string.wifi_copy_password, null);
