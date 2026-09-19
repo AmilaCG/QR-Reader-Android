@@ -31,6 +31,7 @@
     <string name="clearall">Clear All</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
+    <string name="close">Close</string>
     <string name="cd_settings_button">Settings</string>
     <string name="cd_flash_button">Toggle camera flash</string>
     <string name="cd_history_button">Scan history</string>
