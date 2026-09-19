@@ -41,6 +41,26 @@
     <string name="pref_key_open_browser" translatable="false">open_browser</string>
     <string name="pref_key_play_audio_beep" translatable="false">audio_beep</string>
     <string name="unsupported_encryption">WiFi encryption is not supported</string>
+    <string name="wifi_details">\nName (SSID): %1$s\nPassword: %2$s\nEncryption: %3$s</string>
+    <string name="wifi_invalid_ssid">This QR code has a missing or invalid network name. Check the network details in Wi-Fi settings.</string>
+    <string name="wifi_invalid_password">This QR code has a missing or invalid password for its security type. Check the password with the network owner.</string>
+    <string name="wifi_invalid_credentials">These Wi-Fi details could not be used. Check the network name and password, or try Wi-Fi settings.</string>
+    <string name="wifi_unsupported_security">This security type or key format cannot be added automatically on this device. Try adding the network in Wi-Fi settings.</string>
+    <string name="wifi_request_failed">The Wi-Fi request was not accepted. Open Wi-Fi settings to connect manually.</string>
+    <string name="wifi_permission_denied">Wi-Fi control is not allowed for this app. You can connect manually in Wi-Fi settings. On Android 10, you can also enable Wi-Fi control for this app in Settings.</string>
+    <string name="wifi_unavailable">Wi-Fi is unavailable on this device.</string>
+    <string name="wifi_suggestion_submitted">Network suggested. Approve this app’s Wi-Fi notification if shown. Android decides when to connect. If Wi-Fi is off or the network does not connect, open Wi-Fi settings.</string>
+    <string name="wifi_suggestion_exists">This network was already suggested. Check this app’s Wi-Fi approval notification, or connect in Wi-Fi settings. If the password has changed, update it in Wi-Fi settings.</string>
+    <string name="wifi_save_cancelled">Adding the Wi-Fi network was cancelled.</string>
+    <string name="wifi_save_failed">The network could not be saved. Open Wi-Fi settings to add it manually.</string>
+    <string name="wifi_network_saved">Network saved. Android will try to connect when the network is available. Check Wi-Fi settings for the connection status.</string>
+    <string name="wifi_network_exists">This network is already saved. Check Wi-Fi settings to connect or view its connection status.</string>
+    <string name="wifi_enable_failed">Wi-Fi could not be turned on. Turn it on in Wi-Fi settings and try again.</string>
+    <string name="wifi_enabling">Turning on Wi-Fi…</string>
+    <string name="wifi_connection_requested">Connection requested. Check Wi-Fi settings to confirm the connection or resolve a password error.</string>
+    <string name="wifi_open_settings">Wi-Fi settings</string>
+    <string name="wifi_copy_password">Copy password</string>
+    <string name="wifi_settings_unavailable">Wi-Fi settings could not be opened on this device.</string>
     <string name="wait_for_decode">Scanning..</string>
 
     <string name="static_image_prompt_detected_no_results">No barcodes detected</string>

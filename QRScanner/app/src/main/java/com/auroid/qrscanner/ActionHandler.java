@@ -9,10 +9,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.net.Uri;
-import android.net.wifi.WifiConfiguration;
-import android.net.wifi.WifiManager;
-import android.net.wifi.WifiNetworkSuggestion;
-import android.os.Build;
 import android.provider.CalendarContract;
 import android.provider.ContactsContract;
 import android.telephony.PhoneNumberUtils;
@@ -28,6 +24,7 @@ import com.auroid.qrscanner.serializable.ContactWrapper;
 import com.auroid.qrscanner.serializable.EventWrapper;
 import com.auroid.qrscanner.serializable.WiFiWrapper;
 import com.auroid.qrscanner.utils.TypeSelector;
+import com.auroid.qrscanner.wifi.WifiConnectionHelper;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
@@ -37,7 +34,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 
 public class ActionHandler {
@@ -225,38 +221,8 @@ public class ActionHandler {
 
     public void connectToWifi() {
         mFirebaseAnalytics.logEvent("action_connect_to_wifi", null);
-        String ssid = mBarcodeWrapper.wifiWrapper.ssid;
-        String pass = mBarcodeWrapper.wifiWrapper.password;
-
-        Toast.makeText(mContext, "Connecting to: " + ssid + "..", Toast.LENGTH_LONG).show();
-        WifiManager wifiManager =
-                (WifiManager) mContext.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            int encryption = mBarcodeWrapper.wifiWrapper.encryptionType;
-            if (encryption == Barcode.WiFi.TYPE_WPA) {
-                // TODO: Need to find a proper way for API 29 (Q) and above
-                WifiNetworkSuggestion networkSuggestion = new WifiNetworkSuggestion.Builder()
-                        .setSsid(ssid)
-                        .setWpa2Passphrase(pass)
-                        .build();
-
-                List<WifiNetworkSuggestion> suggestionsList = new ArrayList<>();
-                suggestionsList.add(networkSuggestion);
-                wifiManager.addNetworkSuggestions(suggestionsList);
-            } else if (encryption == Barcode.WiFi.TYPE_WEP) {
-                Toast.makeText(mContext, R.string.unsupported_encryption, Toast.LENGTH_SHORT).show();
-            }
-        } else {
-            if (!wifiManager.isWifiEnabled()) {
-                wifiManager.setWifiEnabled(true);
-            }
-            WifiConfiguration wifiConfiguration = new WifiConfiguration();
-            wifiConfiguration.SSID = String.format("\"%s\"", ssid);
-            wifiConfiguration.preSharedKey = String.format("\"%s\"", pass);
-            int wifiID = wifiManager.addNetwork(wifiConfiguration);
-            wifiManager.enableNetwork(wifiID, true);
-        }
+        WifiConnectionHelper.connect(mContext,
+                mBarcodeWrapper == null ? null : mBarcodeWrapper.wifiWrapper);
     }
 
     public void copyToClipboard() {
@@ -457,9 +423,11 @@ public class ActionHandler {
 
     public String getFormattedWiFiDetails() {
         WiFiWrapper wifiParams = mBarcodeWrapper.wifiWrapper;
+        if (wifiParams == null) {
+            return mContext.getString(R.string.wifi_invalid_credentials);
+        }
 
         String encryption;
-        assert wifiParams != null;
         switch (wifiParams.encryptionType) {
             case Barcode.WiFi.TYPE_OPEN:
                 encryption = "None";
@@ -477,8 +445,8 @@ public class ActionHandler {
                 encryption = "Unknown";
         }
 
-        return "\nName (SSID): " + wifiParams.ssid +
-                "\nPassword: " + wifiParams.password +
-                "\nEncryption: " + encryption;
+        return mContext.getString(R.string.wifi_details,
+                wifiParams.ssid == null ? "" : wifiParams.ssid,
+                wifiParams.password == null ? "" : wifiParams.password, encryption);
     }
 }
