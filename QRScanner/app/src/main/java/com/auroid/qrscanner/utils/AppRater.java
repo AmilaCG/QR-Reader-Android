@@ -11,6 +11,7 @@ import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleOwner;
 
 import com.google.android.play.core.review.ReviewManager;
+import com.google.android.play.core.review.ReviewInfo;
 import com.google.android.play.core.review.ReviewManagerFactory;
 
 import java.text.SimpleDateFormat;
@@ -26,8 +27,10 @@ public final class AppRater implements DefaultLifecycleObserver {
 
     private final AppCompatActivity mActivity;
     private final SharedPreferences mPrefs;
+    private ReviewManager mReviewManager;
+    private ReviewInfo mReviewInfo;
     private boolean mBusy;
-    private boolean mRequestPending;
+    private boolean mReviewOpportunity;
 
     public AppRater(AppCompatActivity activity) {
         mActivity = activity;
@@ -51,36 +54,56 @@ public final class AppRater implements DefaultLifecycleObserver {
         return mBusy;
     }
 
-    public void maybeRequestReview(Runnable onFinished) {
+    private boolean isEligible() {
         long lastAttempt = mPrefs.getLong("last_review_attempt", 0);
-        if (mAttemptedThisSession || mBusy || mPrefs.getInt("scan_counter", 0) < 5
-                || mPrefs.getInt("scan_days", 0) < 2
-                || (lastAttempt != 0 && System.currentTimeMillis() - lastAttempt < COOLDOWN_MS)
-                || !canLaunch()) return;
+        return mPrefs.getInt("scan_counter", 0) >= 5
+                && mPrefs.getInt("scan_days", 0) >= 2
+                && (lastAttempt == 0 || System.currentTimeMillis() - lastAttempt >= COOLDOWN_MS);
+    }
+
+    public void prepareReview() {
+        if (mAttemptedThisSession || mBusy || !isEligible() || !canLaunch()) {
+            return;
+        }
 
         mAttemptedThisSession = true;
-        mBusy = true;
-        mRequestPending = true;
+        mReviewOpportunity = true;
         Log.d(TAG, "Requesting review eligibility from Play");
-        ReviewManager manager = ReviewManagerFactory.create(mActivity.getApplicationContext());
-        manager.requestReviewFlow().addOnCompleteListener(request -> {
-            // Leaving cancels the opportunity, even if the user returns quickly.
-            if (!mRequestPending) return;
-            mRequestPending = false;
-            if (!request.isSuccessful() || !canLaunch()) {
-                if (!request.isSuccessful()) Log.w(TAG, "Review request failed", request.getException());
-                mBusy = false;
-                onFinished.run();
+        mReviewManager = ReviewManagerFactory.create(mActivity.getApplicationContext());
+        mReviewManager.requestReviewFlow().addOnCompleteListener(request -> {
+            // Preparation may finish while the result screen or an external app is open.
+            // Never launch here, or accept a response after the return opportunity ends.
+            if (!mReviewOpportunity) {
                 return;
             }
-            mPrefs.edit().putLong("last_review_attempt", System.currentTimeMillis()).apply();
-            Log.d(TAG, "Launching review flow (display and submission are not observable)");
-            manager.launchReviewFlow(mActivity, request.getResult()).addOnCompleteListener(flow -> {
-                if (!flow.isSuccessful()) Log.w(TAG, "Review launch failed", flow.getException());
-                mBusy = false;
-                onFinished.run();
-            });
+            if (request.isSuccessful()) {
+                mReviewInfo = request.getResult();
+            } else {
+                Log.w(TAG, "Review request failed", request.getException());
+            }
         });
+    }
+
+    public void launchPreparedReview(Runnable onFinished) {
+        ReviewInfo reviewInfo = mReviewInfo;
+        discardReview();
+        if (reviewInfo == null || mBusy || !isEligible() || !canLaunch()) {
+            return;
+        }
+
+        mBusy = true;
+        mPrefs.edit().putLong("last_review_attempt", System.currentTimeMillis()).apply();
+        Log.d(TAG, "Launching review flow (display and submission are not observable)");
+        mReviewManager.launchReviewFlow(mActivity, reviewInfo).addOnCompleteListener(flow -> {
+            if (!flow.isSuccessful()) Log.w(TAG, "Review launch failed", flow.getException());
+            mBusy = false;
+            onFinished.run();
+        });
+    }
+
+    private void discardReview() {
+        mReviewOpportunity = false;
+        mReviewInfo = null;
     }
 
     private boolean canLaunch() {
@@ -89,10 +112,7 @@ public final class AppRater implements DefaultLifecycleObserver {
     }
 
     @Override
-    public void onPause(@NonNull LifecycleOwner owner) {
-        if (mRequestPending) {
-            mRequestPending = false;
-            mBusy = false;
-        }
+    public void onDestroy(@NonNull LifecycleOwner owner) {
+        discardReview();
     }
 }

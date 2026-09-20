@@ -119,13 +119,13 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
     @Override
     protected void onResumeFragments() {
         super.onResumeFragments();
-        // Let Android finish dispatching RESUMED before requesting a review.
+        // Let Android finish dispatching RESUMED before launching a prepared review.
         boolean returnedFromScan = mReturnedFromScan;
         mReturnedFromScan = false;
         getWindow().getDecorView().post(() -> {
             if (returnedFromScan) {
                 mWorkflowModel.markCameraFrozen();
-                mAppRater.maybeRequestReview(this::resumeScanning);
+                mAppRater.launchPreparedReview(this::resumeScanning);
             }
             resumeScanning();
         });
@@ -290,6 +290,7 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                             Intent intent = new Intent(this, BarcodeResultActivity.class);
                             intent.putExtra("RESULT", resultHandler.getResultJson());
                             intent.putExtra("FORMAT", barcode.getFormat());
+                            mAppRater.prepareReview();
                             mScanResultLauncher.launch(intent);
                         }
                         mFirebaseAnalytics.logEvent("scan_barcode", null);
