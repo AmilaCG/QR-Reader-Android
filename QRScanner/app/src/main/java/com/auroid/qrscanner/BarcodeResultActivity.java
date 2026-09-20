@@ -11,7 +11,6 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.auroid.qrscanner.serializable.BarcodeWrapper;
-import com.auroid.qrscanner.utils.AppRater;
 import com.auroid.qrscanner.utils.TypeSelector;
 import com.auroid.qrscanner.wifi.WifiConnectionHelper;
 
@@ -72,8 +71,6 @@ public class BarcodeResultActivity extends AppCompatActivity implements View.OnC
             finish();
             return;
         }
-
-        AppRater.showRateDialog(this);
 
         TextView tvBarcodeFormat = findViewById(R.id.barcode_format);
         String format = TypeSelector.barcodeFormatAsString(mBarcodeFormat);
