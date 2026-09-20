@@ -96,6 +96,14 @@ public class ResultListAdapter extends ListAdapter<Result, ResultListAdapter.Res
                         actionHandler.copyToClipboard();
                         return true;
 
+                } else if (id == R.id.menu_item_copy_ssid) {
+                        actionHandler.copyWifiSsid();
+                        return true;
+
+                } else if (id == R.id.menu_item_copy_password) {
+                        actionHandler.copyWifiPassword();
+                        return true;
+
                 } else {
                         return false;
                 }
@@ -201,6 +209,8 @@ public class ResultListAdapter extends ListAdapter<Result, ResultListAdapter.Res
 
             case Barcode.TYPE_WIFI:
                 popupMenu.inflate(R.menu.menu_result_wifi);
+                popupMenu.getMenu().findItem(R.id.menu_item_copy_password).setVisible(
+                        new ActionHandler(mContext, bcWrapper).hasWifiPassword());
                 break;
 
             default:

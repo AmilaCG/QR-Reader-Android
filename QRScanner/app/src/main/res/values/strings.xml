@@ -61,6 +61,7 @@
     <string name="wifi_connection_requested">Connection requested. Check Wi-Fi settings to confirm the connection or resolve a password error.</string>
     <string name="wifi_open_settings">Wi-Fi settings</string>
     <string name="wifi_copy_password">Copy password</string>
+    <string name="wifi_copy_ssid">Copy SSID</string>
     <string name="wifi_settings_unavailable">Wi-Fi settings could not be opened on this device.</string>
     <string name="wait_for_decode">Scanning..</string>
 

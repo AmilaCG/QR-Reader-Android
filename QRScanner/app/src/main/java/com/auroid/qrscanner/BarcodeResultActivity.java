@@ -145,6 +145,23 @@ public class BarcodeResultActivity extends AppCompatActivity implements View.OnC
 
                 tvAction.setText(R.string.action_wifi);
                 ibAction.setImageResource(R.drawable.ic_wifi_black_38);
+                ibAction.setContentDescription(getString(R.string.action_wifi));
+
+                TextView copyLabel = findViewById(R.id.txt_copy);
+                copyLabel.setText(R.string.wifi_copy_ssid);
+                ImageButton copyButton = findViewById(R.id.ib_copy);
+                copyButton.setContentDescription(getString(R.string.wifi_copy_ssid));
+                copyButton.setOnClickListener(v -> actionWifi.copyWifiSsid());
+
+                TextView passwordLabel = findViewById(R.id.txt_search);
+                passwordLabel.setText(R.string.wifi_copy_password);
+                ImageButton passwordButton = findViewById(R.id.ib_search);
+                passwordButton.setImageResource(R.drawable.ic_content_copy_black_36dp);
+                passwordButton.setContentDescription(getString(R.string.wifi_copy_password));
+                passwordButton.setOnClickListener(v -> actionWifi.copyWifiPassword());
+                int passwordVisibility = actionWifi.hasWifiPassword() ? View.VISIBLE : View.GONE;
+                passwordLabel.setVisibility(passwordVisibility);
+                passwordButton.setVisibility(passwordVisibility);
                 break;
 
             case Barcode.TYPE_PRODUCT:

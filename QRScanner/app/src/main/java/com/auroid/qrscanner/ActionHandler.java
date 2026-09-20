@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.net.Uri;
+import android.os.PersistableBundle;
 import android.provider.CalendarContract;
 import android.provider.ContactsContract;
 import android.telephony.PhoneNumberUtils;
@@ -227,9 +228,42 @@ public class ActionHandler {
 
     public void copyToClipboard() {
         mFirebaseAnalytics.logEvent("action_copy_to_clipboard", null);
+        copyText("QRCode", mBarcodeWrapper.displayValue, false);
+    }
+
+    public boolean hasWifiPassword() {
+        WiFiWrapper wifi = mBarcodeWrapper == null ? null : mBarcodeWrapper.wifiWrapper;
+        return wifi != null && wifi.encryptionType != Barcode.WiFi.TYPE_OPEN
+                && wifi.password != null && !wifi.password.isEmpty();
+    }
+
+    public void copyWifiSsid() {
+        WiFiWrapper wifi = mBarcodeWrapper == null ? null : mBarcodeWrapper.wifiWrapper;
+        if (wifi == null || wifi.ssid == null || wifi.ssid.isEmpty()) {
+            return;
+        }
+        mFirebaseAnalytics.logEvent("action_copy_wifi_ssid", null);
+        copyText(mContext.getString(R.string.wifi_copy_ssid), wifi.ssid, false);
+    }
+
+    public void copyWifiPassword() {
+        if (!hasWifiPassword()) {
+            return;
+        }
+        mFirebaseAnalytics.logEvent("action_copy_wifi_password", null);
+        copyText(mContext.getString(R.string.wifi_copy_password),
+                mBarcodeWrapper.wifiWrapper.password, true);
+    }
+
+    private void copyText(String label, String value, boolean sensitive) {
         ClipboardManager clipboardManager =
                 (ClipboardManager) mContext.getSystemService(Context.CLIPBOARD_SERVICE);
-        ClipData clip = ClipData.newPlainText("QRCode", mBarcodeWrapper.displayValue);
+        ClipData clip = ClipData.newPlainText(label, value);
+        if (sensitive) {
+            PersistableBundle extras = new PersistableBundle();
+            extras.putBoolean("android.content.extra.IS_SENSITIVE", true);
+            clip.getDescription().setExtras(extras);
+        }
         if (clipboardManager != null) {
             clipboardManager.setPrimaryClip(clip);
 
