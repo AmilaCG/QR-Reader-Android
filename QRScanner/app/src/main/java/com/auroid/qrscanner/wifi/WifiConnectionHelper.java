@@ -3,8 +3,6 @@ package com.auroid.qrscanner.wifi;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
-import android.content.ClipData;
-import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
@@ -15,7 +13,6 @@ import android.net.wifi.WifiNetworkSuggestion;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
-import android.os.PersistableBundle;
 import android.provider.Settings;
 import android.widget.Toast;
 
@@ -50,7 +47,6 @@ public final class WifiConnectionHelper implements DefaultLifecycleObserver {
     private BroadcastReceiver mWifiStateReceiver;
     private Runnable mEnableTimeout;
     private AlertDialog mDialog;
-    private WiFiWrapper mCurrentWifi;
 
     public WifiConnectionHelper(AppCompatActivity activity) {
         mActivity = activity;
@@ -77,7 +73,6 @@ public final class WifiConnectionHelper implements DefaultLifecycleObserver {
 
     public void connect(WiFiWrapper wifi) {
         stopWaitingForWifi();
-        mCurrentWifi = wifi;
         WifiCredentials.Problem problem = WifiCredentials.validate(wifi);
         if (problem != WifiCredentials.Problem.NONE) {
             int message = problem == WifiCredentials.Problem.INVALID_SSID
@@ -270,29 +265,8 @@ public final class WifiConnectionHelper implements DefaultLifecycleObserver {
                 .setMessage(message)
                 .setPositiveButton(R.string.wifi_open_settings, (d, which) -> openSettings())
                 .setNegativeButton(R.string.close, null);
-        final String password = mCurrentWifi == null ? null : mCurrentWifi.password;
-        if (password != null && !password.isEmpty()) {
-            builder.setNeutralButton(R.string.wifi_copy_password, null);
-        }
         mDialog = builder.create();
         mDialog.show();
-        if (password != null && !password.isEmpty()) {
-            // Keep the settings action available after copying.
-            mDialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener(v -> copyPassword(password));
-        }
-    }
-
-    private void copyPassword(String password) {
-        ClipboardManager clipboard = mActivity.getSystemService(ClipboardManager.class);
-        if (clipboard == null) {
-            return;
-        }
-        ClipData clip = ClipData.newPlainText(mActivity.getString(R.string.wifi_copy_password), password);
-        PersistableBundle extras = new PersistableBundle();
-        extras.putBoolean("android.content.extra.IS_SENSITIVE", true);
-        clip.getDescription().setExtras(extras);
-        clipboard.setPrimaryClip(clip);
-        Toast.makeText(mActivity, R.string.confirm_copy_to_clipboard, Toast.LENGTH_SHORT).show();
     }
 
     private void openSettings() {
@@ -325,6 +299,5 @@ public final class WifiConnectionHelper implements DefaultLifecycleObserver {
         if (mDialog != null) {
             mDialog.dismiss();
         }
-        mCurrentWifi = null;
     }
 }

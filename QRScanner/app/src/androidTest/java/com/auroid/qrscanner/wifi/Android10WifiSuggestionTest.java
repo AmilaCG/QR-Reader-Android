@@ -140,7 +140,8 @@ public class Android10WifiSuggestionTest {
         try (ActivityScenario<BarcodeResultActivity> scenario = scan(wifi(Barcode.WiFi.TYPE_WEP, "abcde"))) {
             onView(withId(R.id.ib_action)).perform(click());
             message(R.string.wifi_unsupported_security);
-            onView(withText(R.string.wifi_copy_password)).inRoot(isDialog()).check(matches(isDisplayed()));
+            onView(withText(R.string.wifi_copy_password)).inRoot(isDialog()).check(
+                    androidx.test.espresso.assertion.ViewAssertions.doesNotExist());
         }
     }
 

@@ -1,25 +1,23 @@
 package com.auroid.qrscanner.resultdb;
 
 import android.content.Context;
-import android.text.method.LinkMovementMethod;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.auroid.qrscanner.ActionHandler;
+import com.auroid.qrscanner.BarcodeResultActivity;
 import com.auroid.qrscanner.R;
+import com.auroid.qrscanner.ResultContent;
 import com.auroid.qrscanner.serializable.BarcodeWrapper;
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.mlkit.vision.barcode.common.Barcode;
 import com.google.gson.Gson;
 
@@ -32,8 +30,6 @@ public class ResultListAdapter extends ListAdapter<Result, ResultListAdapter.Res
             new SimpleDateFormat("EEE, d MMM yyyy, h:mm a", Locale.getDefault());
 
     private Gson mGson;
-
-    private Context mContext;
 
     private static final DiffUtil.ItemCallback<Result> DIFF_CALLBACK = new DiffUtil.ItemCallback<Result>() {
         @Override
@@ -56,8 +52,7 @@ public class ResultListAdapter extends ListAdapter<Result, ResultListAdapter.Res
     @NonNull
     @Override
     public ResultViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        mContext = parent.getContext();
-        View itemView = LayoutInflater.from(mContext)
+        View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.recyclerview_item, parent, false);
         return new ResultViewHolder(itemView);
     }
@@ -66,160 +61,24 @@ public class ResultListAdapter extends ListAdapter<Result, ResultListAdapter.Res
     public void onBindViewHolder(@NonNull ResultViewHolder holder, int position) {
         Result current = getItem(position);
         BarcodeWrapper barcodeWrapper = mGson.fromJson(current.getResult(), BarcodeWrapper.class);
-        int valueFormat = barcodeWrapper.valueFormat;
 
-        holder.resultItemView.setText(barcodeWrapper.displayValue);
+        holder.resultItemView.setText(ResultContent.summary(barcodeWrapper));
         holder.timeItemView.setText(mFormatter.format(current.getTime()));
         setIcon(barcodeWrapper.valueFormat, holder);
 
-        holder.optionItemView.setOnClickListener(v -> {
-            PopupMenu popupMenu = new PopupMenu(mContext, holder.optionItemView);
-
-            inflateMenu(valueFormat, popupMenu, barcodeWrapper);
-            ActionHandler actionHandler = new ActionHandler(mContext, barcodeWrapper);
-
-            popupMenu.setOnMenuItemClickListener(item -> {
-                int id = item.getItemId();
-                if (id == R.id.menu_item_more) {
-                        displayInfo(valueFormat, actionHandler, barcodeWrapper);
-                        return true;
-
-                } else if (id == R.id.menu_item_action) {
-                        runAction(valueFormat, actionHandler);
-                        return true;
-
-                } else if (id == R.id.menu_item_search) {
-                        actionHandler.webSearch();
-                        return true;
-
-                } else if (id == R.id.menu_item_copy) {
-                        actionHandler.copyToClipboard();
-                        return true;
-
-                } else if (id == R.id.menu_item_copy_ssid) {
-                        actionHandler.copyWifiSsid();
-                        return true;
-
-                } else if (id == R.id.menu_item_copy_password) {
-                        actionHandler.copyWifiPassword();
-                        return true;
-
-                } else {
-                        return false;
-                }
-            });
-            popupMenu.show();
-        });
+        View.OnClickListener openDetails = v -> openResult(v.getContext(), current);
+        holder.itemView.setOnClickListener(openDetails);
+        holder.resultItemView.setOnClickListener(openDetails);
     }
 
-    private void displayInfo(int resultType, ActionHandler actionHandler, BarcodeWrapper bcWrapper) {
-        switch (resultType) {
-            case Barcode.TYPE_URL:
-                new MaterialAlertDialogBuilder(mContext)
-                        .setTitle("URL / Text")
-                        .setMessage(bcWrapper.rawValue)
-                        .setIcon(R.drawable.ic_public_white_24dp)
-                        .show();
-                break;
-
-            case Barcode.TYPE_CONTACT_INFO:
-                AlertDialog dialog = new MaterialAlertDialogBuilder(mContext)
-                        .setTitle("Contact")
-                        .setMessage(actionHandler.getFormattedContactDetails())
-                        .setIcon(R.drawable.ic_person_white_24dp)
-                        .show();
-                ((TextView) dialog.findViewById(android.R.id.message)).
-                        setMovementMethod(LinkMovementMethod.getInstance());
-                break;
-
-            case Barcode.TYPE_CALENDAR_EVENT:
-                new MaterialAlertDialogBuilder(mContext)
-                        .setTitle("Calender Event")
-                        .setMessage(actionHandler.getFormattedEventDetails())
-                        .setIcon(R.drawable.ic_calender_white_24dp)
-                        .show();
-                break;
-
-            case Barcode.TYPE_WIFI:
-                new MaterialAlertDialogBuilder(mContext)
-                        .setTitle("WiFi Network")
-                        .setMessage(actionHandler.getFormattedWiFiDetails())
-                        .setIcon(R.drawable.ic_wifi_white_24dp)
-                        .show();
-                break;
-        }
-    }
-
-    private void runAction(int resultType, ActionHandler actionHandler) {
-        switch (resultType) {
-            case Barcode.TYPE_URL:
-                actionHandler.openBrowser();
-                break;
-
-            case Barcode.TYPE_PHONE:
-                actionHandler.openDialer();
-                break;
-
-            case Barcode.TYPE_GEO:
-                actionHandler.openMaps();
-                break;
-
-            case Barcode.TYPE_CALENDAR_EVENT:
-                actionHandler.addToCalender();
-                break;
-
-            case Barcode.TYPE_CONTACT_INFO:
-                actionHandler.addToContacts();
-                break;
-
-            case Barcode.TYPE_WIFI:
-                actionHandler.connectToWifi();
-                break;
-
-            default:
-                break;
-        }
-    }
-
-    private void inflateMenu(int resultType, PopupMenu popupMenu, BarcodeWrapper bcWrapper) {
-        switch(resultType) {
-            case Barcode.TYPE_URL:
-                if (bcWrapper.rawValue.equals(bcWrapper.displayValue)) {
-                    popupMenu.inflate(R.menu.menu_result_web);
-                } else {
-                    popupMenu.inflate(R.menu.menu_result_web_ex);
-                }
-                break;
-
-            case Barcode.TYPE_PHONE:
-                popupMenu.inflate(R.menu.menu_result_phone);
-                break;
-
-            case Barcode.TYPE_GEO:
-                popupMenu.inflate(R.menu.menu_result_geo);
-                break;
-
-            case Barcode.TYPE_CALENDAR_EVENT:
-                popupMenu.inflate(R.menu.menu_result_event);
-                break;
-
-            case Barcode.TYPE_CONTACT_INFO:
-                popupMenu.inflate(R.menu.menu_result_contact);
-                break;
-
-            case Barcode.TYPE_WIFI:
-                popupMenu.inflate(R.menu.menu_result_wifi);
-                popupMenu.getMenu().findItem(R.id.menu_item_copy_password).setVisible(
-                        new ActionHandler(mContext, bcWrapper).hasWifiPassword());
-                break;
-
-            default:
-                popupMenu.inflate(R.menu.menu_result_default);
-                break;
-        }
+    private void openResult(Context context, Result result) {
+        context.startActivity(new Intent(context, BarcodeResultActivity.class)
+                .putExtra("RESULT", result.getResult()));
     }
 
     private void setIcon(int resultType, ResultViewHolder holder) {
+        holder.iconItemView.setImageTintList(android.content.res.ColorStateList.valueOf(
+                holder.itemView.getContext().getColor(R.color.colorTinyIcon)));
         switch(resultType) {
             case Barcode.TYPE_URL:
                 holder.iconItemView.setImageResource(R.drawable.ic_public_white_24dp);
@@ -245,6 +104,10 @@ public class ResultListAdapter extends ListAdapter<Result, ResultListAdapter.Res
                 holder.iconItemView.setImageResource(R.drawable.ic_wifi_white_24dp);
                 break;
 
+            case Barcode.TYPE_EMAIL:
+                holder.iconItemView.setImageResource(R.drawable.ic_email);
+                break;
+
             default:
                 holder.iconItemView.setImageResource(R.drawable.ic_text_white_24dp);
                 break;
@@ -259,14 +122,12 @@ public class ResultListAdapter extends ListAdapter<Result, ResultListAdapter.Res
         private final TextView resultItemView;
         private final TextView timeItemView;
         private final ImageView iconItemView;
-        private final TextView optionItemView;
 
         private ResultViewHolder(View itemView) {
             super(itemView);
             resultItemView = itemView.findViewById(R.id.textViewResult);
             timeItemView = itemView.findViewById(R.id.textViewTime);
             iconItemView = itemView.findViewById(R.id.imgview_history);
-            optionItemView = itemView.findViewById(R.id.textThreeDot);
         }
     }
 }

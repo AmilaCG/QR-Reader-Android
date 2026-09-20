@@ -30,8 +30,7 @@
       android:text="Result"
       android:textAppearance="@android:style/TextAppearance.Material.Medium"
       android:textColor="@color/white"
-      android:textIsSelectable="true"
-      app:layout_constraintEnd_toStartOf="@id/textThreeDot"
+      app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintStart_toEndOf="@id/imgview_history"
       app:layout_constraintTop_toTopOf="parent" />
 
@@ -41,21 +40,9 @@
       android:layout_height="wrap_content"
       android:layout_marginStart="4dp"
       android:text="Date/Time"
-      app:layout_constraintEnd_toStartOf="@id/textThreeDot"
+      app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintStart_toEndOf="@id/imgview_history"
       app:layout_constraintTop_toBottomOf="@id/textViewResult" />
-
-    <TextView
-      android:id="@+id/textThreeDot"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:paddingStart="6dp"
-      android:paddingEnd="8dp"
-      android:text="  ⋮"
-      android:textSize="22dp"
-      android:textStyle="bold"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintTop_toTopOf="parent" />
 
   </androidx.constraintlayout.widget.ConstraintLayout>
 

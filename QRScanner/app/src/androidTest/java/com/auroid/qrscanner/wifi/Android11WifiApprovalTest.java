@@ -47,7 +47,7 @@ public class Android11WifiApprovalTest {
                 .putExtra("FORMAT", Barcode.FORMAT_QR_CODE);
         try (ActivityScenario<BarcodeResultActivity> scenario = ActivityScenario.launch(intent)) {
             onView(withId(R.id.ib_action)).check(matches(isDisplayed()));
-            scenario.onActivity(activity -> activity.doAction(null));
+            scenario.onActivity(activity -> activity.findViewById(com.auroid.qrscanner.R.id.ib_action).performClick());
             await("System Wi-Fi approval did not display the scanned SSID", () -> {
                 AccessibilityNodeInfo root = automation.getRootInActiveWindow();
                 return root != null && "com.android.settings".contentEquals(root.getPackageName())

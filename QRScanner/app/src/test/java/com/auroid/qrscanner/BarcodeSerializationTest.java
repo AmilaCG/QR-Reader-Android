@@ -20,10 +20,20 @@ public class BarcodeSerializationTest {
         BarcodeWrapper barcode = gson.fromJson(savedResult, BarcodeWrapper.class);
 
         assertEquals(9, barcode.valueFormat);
+        org.junit.Assert.assertNull(barcode.barcodeFormat);
         assertNotNull(barcode.wifiWrapper);
         assertEquals("Example", barcode.wifiWrapper.ssid);
         assertEquals("secret", barcode.wifiWrapper.password);
         assertEquals(JsonParser.parseString(savedResult),
                 JsonParser.parseString(gson.toJson(barcode)));
+    }
+
+    @Test
+    public void barcodeFormatSurvivesHistoryRoundTrip() {
+        BarcodeWrapper barcode = new BarcodeWrapper(8, "example", "example");
+        barcode.barcodeFormat = 256;
+        Gson gson = new Gson();
+        assertEquals(Integer.valueOf(256), gson.fromJson(gson.toJson(barcode),
+                BarcodeWrapper.class).barcodeFormat);
     }
 }

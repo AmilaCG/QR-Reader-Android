@@ -10,6 +10,9 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.auroid.qrscanner.R;
+import com.auroid.qrscanner.ResultContent;
+import com.auroid.qrscanner.ResultHandler;
+import com.auroid.qrscanner.ResultActions;
 import com.auroid.qrscanner.utils.TypeSelector;
 import com.google.mlkit.vision.barcode.common.Barcode;
 
@@ -70,8 +73,9 @@ public class PreviewCardAdapter extends RecyclerView.Adapter<PreviewCardAdapter.
 
             setIcon(detectedBarcode.getBarcode().getValueType(), imageView);
             String format = TypeSelector.barcodeFormatAsString(detectedBarcode.getBarcode().getFormat());
-            titleView.setText(format);
-            subtitleView.setText(detectedBarcode.getBarcode().getDisplayValue());
+            titleView.setText(titleView.getContext().getString(
+                    ResultActions.typeLabel(detectedBarcode.getBarcode().getValueType())) + " · " + format);
+            subtitleView.setText(ResultContent.summary(ResultHandler.wrapBarcode(detectedBarcode.getBarcode())));
         }
 
         private void setIcon(int resultType, ImageView imageView) {

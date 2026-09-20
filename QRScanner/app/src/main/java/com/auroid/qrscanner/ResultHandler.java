@@ -23,7 +23,7 @@ import com.google.mlkit.vision.barcode.common.Barcode;
 import java.util.Date;
 import java.util.Objects;
 
-class ResultHandler {
+public class ResultHandler {
 
     private static final String TAG = "ResultHandler";
     private ViewModelStoreOwner mViewModelStoreOwner;
@@ -37,14 +37,19 @@ class ResultHandler {
         return mResultJson;
     }
 
-    @SuppressLint("DefaultLocale")
     public void pushToDatabase(Barcode barcode) {
+        insertToDb(wrapBarcode(barcode));
+    }
+
+    @SuppressLint("DefaultLocale")
+    public static BarcodeWrapper wrapBarcode(Barcode barcode) {
         String result = barcode.getDisplayValue();
         String rawValue = barcode.getRawValue();
         int resultType = barcode.getValueType();
 
         // Create BarcodeWrapper object which will be stored in the database
         BarcodeWrapper barcodeWrapper = new BarcodeWrapper(resultType, result, rawValue);
+        barcodeWrapper.barcodeFormat = barcode.getFormat();
 
         switch (resultType) {
             case Barcode.TYPE_URL:
@@ -68,18 +73,9 @@ class ResultHandler {
                 Log.d(TAG, "CALENDAR_EVENT");
                 Barcode.CalendarEvent calEvent = barcode.getCalendarEvent();
 
-                assert calEvent != null;
-                String eventStart = Objects.requireNonNull(calEvent.getStart()).getYear() + "/"
-                        + calEvent.getStart().getMonth() + "/"
-                        + calEvent.getStart().getDay()
-                        + " " + String.format("%02d", calEvent.getStart().getHours())
-                        + ":" + String.format("%02d", calEvent.getStart().getMinutes());
-
-                String eventEnd = Objects.requireNonNull(calEvent.getEnd()).getYear() + "/"
-                        + calEvent.getEnd().getMonth() + "/"
-                        + calEvent.getEnd().getDay()
-                        + " " + String.format("%02d", calEvent.getEnd().getHours())
-                        + ":" + String.format("%02d", calEvent.getEnd().getMinutes());
+                if (calEvent == null) break;
+                String eventStart = eventDate(calEvent.getStart());
+                String eventEnd = eventDate(calEvent.getEnd());
 
                 barcodeWrapper.eventWrapper = new EventWrapper(
                         calEvent.getDescription(),
@@ -95,7 +91,7 @@ class ResultHandler {
                 Log.d(TAG, "CONTACT_INFO");
                 Barcode.ContactInfo contact = barcode.getContactInfo();
 
-                assert contact != null;
+                if (contact == null) break;
                 int numOfUrls = contact.getUrls().size();
                 String[] urls = new String[numOfUrls];
                 for (int i = 0; i < numOfUrls; i++) {
@@ -127,7 +123,7 @@ class ResultHandler {
                 }
 
                 barcodeWrapper.contactWrapper = new ContactWrapper(
-                        Objects.requireNonNull(contact.getName()).getFormattedName(),
+                        contact.getName() == null ? null : contact.getName().getFormattedName(),
                         contact.getOrganization(),
                         contact.getTitle(),
                         urls,
@@ -146,13 +142,37 @@ class ResultHandler {
                 );
                 break;
 
+            case Barcode.TYPE_EMAIL:
+                Barcode.Email email = barcode.getEmail();
+                if (email != null) {
+                    barcodeWrapper.recipient = email.getAddress();
+                    barcodeWrapper.subject = email.getSubject();
+                    barcodeWrapper.message = email.getBody();
+                }
+                break;
+
+            case Barcode.TYPE_SMS:
+                Barcode.Sms sms = barcode.getSms();
+                if (sms != null) {
+                    barcodeWrapper.recipient = sms.getPhoneNumber();
+                    barcodeWrapper.message = sms.getMessage();
+                }
+                break;
+
             default:
                 Log.d(TAG, "default");
                 // No additional params to set, directly inserting to the DB
                 break;
         }
 
-        insertToDb(barcodeWrapper);
+        ResultContent.restoreMessageFields(barcodeWrapper);
+        return barcodeWrapper;
+    }
+
+    private static String eventDate(Barcode.CalendarDateTime date) {
+        if (date == null) return null;
+        return String.format(java.util.Locale.US, "%04d/%02d/%02d %02d:%02d",
+                date.getYear(), date.getMonth(), date.getDay(), date.getHours(), date.getMinutes());
     }
 
     public void release() {

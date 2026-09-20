@@ -3,6 +3,8 @@ package com.auroid.qrscanner.serializable;
 import com.google.gson.annotations.SerializedName;
 
 public class BarcodeWrapper {
+    @SerializedName("barcodeFormat")
+    public Integer barcodeFormat;
 
     @SerializedName("valueFormat")
     public int valueFormat;
@@ -22,6 +24,12 @@ public class BarcodeWrapper {
     public ContactWrapper contactWrapper;
     @SerializedName("wifiWrapper")
     public WiFiWrapper wifiWrapper;
+    @SerializedName("recipient")
+    public String recipient;
+    @SerializedName("subject")
+    public String subject;
+    @SerializedName("message")
+    public String message;
 
     public BarcodeWrapper(int valueFormat, String displayValue, String rawValue) {
         this.valueFormat = valueFormat;

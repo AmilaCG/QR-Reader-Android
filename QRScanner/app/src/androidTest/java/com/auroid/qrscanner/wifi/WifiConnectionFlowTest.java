@@ -2,12 +2,10 @@ package com.auroid.qrscanner.wifi;
 
 import android.app.Activity;
 import android.app.Instrumentation;
-import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
 import android.net.wifi.WifiNetworkSuggestion;
-import android.os.Build;
 import android.provider.Settings;
 
 import androidx.test.core.app.ActivityScenario;
@@ -53,35 +51,25 @@ public class WifiConnectionFlowTest {
     }
 
     @Test
-    public void missingWifiPayloadCanBeDisplayedAndRejected() {
+    public void missingWifiPayloadShowsDetailsWithoutActions() {
         try (ActivityScenario<BarcodeResultActivity> scenario = scan(null)) {
-            onView(withId(R.id.ib_action)).perform(click());
-            onView(withText(R.string.wifi_invalid_ssid)).check(matches(isDisplayed()));
+            onView(withText(R.string.wifi_invalid_credentials)).check(matches(isDisplayed()));
+            onView(withId(R.id.ib_action)).check(matches(
+                    androidx.test.espresso.matcher.ViewMatchers.withEffectiveVisibility(
+                            androidx.test.espresso.matcher.ViewMatchers.Visibility.GONE)));
         }
     }
 
     @Test
-    public void historyResolvesWrappedContextAndOffersSeparatePasswordCopy() {
+    public void historyResolvesWrappedContextAndShowsSettingsWithoutPasswordCopy() {
         try (ActivityScenario<ScanHistoryActivity> scenario = ActivityScenario.launch(ScanHistoryActivity.class)) {
             onView(withId(R.id.top_action_title)).check(matches(isDisplayed()));
             scenario.onActivity(activity -> new ActionHandler(new ContextWrapper(activity),
                     barcode(new WiFiWrapper(999, "test-secret", "Test"))).connectToWifi());
             onView(withText(R.string.wifi_unsupported_security)).inRoot(isDialog()).check(matches(isDisplayed()));
-            onView(withText(R.string.wifi_copy_password)).inRoot(isDialog()).perform(click());
+            onView(withText(R.string.wifi_copy_password)).inRoot(isDialog()).check(doesNotExist());
             onView(withText(R.string.wifi_open_settings)).inRoot(isDialog()).check(matches(isDisplayed()));
-            scenario.onActivity(activity -> {
-                ClipboardManager clipboard = activity.getSystemService(ClipboardManager.class);
-                assertNotNull(clipboard.getPrimaryClip());
-                assertEquals("Clipboard source: " + clipboard.getPrimaryClipDescription().getLabel(),
-                        "test-secret", clipboard.getPrimaryClip().getItemAt(0).getText().toString());
-                // Android 13+ uses this flag to hide the password in clipboard previews.
-                // Older clipboard services may discard the extras when copying the description.
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    assertNotNull(clipboard.getPrimaryClipDescription().getExtras());
-                    assertTrue(clipboard.getPrimaryClipDescription().getExtras()
-                            .getBoolean("android.content.extra.IS_SENSITIVE"));
-                }
-            });
+            onView(withText(R.string.close)).inRoot(isDialog()).check(matches(isDisplayed()));
         }
     }
 

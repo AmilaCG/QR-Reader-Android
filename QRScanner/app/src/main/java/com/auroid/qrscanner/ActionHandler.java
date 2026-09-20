@@ -7,15 +7,11 @@ import android.content.ClipboardManager;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.PersistableBundle;
 import android.provider.CalendarContract;
 import android.provider.ContactsContract;
-import android.telephony.PhoneNumberUtils;
 import android.text.SpannableStringBuilder;
-import android.text.Spanned;
-import android.text.style.StyleSpan;
 import android.text.util.Linkify;
 import android.util.Log;
 import android.widget.Toast;
@@ -31,11 +27,8 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.google.mlkit.vision.barcode.common.Barcode;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Locale;
 
 public class ActionHandler {
 
@@ -54,10 +47,11 @@ public class ActionHandler {
     public void openBrowser() {
         mFirebaseAnalytics.logEvent("action_open_browser", null);
         String url = mBarcodeWrapper.url;
+        if (!ResultContent.has(url)) return;
 
         Uri webUri = Uri.parse(url);
-        if (!url.startsWith("http://") && !url.startsWith("https://")) {
-            webUri = Uri.parse("http://" + url);
+        if (webUri.getScheme() == null) {
+            webUri = Uri.parse("https://" + url);
         }
 
         Intent intent = new Intent(Intent.ACTION_VIEW);
@@ -76,8 +70,8 @@ public class ActionHandler {
         String number = mBarcodeWrapper.phoneNumber;
 
         Intent intent = new Intent(Intent.ACTION_DIAL);
-        intent.setData(Uri.parse("tel:"+number));
-        mContext.startActivity(intent);
+        intent.setData(Uri.fromParts("tel", number, null));
+        launch(intent);
     }
 
     public void openMaps() {
@@ -88,46 +82,24 @@ public class ActionHandler {
         Uri coordinates = Uri.parse(geo);
 
         Intent intent = new Intent(Intent.ACTION_VIEW, coordinates);
-        intent.setPackage("com.google.android.apps.maps");
-        if (intent.resolveActivity(mContext.getPackageManager()) != null) {
-            mContext.startActivity(intent);
-        } else {
-            Toast.makeText(mContext, R.string.error_open_maps, Toast.LENGTH_LONG).show();
-        }
+        launch(intent);
     }
 
     public void addToCalender() {
         mFirebaseAnalytics.logEvent("action_add_to_calender", null);
-        long startDate;
-        long endDate;
-
-        Date dateStart = null;
-        Date dateEnd = null;
-        try {
-            dateStart = new SimpleDateFormat("yyyy/MM/dd HH:mm", Locale.US)
-                    .parse(mBarcodeWrapper.eventWrapper.start);
-            dateEnd = new SimpleDateFormat("yyyy/MM/dd HH:mm", Locale.US)
-                    .parse(mBarcodeWrapper.eventWrapper.end);
-        } catch (ParseException e) {
-            FirebaseCrashlytics.getInstance().recordException(e);
-            Log.e(TAG, "addToCalender: Date parsing failed", e);
-        }
-        if (dateStart == null || dateEnd == null) {
-            Log.e(TAG, "addToCalender: date is null");
-            return;
-        }
-
-        startDate = dateStart.getTime();
-        endDate = dateEnd.getTime();
-
+        EventWrapper event = mBarcodeWrapper.eventWrapper;
+        if (event == null) return;
+        Date start = ResultContent.parseDate(event.start);
+        Date end = ResultContent.parseDate(event.end);
+        if (start == null) return;
         Intent intent = new Intent(Intent.ACTION_INSERT);
         intent.setType("vnd.android.cursor.item/event");
 
         intent.putExtra(CalendarContract.Events.TITLE, mBarcodeWrapper.eventWrapper.summary);
         intent.putExtra(CalendarContract.Events.EVENT_LOCATION, mBarcodeWrapper.eventWrapper.location);
         intent.putExtra(CalendarContract.Events.ORGANIZER, mBarcodeWrapper.eventWrapper.organizer);
-        intent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, startDate);
-        intent.putExtra(CalendarContract.EXTRA_EVENT_END_TIME, endDate);
+        intent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, start.getTime());
+        if (end != null && !end.before(start)) intent.putExtra(CalendarContract.EXTRA_EVENT_END_TIME, end.getTime());
         intent.putExtra(CalendarContract.Events.STATUS, mBarcodeWrapper.eventWrapper.status);
         intent.putExtra(CalendarContract.Events.DESCRIPTION, mBarcodeWrapper.eventWrapper.description);
 
@@ -143,6 +115,7 @@ public class ActionHandler {
     public void addToContacts() {
         mFirebaseAnalytics.logEvent("action_add_to_contacts", null);
         ContactWrapper contactWrapper = mBarcodeWrapper.contactWrapper;
+        if (contactWrapper == null) return;
 
         Intent intent = new Intent(Intent.ACTION_INSERT);
         intent.setType(ContactsContract.Contacts.CONTENT_TYPE);
@@ -153,7 +126,8 @@ public class ActionHandler {
 
         ArrayList<ContentValues> data = new ArrayList<>();
         // Adding URL's
-        for (int i = 0; i < contactWrapper.urls.length; i++) {
+        for (int i = 0; contactWrapper.urls != null && i < contactWrapper.urls.length; i++) {
+            if (!ResultContent.has(contactWrapper.urls[i])) continue;
             ContentValues row = new ContentValues();
             row.put(ContactsContract.RawContacts.Data.MIMETYPE,
                     ContactsContract.CommonDataKinds.Website.CONTENT_ITEM_TYPE);
@@ -163,7 +137,8 @@ public class ActionHandler {
         }
 
         // Adding phone numbers
-        for (int i = 0; i < contactWrapper.phones.length; i++) {
+        for (int i = 0; contactWrapper.phones != null && i < contactWrapper.phones.length; i++) {
+            if (contactWrapper.phones[i] == null || !ResultContent.has(contactWrapper.phones[i].number)) continue;
             ContentValues row = new ContentValues();
             row.put(ContactsContract.RawContacts.Data.MIMETYPE,
                     ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE);
@@ -176,7 +151,8 @@ public class ActionHandler {
             data.add(row);
         }
         // Adding email addressees
-        for (int i = 0; i < contactWrapper.emails.length; i++) {
+        for (int i = 0; contactWrapper.emails != null && i < contactWrapper.emails.length; i++) {
+            if (contactWrapper.emails[i] == null || !ResultContent.has(contactWrapper.emails[i].address)) continue;
             ContentValues row = new ContentValues();
             row.put(ContactsContract.RawContacts.Data.MIMETYPE,
                     ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE);
@@ -188,36 +164,19 @@ public class ActionHandler {
 
             data.add(row);
         }
-        // Due to some unknown reason, addresses are not passing to contacts in some devices.
-        // Therefore temporarily commented out below code and used an alternative method to set a
-        // single address. This issue will be fixed in the future.
-        // Adding addressees
-        /*for (int i = 0; i < contactWrapper.addresses.length; i++) {
-            ContentValues row = new ContentValues();
-            row.put(ContactsContract.RawContacts.Data.MIMETYPE,
-                    ContactsContract.CommonDataKinds.StructuredPostal.CONTENT_ITEM_TYPE);
-
-            StringBuilder postalAddress = new StringBuilder();
-            for (int j = 0; j < contactWrapper.addresses[i].addressLines.length; j++) {
-                postalAddress.append(contactWrapper.addresses[i].addressLines[j]);
-                if (j > 0) postalAddress.append(" ");
+        // Keep the existing single-address insertion path, preserving every address line.
+        if (contactWrapper.addresses != null) {
+            for (com.auroid.qrscanner.serializable.AddressWrapper address : contactWrapper.addresses) {
+                if (address == null || !ResultContent.has(ResultContent.address(address.addressLines))) continue;
+                intent.putExtra(ContactsContract.Intents.Insert.POSTAL, ResultContent.address(address.addressLines));
+                intent.putExtra(ContactsContract.Intents.Insert.POSTAL_TYPE,
+                        TypeSelector.selectAddressType(address.type));
+                break;
             }
-            row.put(ContactsContract.CommonDataKinds.StructuredPostal.FORMATTED_ADDRESS,
-                    postalAddress.toString());
-
-            row.put(ContactsContract.CommonDataKinds.StructuredPostal.TYPE,
-                    TypeSelector.selectAddressType(contactWrapper.addresses[i].type));
-            data.add(row);
-        }*/
-        if (contactWrapper.addresses.length != 0) {
-            intent.putExtra(ContactsContract.Intents.Insert.POSTAL,
-                    contactWrapper.addresses[0].addressLines[0]);
-            intent.putExtra(ContactsContract.Intents.Insert.POSTAL_TYPE,
-                    TypeSelector.selectAddressType(contactWrapper.addresses[0].type));
         }
 
         intent.putParcelableArrayListExtra(ContactsContract.Intents.Insert.DATA, data);
-        mContext.startActivity(intent);
+        launch(intent);
     }
 
     public void connectToWifi() {
@@ -286,173 +245,99 @@ public class ActionHandler {
     }
 
     public String getFormattedEventDetails() {
-        EventWrapper calEvent = mBarcodeWrapper.eventWrapper;
-
-        return "Title: " + calEvent.summary + "\n"
-                + "Location: " + calEvent.location + "\n"
-                + "Organizer: " + calEvent.organizer + "\n"
-                + "Start: " + calEvent.start + "\n"
-                + "End: " + calEvent.end + "\n"
-                + "Status: " + calEvent.status + "\n"
-                + "Description: " + calEvent.description;
+        return ResultContent.eventDetails(mBarcodeWrapper.eventWrapper);
     }
 
     public SpannableStringBuilder getFormattedContactDetails() {
-        ContactWrapper contact = mBarcodeWrapper.contactWrapper;
-
-        int cursor = 0;
-
-        SpannableStringBuilder ssb = new SpannableStringBuilder();
-
-        String nameHeading = "Name:\n";
-        ssb.append(nameHeading);
-        ssb.setSpan(new StyleSpan(Typeface.BOLD), cursor, cursor += nameHeading.length(),
-                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-        ssb.append(contact.formattedName);
-        cursor += contact.formattedName.length();
-
-        ssb.append("\n\n");
-        cursor += 2;
-
-        if (!contact.title.equals("")) {
-            String titleHeading = "Title:\n";
-            ssb.append(titleHeading);
-            ssb.setSpan(new StyleSpan(Typeface.BOLD), cursor, cursor += titleHeading.length(),
-                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-            ssb.append(contact.title);
-            cursor += contact.title.length();
-
-            ssb.append("\n\n");
-            cursor += 2;
+        SpannableStringBuilder text = new SpannableStringBuilder(
+                ResultContent.contactDetails(mBarcodeWrapper.contactWrapper));
+        java.util.regex.Matcher headings = java.util.regex.Pattern.compile(
+                "(?m)^(Name|Company|Title|Phone|Email|Website|Address):").matcher(text);
+        while (headings.find()) {
+            text.setSpan(new android.text.style.StyleSpan(android.graphics.Typeface.BOLD),
+                    headings.start(), headings.end(), android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
+        Linkify.addLinks(text, Linkify.WEB_URLS | Linkify.EMAIL_ADDRESSES | Linkify.PHONE_NUMBERS);
+        return text;
+    }
 
-        if (!contact.organization.equals("")) {
-            String orgHeading = "Company:\n";
-            ssb.append(orgHeading);
-            ssb.setSpan(new StyleSpan(Typeface.BOLD), cursor, cursor += orgHeading.length(),
-                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-            ssb.append(contact.organization);
-            cursor += contact.organization.length();
-
-            ssb.append("\n\n");
-            cursor += 2;
+    public CharSequence getDetails() {
+        switch (mBarcodeWrapper.valueFormat) {
+            case Barcode.TYPE_CONTACT_INFO: return getFormattedContactDetails();
+            case Barcode.TYPE_CALENDAR_EVENT: return getFormattedEventDetails();
+            case Barcode.TYPE_WIFI: return getFormattedWiFiDetails();
+            case Barcode.TYPE_EMAIL:
+            case Barcode.TYPE_SMS: return ResultContent.messageDetails(mBarcodeWrapper);
+            default: return ResultContent.summary(mBarcodeWrapper);
         }
+    }
 
-        for (int i = 0; i < contact.phones.length; i++) {
-            if (i == 0) {
-                String contactHeading = "Contact Numbers:\n";
-                ssb.append(contactHeading);
-                ssb.setSpan(new StyleSpan(Typeface.BOLD), cursor, cursor += contactHeading.length(),
-                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-            }
-            String phoneType = TypeSelector.phoneTypeAsString(contact.phones[i].type);
-            ssb.append(phoneType);
-            ssb.setSpan(new StyleSpan(Typeface.ITALIC), cursor, cursor += phoneType.length(),
-                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-            ssb.append(": ");
-            cursor += 2;
-
-            String phoneNum = PhoneNumberUtils.formatNumber(contact.phones[i].number, "US");
-            if (phoneNum == null) {
-                phoneNum = contact.phones[i].number.replaceAll("[-,+]","");
-            }
-            ssb.append(phoneNum);
-            // Inserting a space to the end to avoid unintended behaviours when scrolling
-            ssb.append(" ");
-            // adding 1 to count the additional space character
-            cursor += phoneNum.length() + 1;
-
-            ssb.append("\n");
-            cursor += 1;
+    public void perform(ResultActions.Action action) {
+        // Recheck missing data even if the caller retained an old action list.
+        if (!ResultActions.forBarcode(mBarcodeWrapper).contains(action)) return;
+        switch (action) {
+            case OPEN_URL: openBrowser(); break;
+            case DIAL: openDialer(); break;
+            case MAP: openMaps(); break;
+            case CONTACT: addToContacts(); break;
+            case CALENDAR: addToCalender(); break;
+            case CONNECT: connectToWifi(); break;
+            case COPY_SSID: copyWifiSsid(); break;
+            case COPY_PASSWORD: copyWifiPassword(); break;
+            case COPY: copyToClipboard(); break;
+            case SEARCH: webSearch(); break;
+            case SMS:
+            case COMPOSE_SMS:
+            case EMAIL: launch(createComposeIntent(action)); break;
+            case SHARE_URL:
+            case SHARE_LOCATION:
+                Intent share = new Intent(Intent.ACTION_SEND).setType("text/plain");
+                share.putExtra(Intent.EXTRA_TEXT, action == ResultActions.Action.SHARE_URL
+                        ? mBarcodeWrapper.url : "https://maps.google.com/?q=" + ResultContent.coordinates(mBarcodeWrapper));
+                launch(Intent.createChooser(share, mContext.getString(action.label)));
+                break;
+            default:
+                copyText(mContext.getString(action.label), copyValue(action), false);
         }
+    }
 
-        ssb.append("\n");
-        cursor += 1;
-
-        for (int i = 0; i < contact.emails.length; i++) {
-            if (i == 0) {
-                String emailHeading = "Email Addresses:\n";
-                ssb.append(emailHeading);
-                ssb.setSpan(new StyleSpan(Typeface.BOLD), cursor, cursor += emailHeading.length(),
-                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-            }
-            String emailType = TypeSelector.emailTypeAsString(contact.emails[i].type);
-            ssb.append(emailType);
-            ssb.setSpan(new StyleSpan(Typeface.ITALIC), cursor, cursor += emailType.length(),
-                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-            ssb.append(": ");
-            cursor += 2;
-
-            String emailAddr = contact.emails[i].address;
-            ssb.append(emailAddr);
-            // Inserting a space to the end to avoid unintended behaviours when scrolling
-            ssb.append(" ");
-            // adding 1 to count the additional space character
-            cursor += emailAddr.length() + 1;
-
-            ssb.append("\n");
-            cursor += 1;
+    String copyValue(ResultActions.Action action) {
+        switch (action) {
+            case COPY_URL: return mBarcodeWrapper.url;
+            case COPY_NUMBER: return mBarcodeWrapper.valueFormat == Barcode.TYPE_SMS
+                    ? mBarcodeWrapper.recipient : mBarcodeWrapper.phoneNumber;
+            case COPY_COORDINATES: return ResultContent.coordinates(mBarcodeWrapper);
+            case COPY_ADDRESS: return mBarcodeWrapper.recipient;
+            case COPY_MESSAGE: return mBarcodeWrapper.message;
+            case COPY_DETAILS: return getDetails().toString();
+            default: throw new IllegalArgumentException("Not a field copy action");
         }
+    }
 
-        ssb.append("\n");
-        cursor += 1;
-
-        for (int i = 0; i < contact.urls.length; i++) {
-            if (i == 0) {
-                String webHeading = "Websites:\n";
-                ssb.append(webHeading);
-                ssb.setSpan(new StyleSpan(Typeface.BOLD), cursor, cursor += webHeading.length(),
-                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-            }
-
-            String url = contact.urls[i];
-            ssb.append(url);
-            // Inserting a space to the end to avoid unintended behaviours when scrolling
-            ssb.append(" ");
-            // adding 1 to count the additional space character
-            cursor += url.length() + 1;
-
-            ssb.append("\n");
-            cursor += 1;
+    Intent createComposeIntent(ResultActions.Action action) {
+        ResultContent.restoreMessageFields(mBarcodeWrapper);
+        if (action == ResultActions.Action.EMAIL) {
+            String uri = "mailto:" + Uri.encode(mBarcodeWrapper.recipient, "@,+")
+                    + "?subject=" + Uri.encode(ResultContent.safe(mBarcodeWrapper.subject))
+                    + "&body=" + Uri.encode(ResultContent.safe(mBarcodeWrapper.message));
+            return new Intent(Intent.ACTION_SENDTO, Uri.parse(uri))
+                    .putExtra(Intent.EXTRA_EMAIL, new String[]{mBarcodeWrapper.recipient})
+                    .putExtra(Intent.EXTRA_SUBJECT, mBarcodeWrapper.subject)
+                    .putExtra(Intent.EXTRA_TEXT, mBarcodeWrapper.message);
         }
+        String number = action == ResultActions.Action.SMS
+                ? mBarcodeWrapper.phoneNumber : mBarcodeWrapper.recipient;
+        Intent intent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts("smsto", number, null));
+        if (action == ResultActions.Action.COMPOSE_SMS) intent.putExtra("sms_body", mBarcodeWrapper.message);
+        return intent;
+    }
 
-        ssb.append("\n");
-        cursor += 1;
-
-        for (int i = 0; i < contact.addresses.length; i++) {
-            if (i == 0) {
-                String addrHeading = "Addresses:\n";
-                ssb.append(addrHeading);
-                ssb.setSpan(new StyleSpan(Typeface.BOLD), cursor, cursor += addrHeading.length(),
-                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-            }
-            if (i > 0) {
-                ssb.append("\n\n");
-                cursor += 2;
-            }
-            String addressType = TypeSelector.addressTypeAsString(contact.addresses[i].type);
-            ssb.append(addressType);
-            ssb.setSpan(new StyleSpan(Typeface.ITALIC), cursor, cursor += addressType.length(),
-                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-            ssb.append(":\n");
-            cursor += 2;
-
-            String address = contact.addresses[i].addressLines[0];
-            ssb.append(address);
-            // Inserting a space to the end to avoid unintended behaviours when scrolling
-            ssb.append(" ");
-            // adding 1 to count the additional space character
-            cursor += address.length() + 1;
+    private void launch(Intent intent) {
+        try {
+            mContext.startActivity(intent);
+        } catch (ActivityNotFoundException | SecurityException e) {
+            Toast.makeText(mContext, R.string.error_action_unavailable, Toast.LENGTH_LONG).show();
         }
-
-        Linkify.addLinks(ssb, Linkify.ALL);
-        return ssb;
     }
 
     public String getFormattedWiFiDetails() {

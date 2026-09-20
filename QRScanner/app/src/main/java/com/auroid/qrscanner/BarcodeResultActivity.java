@@ -48,7 +48,7 @@ public class BarcodeResultActivity extends AppCompatActivity implements View.OnC
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
             String barcodeJson = bundle.getString("RESULT");
-            mBarcodeFormat = bundle.getInt("FORMAT");
+            mBarcodeFormat = bundle.getInt("FORMAT", Barcode.FORMAT_UNKNOWN);
             Gson gson = new Gson();
             try {
                 mBarcodeWrapper = gson.fromJson(barcodeJson, BarcodeWrapper.class);
@@ -73,158 +73,77 @@ public class BarcodeResultActivity extends AppCompatActivity implements View.OnC
         }
 
         TextView tvBarcodeFormat = findViewById(R.id.barcode_format);
-        String format = TypeSelector.barcodeFormatAsString(mBarcodeFormat);
-        tvBarcodeFormat.setText(format);
+        if (mBarcodeWrapper.barcodeFormat != null) {
+            mBarcodeFormat = mBarcodeWrapper.barcodeFormat;
+        }
+        if (mBarcodeFormat > 0) {
+            tvBarcodeFormat.setText(TypeSelector.barcodeFormatAsString(mBarcodeFormat));
+        } else {
+            tvBarcodeFormat.setVisibility(View.GONE);
+        }
         showResult();
     }
 
     private void showResult() {
-        String result = mBarcodeWrapper.displayValue;
-        String rawValue = mBarcodeWrapper.rawValue;
         mResultType = mBarcodeWrapper.valueFormat;
-
-        TextView tvResultType = findViewById(R.id.result_type);
-        TextView tvBarcodeResult = findViewById(R.id.barcode_result);
-        tvBarcodeResult.setText(result);
-
-        TextView tvAction = findViewById(R.id.txt_action);
-        ImageButton ibAction = findViewById(R.id.ib_action);
-
-        switch (mResultType) {
-            case Barcode.TYPE_URL:
-                Log.d(TAG, "URL");
-                tvResultType.setText(R.string.type_web);
-                tvBarcodeResult.setText(rawValue);
-                tvAction.setText(R.string.action_web);
-                ibAction.setImageResource(R.drawable.ic_public_black_44dp);
-                break;
-
-            case Barcode.TYPE_PHONE:
-                Log.d(TAG, "PHONE");
-                tvResultType.setText(R.string.type_phone);
-                tvAction.setText(R.string.action_phone);
-                ibAction.setImageResource(R.drawable.ic_phone_black_38dp);
-                break;
-
-            case Barcode.TYPE_GEO:
-                Log.d(TAG, "GEO");
-                tvResultType.setText(R.string.type_geo);
-                tvAction.setText(R.string.action_geo);
-                ibAction.setImageResource(R.drawable.ic_location_on_black_38dp);
-                break;
-
-            case Barcode.TYPE_CALENDAR_EVENT:
-                Log.d(TAG, "CALENDAR_EVENT");
-                tvResultType.setText(R.string.type_calender);
-                ActionHandler actionEvent = new ActionHandler(this, mBarcodeWrapper);
-                tvBarcodeResult.setText(actionEvent.getFormattedEventDetails());
-                tvBarcodeResult.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
-
-                tvAction.setText(R.string.action_calender);
-                ibAction.setImageResource(R.drawable.ic_calender_black_38dp);
-                break;
-
-            case Barcode.TYPE_CONTACT_INFO:
-                Log.d(TAG, "CONTACT_INFO");
-                tvResultType.setText(R.string.type_contact);
-                ActionHandler actionContact = new ActionHandler(this, mBarcodeWrapper);
-                tvBarcodeResult.setText(actionContact.getFormattedContactDetails());
-                tvBarcodeResult.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
-                tvBarcodeResult.setTextSize(18);
-                tvBarcodeResult.setMovementMethod(LinkMovementMethod.getInstance());
-
-                tvAction.setText(R.string.action_contact);
-                ibAction.setImageResource(R.drawable.ic_person_add_black_38dp);
-                break;
-
-            case Barcode.TYPE_WIFI:
-                Log.d(TAG, "WIFI");
-                tvResultType.setText(R.string.type_wifi);
-                ActionHandler actionWifi = new ActionHandler(this, mBarcodeWrapper);
-                tvBarcodeResult.setText(actionWifi.getFormattedWiFiDetails());
-
-                tvAction.setText(R.string.action_wifi);
-                ibAction.setImageResource(R.drawable.ic_wifi_black_38);
-                ibAction.setContentDescription(getString(R.string.action_wifi));
-
-                TextView copyLabel = findViewById(R.id.txt_copy);
-                copyLabel.setText(R.string.wifi_copy_ssid);
-                ImageButton copyButton = findViewById(R.id.ib_copy);
-                copyButton.setContentDescription(getString(R.string.wifi_copy_ssid));
-                copyButton.setOnClickListener(v -> actionWifi.copyWifiSsid());
-
-                TextView passwordLabel = findViewById(R.id.txt_search);
-                passwordLabel.setText(R.string.wifi_copy_password);
-                ImageButton passwordButton = findViewById(R.id.ib_search);
-                passwordButton.setImageResource(R.drawable.ic_content_copy_black_36dp);
-                passwordButton.setContentDescription(getString(R.string.wifi_copy_password));
-                passwordButton.setOnClickListener(v -> actionWifi.copyWifiPassword());
-                int passwordVisibility = actionWifi.hasWifiPassword() ? View.VISIBLE : View.GONE;
-                passwordLabel.setVisibility(passwordVisibility);
-                passwordButton.setVisibility(passwordVisibility);
-                break;
-
-            case Barcode.TYPE_PRODUCT:
-                Log.d(TAG, "Product");
-                tvResultType.setText(R.string.type_product);
-                tvAction.setVisibility(View.GONE);
-                ibAction.setVisibility(View.GONE);
-                break;
-
-            case Barcode.TYPE_ISBN:
-                Log.d(TAG, "ISBN");
-                tvResultType.setText(R.string.type_isbn);
-                tvAction.setVisibility(View.GONE);
-                ibAction.setVisibility(View.GONE);
-                break;
-
-            default:
-                Log.d(TAG, "default");
-                tvResultType.setText(R.string.type_text);
-                tvAction.setVisibility(View.GONE);
-                ibAction.setVisibility(View.GONE);
-                break;
+        ActionHandler handler = new ActionHandler(this, mBarcodeWrapper);
+        ((TextView) findViewById(R.id.result_type)).setText(ResultActions.typeLabel(mResultType));
+        TextView details = findViewById(R.id.barcode_result);
+        details.setText(handler.getDetails());
+        if (mResultType == Barcode.TYPE_CONTACT_INFO || mResultType == Barcode.TYPE_CALENDAR_EVENT
+                || mResultType == Barcode.TYPE_EMAIL || mResultType == Barcode.TYPE_SMS) {
+            details.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
+            details.setTextSize(18);
         }
-    }
+        details.setMovementMethod(mResultType == Barcode.TYPE_CONTACT_INFO
+                ? LinkMovementMethod.getInstance() : android.text.method.ScrollingMovementMethod.getInstance());
 
-    public void doAction(View v) {
-        ActionHandler actionHandler = new ActionHandler(this, mBarcodeWrapper);
-
-        switch (mResultType) {
-            case Barcode.TYPE_URL:
-                actionHandler.openBrowser();
-                break;
-
-            case Barcode.TYPE_PHONE:
-                actionHandler.openDialer();
-                break;
-
-            case Barcode.TYPE_CALENDAR_EVENT:
-                actionHandler.addToCalender();
-                break;
-
-            case Barcode.TYPE_GEO:
-                actionHandler.openMaps();
-                break;
-
-            case Barcode.TYPE_CONTACT_INFO:
-                actionHandler.addToContacts();
-                break;
-
-            case Barcode.TYPE_WIFI:
-                actionHandler.connectToWifi();
-                break;
+        java.util.List<ResultActions.Action> actions = ResultActions.forBarcode(mBarcodeWrapper);
+        int[] buttons = {R.id.ib_action, R.id.ib_copy, R.id.ib_search};
+        int[] labels = {R.id.txt_action, R.id.txt_copy, R.id.txt_search};
+        for (int i = 0; i < buttons.length; i++) {
+            ImageButton button = findViewById(buttons[i]);
+            TextView label = findViewById(labels[i]);
+            boolean visible = i < actions.size();
+            button.setVisibility(visible ? View.VISIBLE : View.GONE);
+            label.setVisibility(visible ? View.VISIBLE : View.GONE);
+            if (visible) {
+                ResultActions.Action action = actions.get(i);
+                button.setImageResource(action.icon);
+                button.setContentDescription(getString(action.label));
+                label.setText(action.label);
+                button.setOnClickListener(v -> handler.perform(action));
+            }
         }
-    }
-
-    public void copyToClipboard(View view) {
-        ActionHandler actionHandler = new ActionHandler(this, mBarcodeWrapper);
-        actionHandler.copyToClipboard();
-    }
-
-    public void webSearch(View view) {
-        ActionHandler actionHandler = new ActionHandler(this, mBarcodeWrapper);
-        actionHandler.webSearch();
+        // Keep the existing button chain evenly spaced when one or two actions are present.
+        androidx.constraintlayout.widget.ConstraintLayout layout =
+                (androidx.constraintlayout.widget.ConstraintLayout) findViewById(R.id.ib_copy).getParent();
+        androidx.constraintlayout.widget.ConstraintSet constraints = new androidx.constraintlayout.widget.ConstraintSet();
+        constraints.clone(layout);
+        constraints.connect(R.id.barcode_result, androidx.constraintlayout.widget.ConstraintSet.BOTTOM,
+                actions.isEmpty() ? androidx.constraintlayout.widget.ConstraintSet.PARENT_ID : buttons[0],
+                actions.isEmpty() ? androidx.constraintlayout.widget.ConstraintSet.BOTTOM
+                        : androidx.constraintlayout.widget.ConstraintSet.TOP, 16);
+        for (int button : buttons) {
+            constraints.clear(button, androidx.constraintlayout.widget.ConstraintSet.START);
+            constraints.clear(button, androidx.constraintlayout.widget.ConstraintSet.END);
+        }
+        if (actions.size() == 1) {
+            constraints.connect(buttons[0], androidx.constraintlayout.widget.ConstraintSet.START,
+                    androidx.constraintlayout.widget.ConstraintSet.PARENT_ID, androidx.constraintlayout.widget.ConstraintSet.START);
+            constraints.connect(buttons[0], androidx.constraintlayout.widget.ConstraintSet.END,
+                    androidx.constraintlayout.widget.ConstraintSet.PARENT_ID, androidx.constraintlayout.widget.ConstraintSet.END);
+        } else if (actions.size() > 1) {
+            int[] visibleButtons = java.util.Arrays.copyOf(buttons, actions.size());
+            constraints.createHorizontalChainRtl(
+                    androidx.constraintlayout.widget.ConstraintSet.PARENT_ID,
+                    androidx.constraintlayout.widget.ConstraintSet.START,
+                    androidx.constraintlayout.widget.ConstraintSet.PARENT_ID,
+                    androidx.constraintlayout.widget.ConstraintSet.END,
+                    visibleButtons,
+                    null, androidx.constraintlayout.widget.ConstraintSet.CHAIN_SPREAD);
+        }
+        constraints.applyTo(layout);
     }
 
     @Override
