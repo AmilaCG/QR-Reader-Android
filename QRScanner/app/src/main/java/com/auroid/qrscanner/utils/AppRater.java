@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 
 public final class AppRater implements DefaultLifecycleObserver {
     private static final String TAG = "AppRater";
-    private static final long COOLDOWN_MS = TimeUnit.DAYS.toMillis(90);
+    private static final long COOLDOWN_MS = TimeUnit.DAYS.toMillis(60);
     // A session lasts for this app process, including activity recreation.
     private static boolean mAttemptedThisSession;
 
