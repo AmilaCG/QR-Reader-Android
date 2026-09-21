@@ -50,6 +50,10 @@ public class FrameAnalyzer implements ImageAnalysis.Analyzer {
 
     @Override
     public void analyze(@NonNull ImageProxy imageProxy) {
+        if (!mWorkflowModel.isCameraLive()) {
+            imageProxy.close();
+            return;
+        }
         int rotationDegrees = imageProxy.getImageInfo().getRotationDegrees();
         //TODO: Find a method to crop and feed only the reticle box area for processing, without
         // converting to a bitmap

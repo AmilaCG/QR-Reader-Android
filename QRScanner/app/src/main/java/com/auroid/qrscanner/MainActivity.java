@@ -14,6 +14,8 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.camera.lifecycle.ProcessCameraProvider;
@@ -21,6 +23,7 @@ import androidx.camera.view.PreviewView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.Lifecycle;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.google.common.base.Objects;
@@ -59,6 +62,10 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
     private AudioHandler mAudioHandler;
 
     private FirebaseAnalytics mFirebaseAnalytics;
+    private AppRater mAppRater;
+    private boolean mReturnedFromScan;
+    private final ActivityResultLauncher<Intent> mScanResultLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(), result -> mReturnedFromScan = true);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,6 +93,7 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
         mAudioHandler.setupAudioBeep();
 
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+        mAppRater = new AppRater(this);
 
         setUpWorkflowModel();
         mWorkflowModel.setWorkflowState(WorkflowState.CAMERA_UNAVAILABLE);
@@ -94,11 +102,6 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
         if (getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)
                 && rc != PackageManager.PERMISSION_GRANTED) {
             requestCameraPermission();
-        }
-
-        // Only run at the first time activity launches
-        if (savedInstanceState == null) {
-            AppRater.appLaunched(this);
         }
     }
 
@@ -111,12 +114,37 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
         mGalleryButton.setEnabled(true);
         mFlashButton.setSelected(false);
         mCurrentWorkflowState = WorkflowState.NOT_STARTED;
+    }
+
+    @Override
+    protected void onResumeFragments() {
+        super.onResumeFragments();
+        // Let Android finish dispatching RESUMED before launching a prepared review.
+        boolean returnedFromScan = mReturnedFromScan;
+        mReturnedFromScan = false;
+        getWindow().getDecorView().post(() -> {
+            if (returnedFromScan) {
+                mWorkflowModel.markCameraFrozen();
+                mAppRater.launchPreparedReview(this::resumeScanning);
+            }
+            resumeScanning();
+        });
+    }
+
+    private void resumeScanning() {
+        if (isFinishing() || isDestroyed()
+                || !getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.RESUMED)) return;
+        if (mAppRater.isBusy()) {
+            mWorkflowModel.markCameraFrozen();
+            return;
+        }
         if (mCameraHandler == null
                 && getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)
                 && ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
                 == PackageManager.PERMISSION_GRANTED) {
             setupCamera();
         } else if (mCameraHandler != null && mCameraHandler.isReady()) {
+            mCurrentWorkflowState = WorkflowState.NOT_STARTED;
             mWorkflowModel.setWorkflowState(WorkflowState.DETECTING);
         } else if (mWorkflowModel.workflowState.getValue() == WorkflowState.CAMERA_UNAVAILABLE) {
             mWorkflowModel.setWorkflowState(WorkflowState.CAMERA_UNAVAILABLE);
@@ -126,6 +154,7 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
     @Override
     protected void onPause() {
         super.onPause();
+        mWorkflowModel.markCameraFrozen();
         mCurrentWorkflowState = WorkflowState.NOT_STARTED;
     }
 
@@ -215,7 +244,10 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                         case DETECTING:
                             mGuideText.setVisibility(View.VISIBLE);
                             mGuideText.setText(R.string.prompt_point_at_a_barcode);
-                            mWorkflowModel.markCameraLive();
+                            if (!mAppRater.isBusy() && getLifecycle().getCurrentState()
+                                    .isAtLeast(Lifecycle.State.RESUMED)) {
+                                mWorkflowModel.markCameraLive();
+                            }
                             break;
 
                         case DETECTED:
@@ -235,6 +267,10 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                 this,
                 barcode -> {
                     if (barcode != null) {
+                        // LiveData retains its last value across activity recreation.
+                        mWorkflowModel.detectedBarcode.setValue(null);
+                        if (mAppRater.isBusy()) return;
+                        mAppRater.recordScan();
                         ResultHandler resultHandler = new ResultHandler(this);
                         resultHandler.pushToDatabase(barcode);
 
@@ -254,7 +290,8 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                             Intent intent = new Intent(this, BarcodeResultActivity.class);
                             intent.putExtra("RESULT", resultHandler.getResultJson());
                             intent.putExtra("FORMAT", barcode.getFormat());
-                            startActivity(intent);
+                            mAppRater.prepareReview();
+                            mScanResultLauncher.launch(intent);
                         }
                         mFirebaseAnalytics.logEvent("scan_barcode", null);
                         resultHandler.release();

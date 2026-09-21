@@ -39,7 +39,7 @@ public class WorkflowModel extends AndroidViewModel {
 
     public final MutableLiveData<Barcode> detectedBarcode = new MutableLiveData<>();
 
-    private boolean isCameraLive = false;
+    private volatile boolean isCameraLive = false;
 
     public WorkflowModel(Application application) {
         super(application);
